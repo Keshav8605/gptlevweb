@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { SectionWrapper } from "../SectionWrapper";
+import { RomanticCharacter } from "../RomanticCharacter";
 
 interface RevealedContent {
   title: string;
@@ -123,14 +124,15 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
               transition={{ duration: 0.5 }}
               className="bg-white rounded-3xl p-8 sm:p-12 border border-[var(--border-subtle)] shadow-[0_8px_30px_var(--shadow-pink)] text-center relative overflow-hidden"
             >
-              {/* Floating padlock badge */}
-              <motion.div
-                animate={{ y: [0, -6, 0] }}
-                transition={{ repeat: Infinity, duration: 3.5, ease: "easeInOut" }}
-                className="w-20 h-20 mx-auto rounded-3xl bg-gradient-to-tr from-[var(--pale-rose)] to-[var(--bg-blush)] flex items-center justify-center text-3xl shadow-sm border border-white mb-6"
-              >
-                🔐
-              </motion.div>
+              {/* Cozy Snuggle Couple PNG Illustration */}
+              <div className="flex justify-center mb-6">
+                <RomanticCharacter
+                  character="cozyCouple"
+                  size={165}
+                  animation="soft-breathe"
+                  sparkles
+                />
+              </div>
 
               <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-[var(--text-primary)] mb-2">
                 Protected with Love
@@ -218,14 +220,14 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
             >
               {/* Unlocked Header */}
               <div className="text-center mb-8">
-                <motion.div
-                  initial={{ scale: 0 }}
-                  animate={{ scale: 1 }}
-                  transition={{ type: "spring", stiffness: 200, delay: 0.2 }}
-                  className="w-16 h-16 mx-auto rounded-full bg-[var(--pale-rose)] flex items-center justify-center text-3xl mb-4"
-                >
-                  🔓
-                </motion.div>
+                <div className="flex justify-center mb-4">
+                  <RomanticCharacter
+                    character="huggingCouple"
+                    size={165}
+                    animation="gentle-float"
+                    sparkles
+                  />
+                </div>
                 <span className="text-xs font-semibold uppercase tracking-widest text-[var(--pink-strong)] px-3 py-1 rounded-full bg-[var(--pale-rose)]">
                   Access Granted • Just For You
                 </span>

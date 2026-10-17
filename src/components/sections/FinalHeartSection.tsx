@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { HeartPhotoCollage } from "../HeartPhotoCollage";
-import { PandaHuggingHeart } from "../CuteIllustrations";
+import { RomanticCharacter } from "../RomanticCharacter";
 import type { Milestone } from "@/lib/gift-data";
 
 interface FinalHeartSectionProps {
@@ -105,7 +105,12 @@ export function FinalHeartSection({
             className="flex flex-col items-center mb-6"
           >
             <div className="mb-2">
-              <PandaHuggingHeart size={130} heartText="Forever" />
+              <RomanticCharacter
+                character="tenderCouple"
+                size={145}
+                animation="soft-breathe"
+                sparkles
+              />
             </div>
             <p className="font-handwritten text-2xl md:text-3xl text-[var(--pink-strong)]">
               We have been loving each other for
@@ -170,6 +175,16 @@ export function FinalHeartSection({
             transition={{ duration: 0.8 }}
             className="bg-white rounded-3xl p-8 sm:p-12 md:p-16 border border-[var(--border-subtle)] shadow-xl relative overflow-hidden"
           >
+            {/* Adorable kissing couple companion */}
+            <div className="flex justify-center mb-6">
+              <RomanticCharacter
+                character="kissingCouple"
+                size={160}
+                animation="gentle-float"
+                sparkles
+              />
+            </div>
+
             {/* Elegant Header Accent */}
             <div className="flex items-center justify-center gap-3 mb-8">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[var(--border-medium)]" />

@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { SectionWrapper } from "../SectionWrapper";
+import { RomanticCharacter } from "../RomanticCharacter";
 import type { BucketListItem } from "@/lib/gift-data";
 
 interface BucketListSectionProps {
@@ -29,6 +30,16 @@ export function BucketListSection({ items }: BucketListSectionProps) {
       emoji="🌈"
       bgVariant="default"
     >
+      {/* Cozy dreams character companion */}
+      <div className="flex justify-center -mt-3 mb-6">
+        <RomanticCharacter
+          character="cozyCouple"
+          size={140}
+          animation="gentle-float"
+          sparkles
+        />
+      </div>
+
       {/* Filters */}
       <div className="flex flex-wrap items-center justify-center gap-2 mb-10">
         {["all", "idea", "shortlisted", "planned", "completed"].map((status) => (

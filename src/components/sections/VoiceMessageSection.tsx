@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
+import { RomanticCharacter } from "../RomanticCharacter";
 import type { VoiceMessage } from "@/lib/server-db";
 
 interface VoiceMessageSectionProps {
@@ -306,6 +307,16 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         {/* Section Header */}
         <div className="text-center mb-10">
+          {/* Sweet voice whispers couple companion */}
+          <div className="flex justify-center mb-5">
+            <RomanticCharacter
+              character="kissingCouple"
+              size={135}
+              animation="gentle-float"
+              sparkles
+            />
+          </div>
+
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}

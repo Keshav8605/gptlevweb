@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { SharedInteractions } from "../interactions/SharedInteractions";
+import { RomanticCharacter } from "../RomanticCharacter";
 import type { Memory } from "@/lib/gift-data";
 
 interface MemoriesSectionProps {
@@ -97,8 +98,18 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
       bgVariant="default"
     >
       <div className="max-w-5xl mx-auto">
+        {/* Subtle character accent for memory scrapbook */}
+        <div className="flex justify-center -mt-3 mb-6">
+          <RomanticCharacter
+            character="kissingCouple"
+            size={130}
+            animation="subtle-tilt"
+            sparkles
+          />
+        </div>
+
         {/* Scrapbook Polaroid Grid (Inspired by Reference 1) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 pt-4 pb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 pt-2 pb-8">
           {displayItems.map((item, idx) => (
             <motion.div
               key={item.id}

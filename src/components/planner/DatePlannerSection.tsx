@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
 import { SectionWrapper } from "../SectionWrapper";
+import { RomanticCharacter } from "../RomanticCharacter";
 import { DateCountdownBanner } from "./DateCountdownBanner";
 import { DateIdeasCatalog } from "./DateIdeasCatalog";
 import { DateItineraryBuilder } from "./DateItineraryBuilder";
@@ -533,6 +534,16 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
       bgVariant="blush"
     >
       <div className="max-w-6xl mx-auto space-y-6">
+        {/* Playful adventurous couple companion */}
+        <div className="flex justify-center -mt-3 mb-6">
+          <RomanticCharacter
+            character="huggingCouple"
+            size={135}
+            animation="gentle-float"
+            sparkles
+          />
+        </div>
+
         {/* Top Control Bar: Active Participant, Notifications & Key Metrics */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-3xl bg-white/90 border border-[var(--border-subtle)] shadow-xs">
           {/* Active Partner Badge */}

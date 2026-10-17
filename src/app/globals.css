@@ -203,6 +203,26 @@ body {
   75% { transform: rotate(2.5deg); }
 }
 
+@keyframes gentleFloat {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-6px); }
+}
+
+@keyframes softBreathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.025); }
+}
+
+@keyframes subtleTilt {
+  0%, 100% { transform: rotate(0deg); }
+  33% { transform: rotate(-1.5deg); }
+  66% { transform: rotate(1.5deg); }
+}
+
+.animate-gentle-float { animation: gentleFloat 4.5s ease-in-out infinite; }
+.animate-soft-breathe { animation: softBreathe 5s ease-in-out infinite; }
+.animate-subtle-tilt { animation: subtleTilt 6s ease-in-out infinite; }
+
 .animate-shimmer {
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
   background-size: 200% 100%;

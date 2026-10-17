@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { SectionWrapper } from "../SectionWrapper";
 import { SharedInteractions } from "../interactions/SharedInteractions";
+import { RomanticCharacter } from "../RomanticCharacter";
 import type { ObservationCard } from "@/lib/gift-data";
 
 interface ObservationsSectionProps {
@@ -18,6 +19,16 @@ export function ObservationsSection({ observations }: ObservationsSectionProps) 
       emoji="👀"
       bgVariant="surface"
     >
+      {/* Gentle Romantic Character Accent */}
+      <div className="flex justify-center -mt-3 mb-8">
+        <RomanticCharacter
+          character="tenderCouple"
+          size={135}
+          animation="soft-breathe"
+          sparkles
+        />
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
         {observations.map((card, i) => {
           return (

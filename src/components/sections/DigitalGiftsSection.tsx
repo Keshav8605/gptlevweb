@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { SectionWrapper } from "../SectionWrapper";
+import { RomanticCharacter } from "../RomanticCharacter";
 import type { DigitalGift } from "@/lib/gift-data";
 
 export interface ClaimRecord {
@@ -126,6 +127,16 @@ export function DigitalGiftsSection({ gifts = defaultGiftsList }: DigitalGiftsSe
       bgVariant="cream"
     >
       <div className="max-w-4xl mx-auto space-y-8">
+        {/* Affectionate Gift Character Companion */}
+        <div className="flex justify-center -mt-3 mb-6">
+          <RomanticCharacter
+            character="huggingCouple"
+            size={135}
+            animation="subtle-tilt"
+            sparkles
+          />
+        </div>
+
         {/* Claimed counter badge */}
         <div className="text-center">
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] text-xs font-semibold shadow-xs">

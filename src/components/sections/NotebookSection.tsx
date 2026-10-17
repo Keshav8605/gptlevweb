@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { SectionWrapper } from "../SectionWrapper";
+import { RomanticCharacter } from "../RomanticCharacter";
 import type { JournalEntry } from "@/lib/server-db";
 
 const notebookPrompts = [
@@ -190,6 +191,16 @@ export function NotebookSection({
       bgVariant="cream"
     >
       <div className="max-w-3xl mx-auto space-y-8">
+        {/* Cozy notebook journal companion */}
+        <div className="flex justify-center -mt-3 mb-6">
+          <RomanticCharacter
+            character="cozyCouple"
+            size={135}
+            animation="soft-breathe"
+            sparkles
+          />
+        </div>
+
         {/* Top Action Bar */}
         <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
           <div>

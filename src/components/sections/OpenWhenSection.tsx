@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { SharedInteractions } from "../interactions/SharedInteractions";
+import { RomanticCharacter } from "../RomanticCharacter";
 import type { OpenWhenLetter } from "@/lib/gift-data";
 
 interface OpenWhenSectionProps {
@@ -31,6 +32,16 @@ export function OpenWhenSection({ letters }: OpenWhenSectionProps) {
       emoji="✉️"
       bgVariant="lavender"
     >
+      {/* Cozy envelope companion */}
+      <div className="flex justify-center -mt-3 mb-6">
+        <RomanticCharacter
+          character="cozyCouple"
+          size={135}
+          animation="soft-breathe"
+          sparkles
+        />
+      </div>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {letters.map((letter, i) => (
           <EnvelopeCard
@@ -208,13 +219,23 @@ function OpenLetterOverlay({
             </motion.p>
           ))}
 
+          {/* Sweet companion alongside revealed letter message */}
+          <div className="flex justify-center pt-2 pb-2">
+            <RomanticCharacter
+              character="tenderCouple"
+              size={120}
+              animation="gentle-float"
+              sparkles
+            />
+          </div>
+
           {/* Signature */}
           {letter.signature && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.2 }}
-              className="pt-6 text-right"
+              className="pt-4 text-right"
             >
               <p
                 className="font-script text-xl md:text-2xl"

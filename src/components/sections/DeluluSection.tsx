@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { SectionWrapper } from "../SectionWrapper";
+import { RomanticCharacter } from "../RomanticCharacter";
 import type { DeluluScenario } from "@/lib/gift-data";
 
 export const defaultDeluluScenarios: DeluluScenario[] = [
@@ -210,6 +211,16 @@ export function DeluluSection({ scenarios = defaultDeluluScenarios }: DeluluSect
       bgVariant="blush"
     >
       <div className="max-w-2xl mx-auto">
+        {/* Playful couple companion */}
+        <div className="flex justify-center -mt-3 mb-6">
+          <RomanticCharacter
+            character="huggingCouple"
+            size={135}
+            animation="gentle-float"
+            sparkles
+          />
+        </div>
+
         {/* Progress Dots */}
         <div className="flex items-center justify-center gap-2 mb-8">
           {activeScenarios.map((_, i) => (

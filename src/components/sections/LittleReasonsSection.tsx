@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useCallback } from "react";
 import { SectionWrapper } from "../SectionWrapper";
-import { ShyHappyPanda } from "../CuteIllustrations";
+import { RomanticCharacter } from "../RomanticCharacter";
 import type { LittleReason } from "@/lib/gift-data";
 
 export const defaultReasonsList: LittleReason[] = [
@@ -109,9 +109,14 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
           <span className="font-script text-[var(--pink-strong)] font-normal text-5xl sm:text-6xl">you</span>
         </h2>
 
-        {/* Cute Illustrated Shy Panda (Matching Reference 4) */}
-        <div className="my-2">
-          <ShyHappyPanda size={140} />
+        {/* Tender loving couple (Authentic PNG Illustration) */}
+        <div className="my-2 flex justify-center">
+          <RomanticCharacter
+            character="tenderCouple"
+            size={155}
+            animation="gentle-float"
+            sparkles
+          />
         </div>
 
         {/* Playful Subtitle (Matching Reference 4) */}

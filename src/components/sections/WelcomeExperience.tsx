@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import { BubuDuduSittingTogether } from "../CuteIllustrations";
+import { RomanticCharacter } from "../RomanticCharacter";
 
 interface WelcomeExperienceProps {
   recipientNickname: string;
@@ -184,14 +184,21 @@ export function WelcomeExperience({
 
       {/* Central Storybook Content */}
       <div className="relative z-20 max-w-2xl mx-auto flex flex-col items-center">
-        {/* Adorable Illustrated Couple: Bubu & Dudu Sitting Together */}
+        {/* Adorable Illustrated Couple: Sweet Cheek Kiss & Daydreams (Reference 2 PNG) */}
         <motion.div
           initial={{ opacity: 0, y: -20, scale: 0.9 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="mb-2"
+          className="mb-3"
         >
-          <BubuDuduSittingTogether size={180} />
+          <RomanticCharacter
+            character="kissingCouple"
+            size={180}
+            priority
+            sparkles
+            animation="gentle-float"
+            className="cursor-pointer"
+          />
         </motion.div>
 
         {/* Story Eyebrow */}

@@ -3,7 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { SectionWrapper } from "../SectionWrapper";
-import { PandaHuggingHeart, BearPandaHuggingLoving } from "../CuteIllustrations";
+import { RomanticCharacter } from "../RomanticCharacter";
 import type { QuizQuestion } from "@/lib/gift-data";
 
 export interface ExtendedQuizQuestion extends QuizQuestion {
@@ -168,9 +168,14 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
               Please say YES... 💖
             </p>
 
-            {/* Cute Panda Looking Up */}
-            <div className="my-2">
-              <PandaHuggingHeart size={160} heartText="Say Yes ♡" />
+            {/* Tender loving couple asking for your love */}
+            <div className="my-3 flex justify-center">
+              <RomanticCharacter
+                character="tenderCouple"
+                size={175}
+                animation="soft-breathe"
+                sparkles
+              />
             </div>
 
             {/* YES / NO Interactive Buttons */}
@@ -192,14 +197,19 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
             </div>
           </motion.div>
         ) : (
-          /* YAYYY I knew it all along (Matching Reference 5 Success State) */
+          /* YAYYY I knew it all along (Matching Reference 5 Success State with Leaping Hugging Couple PNG) */
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             className="bg-white rounded-3xl p-8 sm:p-10 border border-[var(--border-subtle)] shadow-lg mb-8"
           >
-            <div className="mb-2">
-              <BearPandaHuggingLoving size={170} />
+            <div className="mb-3 flex justify-center">
+              <RomanticCharacter
+                character="huggingCouple"
+                size={185}
+                animation="gentle-float"
+                sparkles
+              />
             </div>
 
             <h3 className="font-rounded text-3xl sm:text-4xl font-bold text-[var(--pink-strong)] mb-1">

@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { SharedInteractions } from "../interactions/SharedInteractions";
+import { RomanticCharacter } from "../RomanticCharacter";
 import type { Letter } from "@/lib/gift-data";
 
 interface LettersSectionProps {
@@ -21,6 +22,16 @@ export function LettersSection({ letters }: LettersSectionProps) {
       emoji="💌"
       bgVariant="cream"
     >
+      {/* Gentle love letters character companion */}
+      <div className="flex justify-center -mt-3 mb-6">
+        <RomanticCharacter
+          character="tenderCouple"
+          size={135}
+          animation="soft-breathe"
+          sparkles
+        />
+      </div>
+
       <div className="space-y-8">
         {letters.map((letter, i) => (
           <LetterCard
