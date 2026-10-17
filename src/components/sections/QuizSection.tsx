@@ -65,20 +65,39 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
 
   // Reference 5: "Do You Love Me?" interactive game state
   const [hasSaidYes, setHasSaidYes] = useState(false);
-  const [noCount, setNoCount] = useState(0);
+  const [noPosition, setNoPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [noAttempts, setNoAttempts] = useState(0);
 
   const noPhrases = [
     "No 🥺",
-    "Are you sure? 💔",
-    "Pwease think again? 🥺",
-    "Wrong button silly! 🙈",
-    "Don't do this to me! 😭",
-    "Look at this cute face! 🐾",
-    "You know you love me! 🥰",
+    "Oops too slow! 😜",
+    "Can't click this! 🙈",
+    "Wrong button! 🏃",
+    "Say YES instead! 💕",
+    "Nice try! 💨",
+    "Still can't! 🤭",
+    "You have to say YES! 🥰",
   ];
 
-  const handleNoClick = () => {
-    setNoCount((prev) => (prev + 1) % noPhrases.length);
+  const moveNoButton = () => {
+    setNoPosition((prev) => {
+      const minDistance = 80;
+      const angle = Math.random() * Math.PI * 2;
+      const distance = Math.floor(Math.random() * 80 + minDistance);
+      let nextX = Math.round(Math.cos(angle) * distance);
+      let nextY = Math.round(Math.sin(angle) * (distance * 0.65));
+
+      // Clamp within safe margins so it stays playful and visible inside the card
+      nextX = Math.max(-130, Math.min(130, nextX));
+      nextY = Math.max(-70, Math.min(70, nextY));
+
+      if (Math.abs(nextX - prev.x) < 45 && Math.abs(nextY - prev.y) < 45) {
+        nextX = -prev.x || 90;
+        nextY = -prev.y || 45;
+      }
+      return { x: nextX, y: nextY };
+    });
+    setNoAttempts((prev) => prev + 1);
   };
 
   const [currentQ, setCurrentQ] = useState(0);
@@ -127,47 +146,17 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
       bgVariant="default"
     >
       <div className="max-w-2xl mx-auto text-center">
-        {/* Eyebrow and Header (Matching Reference 5) */}
-        <p className="font-handwritten text-lg sm:text-xl text-[var(--pink-strong)] mb-1">
-          AlwaysYou · MADE WITH LOVE ♥
-        </p>
-
-        <h2 className="font-rounded text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--romantic-plum)] mb-3">
+        <h2 className="font-rounded text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--romantic-plum)] mb-8 select-none">
           Do You Love Me? <span className="inline-block animate-pulse-soft text-[var(--pink-primary)]">💖</span>
         </h2>
 
-        {/* Pill Badge */}
-        <div className="inline-block px-4 py-1.5 rounded-full bg-[var(--soft-pink)] border border-[var(--border-subtle)] text-[var(--pink-strong)] text-xs font-rounded font-semibold tracking-wide shadow-2xs mb-6">
-          A Cute Interactive Surprise 💖
-        </div>
-
-        {/* Three Value Props (Matching Reference 5) */}
-        <div className="flex flex-wrap items-center justify-center gap-3 sm:gap-6 mb-8 text-xs font-rounded font-medium text-[var(--text-secondary)]">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/70 border border-[var(--border-subtle)] shadow-2xs">
-            <span className="text-[var(--pink-primary)]">♥</span>
-            <span>Sweet Questions</span>
-          </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/70 border border-[var(--border-subtle)] shadow-2xs">
-            <span>🎁</span>
-            <span>Adorable Surprises</span>
-          </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/70 border border-[var(--border-subtle)] shadow-2xs">
-            <span className="text-[var(--pink-primary)]">✨</span>
-            <span>Made with Love</span>
-          </div>
-        </div>
-
-        {/* Interactive "Do You Love Me?" Card (Reference 5) */}
+        {/* Interactive "Do You Love Me?" Card */}
         {!hasSaidYes ? (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
-            className="bg-white rounded-3xl p-8 sm:p-10 border border-[var(--border-subtle)] shadow-lg relative overflow-hidden mb-8"
+            className="bg-white rounded-3xl p-8 sm:p-12 border border-[var(--border-subtle)] shadow-lg relative mb-8 overflow-hidden"
           >
-            <p className="font-handwritten text-2xl text-[var(--pink-strong)] mb-4">
-              Please say YES... 💖
-            </p>
-
             {/* Tender loving couple asking for your love */}
             <div className="my-3 flex justify-center">
               <RomanticCharacter
@@ -178,22 +167,37 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
               />
             </div>
 
-            {/* YES / NO Interactive Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-4 mt-6">
+            {/* YES / NO Interactive Buttons (No button moves away on hover) */}
+            <div className="relative flex flex-col sm:flex-row items-center justify-center gap-6 mt-8 min-h-[64px]">
               <button
+                type="button"
                 onClick={() => setHasSaidYes(true)}
-                style={{ transform: `scale(${1 + noCount * 0.1})` }}
-                className="w-full sm:w-auto px-10 py-3.5 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-base font-rounded font-bold shadow-md hover:shadow-lg hover:scale-105 active:scale-95 cursor-pointer transition-all duration-300"
+                style={{ transform: `scale(${1 + Math.min(noAttempts * 0.08, 0.4)})` }}
+                className="w-full sm:w-auto px-10 py-3.5 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-base font-rounded font-bold shadow-md hover:shadow-lg hover:scale-105 active:scale-95 cursor-pointer transition-all duration-300 z-10"
               >
                 YES ❤️
               </button>
 
-              <button
-                onClick={handleNoClick}
-                className="w-full sm:w-auto px-6 py-3 rounded-full bg-slate-100 text-slate-600 hover:bg-slate-200 text-xs font-rounded font-medium border border-slate-200 cursor-pointer transition-all"
+              <motion.button
+                type="button"
+                animate={{ x: noPosition.x, y: noPosition.y }}
+                transition={{ type: "spring", stiffness: 450, damping: 20 }}
+                onMouseEnter={moveNoButton}
+                onPointerEnter={moveNoButton}
+                onTouchStart={(e) => {
+                  e.preventDefault();
+                  moveNoButton();
+                }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  moveNoButton();
+                }}
+                className="w-full sm:w-auto px-6 py-3 rounded-full bg-slate-100 text-slate-600 text-xs font-rounded font-medium border border-slate-200 select-none shadow-2xs whitespace-nowrap z-20 cursor-default"
+                tabIndex={-1}
               >
-                {noPhrases[noCount]}
-              </button>
+                {noPhrases[noAttempts % noPhrases.length]}
+              </motion.button>
             </div>
           </motion.div>
         ) : (
