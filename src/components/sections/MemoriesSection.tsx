@@ -87,6 +87,8 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
         rotation: p.rotation,
         tint: p.tint,
         emoji: p.emoji,
+        date: undefined as string | undefined,
+        location: undefined as string | undefined,
       }));
 
   return (
@@ -137,9 +139,34 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
                       e.currentTarget.style.display = "none";
                     }}
                   />
+
                   {/* Floating emoji icon badge */}
-                  <div className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-sm shadow-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  <div className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-sm shadow-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
                     💖
+                  </div>
+
+                  {/* Cute Classy Hover Story Reveal Overlay */}
+                  <div className="absolute inset-0 p-4 sm:p-5 bg-gradient-to-b from-white/95 via-white/92 to-[var(--bg-surface)]/95 backdrop-blur-md rounded-xl flex flex-col justify-between opacity-0 group-hover:opacity-100 translate-y-3 group-hover:translate-y-0 transition-all duration-300 ease-out shadow-inner border border-white/80 z-20">
+                    <div>
+                      <div className="flex items-center justify-between gap-1 mb-2 pb-1.5 border-b border-[var(--border-subtle)]">
+                        <span className="text-[11px] font-bold text-[var(--pink-strong)] uppercase tracking-wider font-rounded flex items-center gap-1">
+                          <span>{item.emoji || "📸"}</span> Story
+                        </span>
+                        {item.date && (
+                          <span className="text-[10px] text-[var(--text-muted)] font-rounded">
+                            {new Date(item.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
+                          </span>
+                        )}
+                      </div>
+                      <p className="font-serif italic text-xs sm:text-sm text-[var(--romantic-plum)] leading-relaxed line-clamp-5 sm:line-clamp-6">
+                        &ldquo;{item.description}&rdquo;
+                      </p>
+                    </div>
+
+                    <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between text-[11px] text-[var(--pink-deep)] font-rounded font-semibold">
+                      <span>Tap to read more &amp; comment ♡</span>
+                      <span className="text-sm animate-pulse-soft">✨</span>
+                    </div>
                   </div>
                 </div>
 

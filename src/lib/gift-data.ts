@@ -245,6 +245,16 @@ export const defaultGiftConfig: GiftConfig = {
       category: "ordinary-but-special",
       emoji: "🛒",
     },
+    {
+      id: "m6",
+      title: "Our Quiet Beach Walk",
+      description: "The waves were whispering against our feet, the sky turned a deep lavender, and you held my hand like you never wanted to let go. In that quiet moment, everything made sense.",
+      date: "2024-05-18",
+      photos: [],
+      location: "By the water at sunset",
+      category: "romantic",
+      emoji: "🌅",
+    },
   ],
   
   letters: [

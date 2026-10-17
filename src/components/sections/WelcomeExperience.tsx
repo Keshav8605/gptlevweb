@@ -30,7 +30,7 @@ export function WelcomeExperience({
       caption: "A moment I'd keep forever",
       rotation: -5,
       delay: 0,
-      positionClass: "hidden lg:block absolute top-12 left-8 xl:left-16",
+      positionClass: "hidden lg:block absolute top-6 lg:top-8 left-4 xl:left-12",
     },
     {
       id: "p2",
@@ -38,7 +38,7 @@ export function WelcomeExperience({
       caption: "Our favourite view",
       rotation: 4.5,
       delay: 0.5,
-      positionClass: "hidden lg:block absolute top-14 right-8 xl:right-16",
+      positionClass: "hidden lg:block absolute top-8 lg:top-10 right-4 xl:right-12",
     },
     {
       id: "p3",
@@ -46,7 +46,7 @@ export function WelcomeExperience({
       caption: "Anywhere is lovely with you",
       rotation: 4,
       delay: 1,
-      positionClass: "hidden md:block absolute bottom-12 left-6 xl:left-20",
+      positionClass: "hidden md:block absolute top-[44%] lg:top-[42%] left-4 xl:left-12",
     },
     {
       id: "p4",
@@ -54,7 +54,7 @@ export function WelcomeExperience({
       caption: "Told mostly in bad jokes",
       rotation: -3.5,
       delay: 1.5,
-      positionClass: "hidden md:block absolute bottom-10 right-6 xl:right-20",
+      positionClass: "hidden md:block absolute top-[46%] lg:top-[44%] right-4 xl:right-12",
     },
   ];
 
@@ -88,9 +88,9 @@ export function WelcomeExperience({
         animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[0].rotation }}
         transition={{ duration: 0.9, delay: 0.3 }}
         whileHover={{ scale: 1.06, rotate: -2, zIndex: 30 }}
-        className={`${heroPolaroids[0].positionClass} z-10 w-48 xl:w-56 p-3 pb-4 bg-white rounded-xl shadow-md border border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-xl`}
+        className={`${heroPolaroids[0].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl`}
       >
-        <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-[var(--soft-pink)]">
+        <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--soft-pink)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={heroPolaroids[0].src}
@@ -99,10 +99,10 @@ export function WelcomeExperience({
             onLoad={() => setPhotoLoaded((prev) => ({ ...prev, p1: true }))}
           />
           {!photoLoaded.p1 && (
-            <div className="absolute inset-0 flex items-center justify-center text-2xl">📸</div>
+            <div className="absolute inset-0 flex items-center justify-center text-3xl">📸</div>
           )}
         </div>
-        <p className="mt-2.5 font-handwritten text-center text-sm text-[var(--romantic-plum)]">
+        <p className="mt-3 font-handwritten text-center text-base xl:text-lg text-[var(--romantic-plum)] font-semibold">
           {heroPolaroids[0].caption}
         </p>
       </motion.div>
@@ -113,9 +113,9 @@ export function WelcomeExperience({
         animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[1].rotation }}
         transition={{ duration: 0.9, delay: 0.4 }}
         whileHover={{ scale: 1.06, rotate: 1, zIndex: 30 }}
-        className={`${heroPolaroids[1].positionClass} z-10 w-48 xl:w-56 p-3 pb-4 bg-white rounded-xl shadow-md border border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-xl`}
+        className={`${heroPolaroids[1].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl`}
       >
-        <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-[var(--lavender)]">
+        <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--lavender)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={heroPolaroids[1].src}
@@ -124,10 +124,10 @@ export function WelcomeExperience({
             onLoad={() => setPhotoLoaded((prev) => ({ ...prev, p2: true }))}
           />
           {!photoLoaded.p2 && (
-            <div className="absolute inset-0 flex items-center justify-center text-2xl">🌅</div>
+            <div className="absolute inset-0 flex items-center justify-center text-3xl">🌅</div>
           )}
         </div>
-        <p className="mt-2.5 font-handwritten text-center text-sm text-[var(--romantic-plum)]">
+        <p className="mt-3 font-handwritten text-center text-base xl:text-lg text-[var(--romantic-plum)] font-semibold">
           {heroPolaroids[1].caption}
         </p>
       </motion.div>
@@ -138,9 +138,9 @@ export function WelcomeExperience({
         animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[2].rotation }}
         transition={{ duration: 0.9, delay: 0.5 }}
         whileHover={{ scale: 1.06, rotate: 0, zIndex: 30 }}
-        className={`${heroPolaroids[2].positionClass} z-10 w-44 xl:w-52 p-3 pb-4 bg-white rounded-xl shadow-md border border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-xl`}
+        className={`${heroPolaroids[2].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl`}
       >
-        <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-[var(--soft-pink)]">
+        <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--soft-pink)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={heroPolaroids[2].src}
@@ -149,10 +149,10 @@ export function WelcomeExperience({
             onLoad={() => setPhotoLoaded((prev) => ({ ...prev, p3: true }))}
           />
           {!photoLoaded.p3 && (
-            <div className="absolute inset-0 flex items-center justify-center text-2xl">✨</div>
+            <div className="absolute inset-0 flex items-center justify-center text-3xl">✨</div>
           )}
         </div>
-        <p className="mt-2.5 font-handwritten text-center text-sm text-[var(--romantic-plum)]">
+        <p className="mt-3 font-handwritten text-center text-base xl:text-lg text-[var(--romantic-plum)] font-semibold">
           {heroPolaroids[2].caption}
         </p>
       </motion.div>
@@ -163,9 +163,9 @@ export function WelcomeExperience({
         animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[3].rotation }}
         transition={{ duration: 0.9, delay: 0.6 }}
         whileHover={{ scale: 1.06, rotate: 0, zIndex: 30 }}
-        className={`${heroPolaroids[3].positionClass} z-10 w-44 xl:w-52 p-3 pb-4 bg-white rounded-xl shadow-md border border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-xl`}
+        className={`${heroPolaroids[3].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl`}
       >
-        <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-[var(--pale-rose)]">
+        <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--pale-rose)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
             src={heroPolaroids[3].src}
@@ -174,10 +174,10 @@ export function WelcomeExperience({
             onLoad={() => setPhotoLoaded((prev) => ({ ...prev, p4: true }))}
           />
           {!photoLoaded.p4 && (
-            <div className="absolute inset-0 flex items-center justify-center text-2xl">💛</div>
+            <div className="absolute inset-0 flex items-center justify-center text-3xl">💛</div>
           )}
         </div>
-        <p className="mt-2.5 font-handwritten text-center text-sm text-[var(--romantic-plum)]">
+        <p className="mt-3 font-handwritten text-center text-base xl:text-lg text-[var(--romantic-plum)] font-semibold">
           {heroPolaroids[3].caption}
         </p>
       </motion.div>

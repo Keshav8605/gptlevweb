@@ -38,6 +38,7 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
     }
   });
   const [activePhoto, setActivePhoto] = useState<string | null>(null);
+  const [showHint, setShowHint] = useState<boolean>(false);
 
   // Fetch current public hint from server
   useEffect(() => {
@@ -122,7 +123,7 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95 }}
               transition={{ duration: 0.5 }}
-              className="bg-white rounded-3xl p-8 sm:p-12 border border-[var(--border-subtle)] shadow-[0_8px_30px_var(--shadow-pink)] text-center relative overflow-hidden"
+              className="bg-white rounded-3xl p-8 sm:p-12 border-2 border-[var(--romantic-plum)] shadow-[0_12px_40px_rgba(81,36,63,0.16)] text-center relative overflow-hidden"
             >
               {/* Cozy Snuggle Couple PNG Illustration */}
               <div className="flex justify-center mb-6">
@@ -141,11 +142,53 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                 Behind this door lies an intimate surprise I prepared just for you. Enter our secret phrase to unlock it.
               </p>
 
-              {/* Gentle Hint Box */}
-              <div className="inline-block px-5 py-3 rounded-2xl bg-[var(--warm-cream)] border border-[var(--border-subtle)] text-xs sm:text-sm text-[var(--text-secondary)] mb-8 max-w-lg shadow-xs">
-                <span className="font-semibold text-[var(--pink-strong)]">💡 Hint: </span>
-                <span className="italic">{hint}</span>
-              </div>
+              {/* Gentle Whisper Hint Toggle Button & Expandable Card */}
+              {!showHint ? (
+                <div className="mb-8">
+                  <motion.button
+                    type="button"
+                    whileHover={{ scale: 1.04 }}
+                    whileTap={{ scale: 0.96 }}
+                    onClick={() => setShowHint(true)}
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--soft-pink)]/80 hover:bg-[var(--soft-pink)] border border-[var(--border-medium)] text-xs sm:text-sm font-rounded font-semibold text-[var(--pink-deep)] shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
+                  >
+                    <span className="text-sm group-hover:scale-125 transition-transform">🤫</span>
+                    <span>Need a gentle whisper, sweetheart? ♡</span>
+                    <span className="text-xs text-[var(--pink-strong)]">✨</span>
+                  </motion.button>
+                </div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0, height: 0, scale: 0.96 }}
+                  animate={{ opacity: 1, height: "auto", scale: 1 }}
+                  exit={{ opacity: 0, height: 0, scale: 0.96 }}
+                  transition={{ duration: 0.35, ease: "easeOut" }}
+                  className="mb-8 max-w-lg mx-auto overflow-hidden"
+                >
+                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[var(--warm-cream)] to-[var(--soft-pink)]/50 border border-[var(--border-medium)] shadow-xs relative text-left">
+                    <div className="flex items-start gap-3">
+                      <span className="text-xl mt-0.5">💡</span>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className="text-xs font-bold text-[var(--pink-strong)] uppercase tracking-wider font-rounded">
+                            A Sweet Little Whisper ♡
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => setShowHint(false)}
+                            className="text-xs text-[var(--text-muted)] hover:text-[var(--pink-strong)] font-rounded cursor-pointer px-1.5 py-0.5 rounded hover:bg-white/60 transition-colors"
+                          >
+                            hide ✕
+                          </button>
+                        </div>
+                        <p className="font-serif italic text-sm sm:text-base text-[var(--romantic-plum)] leading-relaxed">
+                          {hint}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              )}
 
               {/* Form Input */}
               <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">

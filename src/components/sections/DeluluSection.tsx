@@ -300,30 +300,6 @@ export function DeluluSection({ scenarios = defaultDeluluScenarios }: DeluluSect
               </div>
             </div>
 
-            {/* Revealed Response Card */}
-            <AnimatePresence>
-              {selectedOption && (
-                <motion.div
-                  initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10 }}
-                  transition={{ duration: 0.4 }}
-                  className="bg-gradient-to-br from-white via-[var(--bg-surface)] to-[var(--pale-rose)] rounded-3xl p-6 sm:p-8 border border-[var(--pink-primary)] shadow-md"
-                >
-                  <div className="flex items-start gap-3.5">
-                    <span className="text-2xl mt-0.5 animate-bounce">💖</span>
-                    <div>
-                      <p className="text-xs font-semibold uppercase tracking-wider text-[var(--pink-strong)] mb-1.5">
-                        My Reaction to Your Choice:
-                      </p>
-                      <p className="text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
-                        {selectedOption.response}
-                      </p>
-                    </div>
-                  </div>
-                </motion.div>
-              )}
-            </AnimatePresence>
 
             {/* Navigation buttons */}
             <div className="flex items-center justify-between pt-2">
