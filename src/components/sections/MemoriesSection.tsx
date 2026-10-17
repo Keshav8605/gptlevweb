@@ -10,143 +10,147 @@ interface MemoriesSectionProps {
   memories: Memory[];
 }
 
-const categoryColors: Record<string, string> = {
-  funny: "bg-[#FFE8D6] text-[#A75D27]",
-  romantic: "bg-[var(--pale-rose)] text-[var(--pink-strong)]",
-  memorable: "bg-[var(--lavender)] text-[#70529A]",
-  "ordinary-but-special": "bg-[#E5F0E0] text-[#4A723D]",
-};
-
-const categoryLabels: Record<string, string> = {
-  funny: "😂 Funny Moment",
-  romantic: "💕 Pure Romance",
-  memorable: "✨ Forever Cherished",
-  "ordinary-but-special": "🤍 Ordinary but Special",
-};
+// Curated romantic photos for scrapbook demo fallbacks matching Reference 1
+const defaultPolaroids = [
+  {
+    id: "pol-1",
+    src: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80",
+    caption: "A moment I'd keep forever",
+    rotation: -3,
+    tint: "from-[#FCE7EF] to-[#EDE2FA]",
+    emoji: "📸",
+  },
+  {
+    id: "pol-2",
+    src: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=600&q=80",
+    caption: "Little things, big feelings",
+    rotation: 2.5,
+    tint: "from-[#FFE0EA] to-[#FFCADB]",
+    emoji: "🌸",
+  },
+  {
+    id: "pol-3",
+    src: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=600&q=80",
+    caption: "Anywhere is lovely with you",
+    rotation: -2,
+    tint: "from-[#EDE2FA] to-[#F7F0FF]",
+    emoji: "🌅",
+  },
+  {
+    id: "pol-4",
+    src: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80",
+    caption: "One for our imaginary scrapbook",
+    rotation: 2,
+    tint: "from-[#FFF9F3] to-[#FFE0EA]",
+    emoji: "🏖️",
+  },
+  {
+    id: "pol-5",
+    src: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=600&q=80",
+    caption: "The best kind of ordinary",
+    rotation: -2.5,
+    tint: "from-[#FFCADB] to-[#EDE2FA]",
+    emoji: "☕",
+  },
+  {
+    id: "pol-6",
+    src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
+    caption: "My favourite view",
+    rotation: 3,
+    tint: "from-[#FFE0EA] to-[#FF5F96]/30",
+    emoji: "🌿",
+  },
+];
 
 export function MemoriesSection({ memories }: MemoriesSectionProps) {
   const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
 
+  // Combine user memories with default layout
+  const displayItems = memories && memories.length > 0
+    ? memories.map((m, idx) => {
+        const fallback = defaultPolaroids[idx % defaultPolaroids.length];
+        return {
+          ...m,
+          photoUrl: m.photos && m.photos.length > 0 ? m.photos[0] : fallback.src,
+          caption: m.title || fallback.caption,
+          rotation: fallback.rotation,
+          tint: fallback.tint,
+        };
+      })
+    : defaultPolaroids.map((p) => ({
+        id: p.id,
+        title: p.caption,
+        description: "A cherished memory forever kept in my heart ♡",
+        photoUrl: p.src,
+        caption: p.caption,
+        rotation: p.rotation,
+        tint: p.tint,
+        emoji: p.emoji,
+      }));
+
   return (
     <SectionWrapper
       id="memories"
-      title="Our Memories"
-      subtitle="Every little adventure, quiet whisper, and belly laugh with you"
+      title="Little moments, big feelings ♡"
+      subtitle="Every picture holds a little story."
       emoji="📸"
       bgVariant="default"
     >
-      <div className="space-y-16 md:space-y-24">
-        {memories.map((memory, i) => {
-          const isEven = i % 2 === 0;
-
-          return (
-            <motion.article
-              key={memory.id}
-              initial={{ opacity: 0, y: 40 }}
+      <div className="max-w-5xl mx-auto">
+        {/* Scrapbook Polaroid Grid (Inspired by Reference 1) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 pt-4 pb-8">
+          {displayItems.map((item, idx) => (
+            <motion.div
+              key={item.id}
+              initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-60px" }}
-              transition={{ duration: 0.8, ease: "easeOut" }}
-              className={`flex flex-col ${isEven ? "md:flex-row" : "md:flex-row-reverse"} gap-8 md:gap-12 items-center`}
+              viewport={{ once: true, margin: "-40px" }}
+              transition={{ duration: 0.6, delay: idx * 0.1 }}
+              whileHover={{ scale: 1.05, rotate: 0, zIndex: 20 }}
+              onClick={() => setSelectedMemory(item as Memory)}
+              className="group cursor-pointer select-none"
+              style={{
+                transform: `rotate(${item.rotation}deg)`,
+              }}
             >
-              {/* Polaroid-style photo frame / scrapbook visual */}
-              <div
-                onClick={() => setSelectedMemory(memory)}
-                className="w-full md:w-5/12 cursor-pointer group"
-              >
-                <div
-                  className="bg-white p-4 pb-7 rounded-2xl shadow-lg border border-[var(--border-subtle)] transition-all duration-300 transform group-hover:scale-102 group-hover:-rotate-1 group-hover:shadow-2xl"
-                  style={{
-                    boxShadow: "0 10px 30px var(--shadow-pink)",
-                  }}
-                >
-                  <div
-                    className="aspect-[4/3] rounded-xl overflow-hidden relative flex items-center justify-center bg-gradient-to-br from-[var(--pale-rose)] via-[var(--bg-blush)] to-[var(--lavender)]"
-                  >
-                    {memory.photos && memory.photos.length > 0 ? (
-                      <img
-                        src={memory.photos[0]}
-                        alt={memory.title}
-                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                      />
-                    ) : (
-                      <div className="text-center p-6 flex flex-col items-center">
-                        <span className="text-6xl mb-2 animate-bounce">
-                          {memory.emoji || "📸"}
-                        </span>
-                        <p className="font-script text-xl text-[var(--pink-strong)]">
-                          Captured in my heart ♡
-                        </p>
-                      </div>
-                    )}
-
-                    {memory.category && (
-                      <div
-                        className={`absolute bottom-3 right-3 px-3 py-1 rounded-full text-xs font-semibold shadow-xs ${categoryColors[memory.category] || "bg-white text-[var(--text-primary)]"}`}
-                      >
-                        {categoryLabels[memory.category] || memory.category}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Caption line */}
-                  <div className="mt-3 flex items-center justify-between text-xs text-[var(--text-muted)] px-1">
-                    <span className="font-script text-base text-[var(--pink-strong)]">
-                      {memory.title}
-                    </span>
-                    {memory.date && (
-                      <span>
-                        {new Date(memory.date).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </span>
-                    )}
+              <div className="bg-white p-4 pb-5 rounded-2xl shadow-md group-hover:shadow-2xl border border-[var(--border-subtle)] transition-all duration-300">
+                {/* Photo Container */}
+                <div className={`relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br ${item.tint} flex items-center justify-center`}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={item.photoUrl}
+                    alt={item.caption}
+                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-108"
+                    onError={(e) => {
+                      // Graceful fallback to lovely icon gradient if image fails
+                      e.currentTarget.style.display = "none";
+                    }}
+                  />
+                  {/* Floating emoji icon badge */}
+                  <div className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-sm shadow-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    💖
                   </div>
                 </div>
-              </div>
 
-              {/* Memory Story Description and Reactions */}
-              <div className="w-full md:w-7/12 space-y-4">
-                <div className="flex items-center gap-3">
-                  <span className="text-3xl">{memory.emoji || "✨"}</span>
-                  <h3 className="font-serif text-2xl md:text-3xl font-semibold text-[var(--text-primary)]">
-                    {memory.title}
-                  </h3>
-                </div>
-
-                <p className="text-sm md:text-base leading-relaxed text-[var(--text-secondary)]">
-                  {memory.description}
-                </p>
-
-                {memory.location && (
-                  <p className="text-xs flex items-center gap-1.5 text-[var(--text-muted)]">
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                    >
-                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
-                      <circle cx="12" cy="10" r="3" />
-                    </svg>
-                    <span>{memory.location}</span>
+                {/* Handwritten Polaroid Caption */}
+                <div className="pt-3.5 text-center">
+                  <p className="font-handwritten text-lg sm:text-xl text-[var(--romantic-plum)] leading-snug">
+                    {item.caption}
                   </p>
-                )}
-
-                {/* Shared Persistent Reactions & Comments */}
-                <SharedInteractions
-                  targetType="memory"
-                  targetId={memory.id}
-                />
+                </div>
               </div>
-            </motion.article>
-          );
-        })}
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Cute Dot Navigation / Heart Indicators */}
+        <div className="flex items-center justify-center gap-2 pt-4">
+          <span className="text-[var(--pink-primary)] text-xs">♥</span>
+          <span className="text-[var(--pink-primary)] text-sm">♥</span>
+          <span className="text-[var(--pink-strong)] text-base">♥</span>
+          <span className="text-[var(--pink-primary)] text-sm">♥</span>
+          <span className="text-[var(--pink-primary)] text-xs">♥</span>
+        </div>
       </div>
 
       {/* Memory Lightbox Modal */}
@@ -158,7 +162,7 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setSelectedMemory(null)}
-              className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
+              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
             />
             <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 30 }}
@@ -170,13 +174,13 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
                 <span className="text-2xl">{selectedMemory.emoji || "📸"}</span>
                 <button
                   onClick={() => setSelectedMemory(null)}
-                  className="w-8 h-8 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-blush)]"
+                  className="w-8 h-8 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-blush)] transition-colors"
                 >
                   ✕
                 </button>
               </div>
 
-              <h3 className="font-serif text-2xl font-semibold text-[var(--text-primary)] mb-2">
+              <h3 className="font-rounded text-2xl font-bold text-[var(--romantic-plum)] mb-2">
                 {selectedMemory.title}
               </h3>
 
@@ -187,16 +191,14 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
                     day: "numeric",
                     year: "numeric",
                   })}
-                  {selectedMemory.location && ` • ${selectedMemory.location}`}
+                  {selectedMemory.location && ` • 📍 ${selectedMemory.location}`}
                 </p>
               )}
 
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-6">
-                {selectedMemory.description}
-              </p>
-
+              {/* Photo Preview in Modal */}
               {selectedMemory.photos && selectedMemory.photos.length > 0 && (
-                <div className="rounded-2xl overflow-hidden aspect-[4/3] border border-[var(--border-subtle)] mb-4">
+                <div className="rounded-2xl overflow-hidden aspect-[4/3] border border-[var(--border-subtle)] mb-5 shadow-xs">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={selectedMemory.photos[0]}
                     alt={selectedMemory.title}
@@ -205,9 +207,21 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
                 </div>
               )}
 
-              <div className="text-center pt-2">
-                <p className="font-script text-xl text-[var(--pink-strong)]">
-                  Forever saved in our hearts ♡
+              <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-6">
+                {selectedMemory.description}
+              </p>
+
+              {/* Shared Persistent Reactions & Comments */}
+              <div className="pt-2 border-t border-[var(--border-subtle)]">
+                <SharedInteractions
+                  targetType="memory"
+                  targetId={selectedMemory.id}
+                />
+              </div>
+
+              <div className="text-center pt-4">
+                <p className="font-handwritten text-xl text-[var(--pink-strong)]">
+                  Forever saved in our imaginary scrapbook ♡
                 </p>
               </div>
             </motion.div>

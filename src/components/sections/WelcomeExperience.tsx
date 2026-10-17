@@ -1,13 +1,15 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState } from "react";
+import { BubuDuduSittingTogether } from "../CuteIllustrations";
 
 interface WelcomeExperienceProps {
   recipientNickname: string;
-  title: string;
-  subtitle: string;
-  message: string;
+  title?: string;
+  subtitle?: string;
+  message?: string;
+  startDate?: string;
   onEnter: () => void;
 }
 
@@ -18,206 +20,270 @@ export function WelcomeExperience({
   message,
   onEnter,
 }: WelcomeExperienceProps) {
-  const [isRevealing, setIsRevealing] = useState(false);
-  const [showContent, setShowContent] = useState(false);
+  const [photoLoaded, setPhotoLoaded] = useState<Record<string, boolean>>({});
 
-  const handleOpen = () => {
-    setIsRevealing(true);
-    setTimeout(() => setShowContent(true), 800);
-  };
+  // 4 Curated Romantic Hero Polaroids (matching Reference 2)
+  const heroPolaroids = [
+    {
+      id: "p1",
+      src: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80",
+      caption: "A moment I'd keep forever",
+      rotation: -5,
+      delay: 0,
+      positionClass: "hidden lg:block absolute top-12 left-8 xl:left-16",
+    },
+    {
+      id: "p2",
+      src: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=600&q=80",
+      caption: "Our favourite view",
+      rotation: 4.5,
+      delay: 0.5,
+      positionClass: "hidden lg:block absolute top-14 right-8 xl:right-16",
+    },
+    {
+      id: "p3",
+      src: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80",
+      caption: "Anywhere is lovely with you",
+      rotation: 4,
+      delay: 1,
+      positionClass: "hidden md:block absolute bottom-12 left-6 xl:left-20",
+    },
+    {
+      id: "p4",
+      src: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=600&q=80",
+      caption: "Told mostly in bad jokes",
+      rotation: -3.5,
+      delay: 1.5,
+      positionClass: "hidden md:block absolute bottom-10 right-6 xl:right-20",
+    },
+  ];
 
   return (
-    <AnimatePresence mode="wait">
-      {!showContent ? (
-        <motion.section
-          key="welcome-closed"
-          id="welcome"
-          className="min-h-screen flex flex-col items-center justify-center px-6 relative"
-          exit={{ opacity: 0, scale: 0.95, y: -30 }}
-          transition={{ duration: 0.8, ease: "easeInOut" }}
+    <section
+      id="welcome"
+      className="relative min-h-[92vh] flex flex-col items-center justify-center px-4 sm:px-6 py-12 md:py-20 overflow-hidden text-center"
+      style={{
+        background: "radial-gradient(ellipse at 50% 30%, #FFF5F9 0%, #FFF0F5 50%, #EDE2FA 100%)",
+      }}
+    >
+      {/* Decorative dreamy pastel floating clouds/glows */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden z-0">
+        <div
+          className="absolute -top-24 -left-24 w-96 h-96 rounded-full opacity-60 blur-3xl"
+          style={{ background: "#FFE0EA" }}
+        />
+        <div
+          className="absolute top-1/4 -right-20 w-80 h-80 rounded-full opacity-50 blur-3xl"
+          style={{ background: "#EDE2FA" }}
+        />
+        <div
+          className="absolute -bottom-20 left-1/3 w-96 h-96 rounded-full opacity-40 blur-3xl"
+          style={{ background: "#FFCADB" }}
+        />
+      </div>
+
+      {/* Floating Polaroid: Top-Left (Desktop) */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.85, rotate: -8 }}
+        animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[0].rotation }}
+        transition={{ duration: 0.9, delay: 0.3 }}
+        whileHover={{ scale: 1.06, rotate: -2, zIndex: 30 }}
+        className={`${heroPolaroids[0].positionClass} z-10 w-48 xl:w-56 p-3 pb-4 bg-white rounded-xl shadow-md border border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-xl`}
+      >
+        <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-[var(--soft-pink)]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={heroPolaroids[0].src}
+            alt="Romantic memory moment"
+            className="w-full h-full object-cover"
+            onLoad={() => setPhotoLoaded((prev) => ({ ...prev, p1: true }))}
+          />
+          {!photoLoaded.p1 && (
+            <div className="absolute inset-0 flex items-center justify-center text-2xl">📸</div>
+          )}
+        </div>
+        <p className="mt-2.5 font-handwritten text-center text-sm text-[var(--romantic-plum)]">
+          {heroPolaroids[0].caption}
+        </p>
+      </motion.div>
+
+      {/* Floating Polaroid: Top-Right (Desktop) */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.85, rotate: 8 }}
+        animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[1].rotation }}
+        transition={{ duration: 0.9, delay: 0.4 }}
+        whileHover={{ scale: 1.06, rotate: 1, zIndex: 30 }}
+        className={`${heroPolaroids[1].positionClass} z-10 w-48 xl:w-56 p-3 pb-4 bg-white rounded-xl shadow-md border border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-xl`}
+      >
+        <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-[var(--lavender)]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={heroPolaroids[1].src}
+            alt="Romantic memory moment"
+            className="w-full h-full object-cover"
+            onLoad={() => setPhotoLoaded((prev) => ({ ...prev, p2: true }))}
+          />
+          {!photoLoaded.p2 && (
+            <div className="absolute inset-0 flex items-center justify-center text-2xl">🌅</div>
+          )}
+        </div>
+        <p className="mt-2.5 font-handwritten text-center text-sm text-[var(--romantic-plum)]">
+          {heroPolaroids[1].caption}
+        </p>
+      </motion.div>
+
+      {/* Floating Polaroid: Bottom-Left (Tablet/Desktop) */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.85, rotate: 6 }}
+        animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[2].rotation }}
+        transition={{ duration: 0.9, delay: 0.5 }}
+        whileHover={{ scale: 1.06, rotate: 0, zIndex: 30 }}
+        className={`${heroPolaroids[2].positionClass} z-10 w-44 xl:w-52 p-3 pb-4 bg-white rounded-xl shadow-md border border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-xl`}
+      >
+        <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-[var(--soft-pink)]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={heroPolaroids[2].src}
+            alt="Romantic memory moment"
+            className="w-full h-full object-cover"
+            onLoad={() => setPhotoLoaded((prev) => ({ ...prev, p3: true }))}
+          />
+          {!photoLoaded.p3 && (
+            <div className="absolute inset-0 flex items-center justify-center text-2xl">✨</div>
+          )}
+        </div>
+        <p className="mt-2.5 font-handwritten text-center text-sm text-[var(--romantic-plum)]">
+          {heroPolaroids[2].caption}
+        </p>
+      </motion.div>
+
+      {/* Floating Polaroid: Bottom-Right (Tablet/Desktop) */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.85, rotate: -6 }}
+        animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[3].rotation }}
+        transition={{ duration: 0.9, delay: 0.6 }}
+        whileHover={{ scale: 1.06, rotate: 0, zIndex: 30 }}
+        className={`${heroPolaroids[3].positionClass} z-10 w-44 xl:w-52 p-3 pb-4 bg-white rounded-xl shadow-md border border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-xl`}
+      >
+        <div className="relative aspect-square w-full rounded-lg overflow-hidden bg-[var(--pale-rose)]">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={heroPolaroids[3].src}
+            alt="Romantic memory moment"
+            className="w-full h-full object-cover"
+            onLoad={() => setPhotoLoaded((prev) => ({ ...prev, p4: true }))}
+          />
+          {!photoLoaded.p4 && (
+            <div className="absolute inset-0 flex items-center justify-center text-2xl">💛</div>
+          )}
+        </div>
+        <p className="mt-2.5 font-handwritten text-center text-sm text-[var(--romantic-plum)]">
+          {heroPolaroids[3].caption}
+        </p>
+      </motion.div>
+
+      {/* Central Storybook Content */}
+      <div className="relative z-20 max-w-2xl mx-auto flex flex-col items-center">
+        {/* Adorable Illustrated Couple: Bubu & Dudu Sitting Together */}
+        <motion.div
+          initial={{ opacity: 0, y: -20, scale: 0.9 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="mb-2"
         >
-          {/* Decorative circles */}
-          <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            <div
-              className="absolute -top-20 -right-20 w-80 h-80 rounded-full animate-float-slow"
-              style={{ background: "radial-gradient(circle, var(--bg-blush) 0%, transparent 70%)" }}
-            />
-            <div
-              className="absolute -bottom-40 -left-20 w-96 h-96 rounded-full animate-float"
-              style={{ background: "radial-gradient(circle, var(--pale-rose) 0%, transparent 70%)" }}
-            />
-            <div
-              className="absolute top-1/3 right-10 w-40 h-40 rounded-full"
-              style={{ background: "radial-gradient(circle, var(--lavender) 0%, transparent 70%)", opacity: 0.5 }}
-            />
-          </div>
+          <BubuDuduSittingTogether size={180} />
+        </motion.div>
 
-          {/* Small greeting */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.8 }}
-            className="font-script text-2xl md:text-3xl mb-4"
-            style={{ color: "var(--pink-strong)" }}
-          >
-            Hey, {recipientNickname} 💕
-          </motion.p>
-
-          {/* Main title */}
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6, duration: 0.8 }}
-            className="font-serif text-4xl md:text-6xl lg:text-7xl font-semibold text-center leading-tight max-w-3xl"
-            style={{ color: "var(--text-primary)" }}
-          >
-            {title}
-          </motion.h1>
-
-          {/* Subtitle */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.0, duration: 0.8 }}
-            className="mt-6 text-lg md:text-xl text-center max-w-lg"
-            style={{ color: "var(--text-secondary)" }}
-          >
-            {subtitle}
-          </motion.p>
-
-          {/* Gift Box / Envelope */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 1.4, duration: 0.8, type: "spring", stiffness: 100 }}
-            className="mt-12 relative"
-          >
-            {!isRevealing ? (
-              <button
-                onClick={handleOpen}
-                className="group relative cursor-pointer"
-                aria-label="Open your surprise"
-              >
-                {/* Envelope */}
-                <div className="relative w-64 h-44 md:w-80 md:h-52 transition-transform duration-300 group-hover:scale-105">
-                  {/* Envelope body */}
-                  <div
-                    className="absolute inset-0 rounded-2xl shadow-lg"
-                    style={{
-                      background: "linear-gradient(135deg, var(--pale-rose) 0%, var(--bg-blush) 100%)",
-                      border: "2px solid var(--border-subtle)",
-                    }}
-                  />
-                  {/* Envelope flap */}
-                  <div
-                    className="absolute top-0 left-0 right-0 h-1/2 origin-top transition-transform duration-500 group-hover:-rotate-x-6"
-                    style={{
-                      background: "linear-gradient(180deg, var(--bg-blush) 0%, var(--pale-rose) 100%)",
-                      clipPath: "polygon(0 0, 50% 60%, 100% 0)",
-                      borderBottom: "2px solid var(--border-subtle)",
-                    }}
-                  />
-                  {/* Heart seal */}
-                  <div className="absolute top-6 left-1/2 -translate-x-1/2 z-10">
-                    <div
-                      className="w-10 h-10 flex items-center justify-center rounded-full animate-pulse-soft"
-                      style={{ background: "var(--pink-primary)" }}
-                    >
-                      <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-                      </svg>
-                    </div>
-                  </div>
-                  {/* Text on envelope */}
-                  <div className="absolute inset-0 flex items-end justify-center pb-6">
-                    <span
-                      className="font-script text-xl md:text-2xl"
-                      style={{ color: "var(--pink-strong)" }}
-                    >
-                      For You ♡
-                    </span>
-                  </div>
-                </div>
-
-                {/* CTA text */}
-                <motion.p
-                  animate={{ y: [0, -5, 0] }}
-                  transition={{ repeat: Infinity, duration: 2, ease: "easeInOut" }}
-                  className="mt-8 text-center font-sans text-sm tracking-widest uppercase"
-                  style={{ color: "var(--pink-primary)" }}
-                >
-                  Tap to open your surprise
-                </motion.p>
-              </button>
-            ) : (
-              <motion.div
-                initial={{ scale: 1 }}
-                animate={{ scale: [1, 1.1, 0.9, 1.05, 0], rotate: [0, -5, 5, -3, 0] }}
-                transition={{ duration: 0.8, ease: "easeInOut" }}
-                className="w-64 h-44 md:w-80 md:h-52 rounded-2xl flex items-center justify-center"
-                style={{ background: "var(--bg-blush)" }}
-              >
-                <span className="text-6xl">💕</span>
-              </motion.div>
-            )}
-          </motion.div>
-        </motion.section>
-      ) : (
-        <motion.section
-          key="welcome-open"
-          id="welcome"
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1 }}
-          className="min-h-screen flex flex-col items-center justify-center px-6 py-20 relative"
+        {/* Story Eyebrow */}
+        <motion.div
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.3 }}
+          className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 border border-[var(--border-subtle)] shadow-2xs mb-4"
         >
-          {/* Sparkle burst */}
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: [0, 1.5, 1], opacity: [0, 1, 0.8] }}
-            transition={{ duration: 1, ease: "easeOut" }}
-            className="absolute top-1/4 left-1/2 -translate-x-1/2 -translate-y-1/2"
-          >
-            <span className="text-6xl md:text-8xl">✨</span>
-          </motion.div>
+          <span className="text-[11px] font-bold tracking-widest uppercase font-rounded text-[var(--pink-strong)]">
+            CHAPTER ∞ · AN ONGOING STORY
+          </span>
+          <span className="text-xs">✨</span>
+        </motion.div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5, duration: 1 }}
-            className="text-center max-w-2xl"
-          >
-            <p
-              className="font-script text-3xl md:text-4xl mb-6"
-              style={{ color: "var(--pink-strong)" }}
-            >
-              Welcome to our little world
-            </p>
-            <p
-              className="text-base md:text-lg leading-relaxed mb-10"
-              style={{ color: "var(--text-secondary)", lineHeight: 1.9 }}
-            >
-              {message}
-            </p>
-          </motion.div>
+        {/* Main Title: "you & me" in Playful Rounded Display Font (Inspired by Reference 2) */}
+        <motion.h1
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+          className="font-rounded text-6xl sm:text-7xl md:text-8xl font-bold tracking-tight text-[var(--romantic-plum)] leading-none select-none"
+        >
+          {title ? (
+            title
+          ) : (
+            <>
+              you <span className="font-script text-[var(--pink-primary)] font-normal px-1 text-7xl sm:text-8xl md:text-9xl">&amp;</span> me
+            </>
+          )}
+        </motion.h1>
 
-          <motion.button
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.2, duration: 0.8 }}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+        {/* Personalized dedication for recipient */}
+        <motion.p
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.6 }}
+          className="mt-3 font-handwritten text-xl sm:text-2xl text-[var(--pink-strong)]"
+        >
+          For my sweetest {recipientNickname} ♡
+        </motion.p>
+
+        {/* Subtitle / Romantic Tagline */}
+        <motion.p
+          initial={{ opacity: 0, y: 15 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.7 }}
+          className="mt-3 text-sm sm:text-base md:text-lg text-[var(--text-secondary)] max-w-lg leading-relaxed font-sans"
+        >
+          {subtitle || "an entirely accidental love story told mostly in polaroids and bad jokes 🥹"}
+        </motion.p>
+
+        {/* Optional heartfelt personal message snippet if provided */}
+        {message && message !== subtitle && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.85 }}
+            className="mt-3 text-xs sm:text-sm text-[var(--text-muted)] italic max-w-md"
+          >
+            &ldquo;{message}&rdquo;
+          </motion.p>
+        )}
+
+        {/* Primary Action Button: "Let's continue ♡" */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.9 }}
+          className="mt-8 flex flex-col items-center gap-4"
+        >
+          <button
             onClick={onEnter}
-            className="px-10 py-4 rounded-full font-sans font-medium text-white text-lg shadow-lg cursor-pointer transition-shadow hover:shadow-xl"
-            style={{
-              background: "linear-gradient(135deg, var(--pink-primary) 0%, var(--pink-strong) 100%)",
-              boxShadow: "0 8px 30px var(--shadow-pink-strong)",
-            }}
+            className="group relative px-9 py-3.5 rounded-full text-white font-rounded font-semibold text-base sm:text-lg bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] shadow-lg shadow-pink-300/40 hover:shadow-xl hover:shadow-pink-400/50 hover:scale-105 active:scale-95 cursor-pointer transition-all duration-300 flex items-center gap-2"
           >
-            Begin Exploring ♡
-          </motion.button>
-        </motion.section>
-      )}
-    </AnimatePresence>
+            <span>Let&apos;s continue</span>
+            <span className="text-xl group-hover:scale-125 transition-transform duration-300">♡</span>
+          </button>
+
+          {/* Scroll Cue (Inspired by Reference 2) */}
+          <div className="flex flex-col items-center gap-1.5 pt-3">
+            <span className="text-[10px] font-bold tracking-widest uppercase font-rounded text-[var(--pink-strong)]">
+              SCROLL FOR THE FULL STORY ↓
+            </span>
+            <button
+              onClick={onEnter}
+              className="px-3 py-1 rounded-full bg-[var(--pale-rose)]/70 text-[var(--pink-deep)] text-[10px] font-semibold animate-bounce cursor-pointer hover:bg-[var(--pale-rose)]"
+            >
+              keep going
+            </button>
+          </div>
+        </motion.div>
+      </div>
+    </section>
   );
 }

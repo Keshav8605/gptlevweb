@@ -6,6 +6,7 @@ import { motion } from "framer-motion";
 import type { GiftRecord } from "@/lib/server-db";
 import { defaultGiftConfig } from "@/lib/gift-data";
 import { FloatingHearts } from "@/components/FloatingHearts";
+import { CursorHeartTrail } from "@/components/CursorHeartTrail";
 import { GiftNavigation } from "@/components/GiftNavigation";
 import { WelcomeExperience } from "@/components/sections/WelcomeExperience";
 import { ObservationsSection } from "@/components/sections/ObservationsSection";
@@ -243,6 +244,8 @@ function GiftRecipientContent({
     <main className="relative min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)]">
       {/* Floating hearts ambience */}
       <FloatingHearts />
+      {/* Delightful cursor heart trail */}
+      <CursorHeartTrail />
 
       {/* Floating navigation bar */}
       <GiftNavigation

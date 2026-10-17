@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { defaultGiftConfig } from "@/lib/gift-data";
 import { FloatingHearts } from "@/components/FloatingHearts";
+import { CursorHeartTrail } from "@/components/CursorHeartTrail";
 import { GiftNavigation } from "@/components/GiftNavigation";
 import { WelcomeExperience } from "@/components/sections/WelcomeExperience";
 import { ObservationsSection } from "@/components/sections/ObservationsSection";
@@ -63,6 +64,8 @@ export default function Home() {
     <main className="relative min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)]">
       {/* Delicate floating background ambience */}
       <FloatingHearts />
+      {/* Delightful cursor heart trail */}
+      <CursorHeartTrail />
 
       {/* Floating interactive navigation menu */}
       <GiftNavigation

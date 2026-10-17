@@ -3,6 +3,8 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { SectionWrapper } from "../SectionWrapper";
+import { HeartPhotoCollage } from "../HeartPhotoCollage";
+import { PandaHuggingHeart } from "../CuteIllustrations";
 import type { Milestone } from "@/lib/gift-data";
 
 interface FinalHeartSectionProps {
@@ -83,22 +85,32 @@ export function FinalHeartSection({
   return (
     <SectionWrapper
       id="finalHeart"
-      title="Forever & Always"
-      subtitle="Every second since the day my life became intertwined with yours"
+      title="A Thousand Little Moments, One Big Love"
+      subtitle="Every picture, every heartbeat, every step leading right to you ♡"
       emoji="❤️"
       bgVariant="blush"
     >
       <div className="max-w-4xl mx-auto space-y-16">
+        {/* The Emotional Climax: Genuine Heart-Shaped Photo Collage */}
+        <div className="relative">
+          <HeartPhotoCollage />
+        </div>
+
         {/* Relationship Counter */}
-        <div className="text-center">
-          <motion.p
+        <div className="text-center pt-6 border-t border-[var(--border-subtle)]">
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="font-script text-2xl md:text-3xl mb-6 text-[var(--pink-strong)]"
+            className="flex flex-col items-center mb-6"
           >
-            We have been loving each other for
-          </motion.p>
+            <div className="mb-2">
+              <PandaHuggingHeart size={130} heartText="Forever" />
+            </div>
+            <p className="font-handwritten text-2xl md:text-3xl text-[var(--pink-strong)]">
+              We have been loving each other for
+            </p>
+          </motion.div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-2xl mx-auto">
             {[
@@ -113,12 +125,12 @@ export function FinalHeartSection({
                 whileInView={{ opacity: 1, scale: 1 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, type: "spring", stiffness: 200 }}
-                className="bg-white/80 backdrop-blur-md rounded-2xl p-5 border border-[var(--border-subtle)] shadow-sm hover:shadow-md transition-shadow"
+                className="bg-white/90 backdrop-blur-md rounded-2xl p-5 border border-[var(--border-subtle)] shadow-xs hover:shadow-md transition-shadow"
               >
-                <div className="font-serif text-3xl md:text-4xl font-bold text-[var(--pink-deep)]">
+                <div className="font-rounded text-3xl md:text-4xl font-bold text-[var(--pink-deep)]">
                   {unit.value.toString().padStart(2, "0")}
                 </div>
-                <div className="text-xs uppercase tracking-wider text-[var(--text-muted)] font-medium mt-1">
+                <div className="text-xs uppercase tracking-wider text-[var(--text-muted)] font-rounded font-semibold mt-1">
                   {unit.label}
                 </div>
               </motion.div>
@@ -136,10 +148,10 @@ export function FinalHeartSection({
               {milestones.map((m) => (
                 <div
                   key={m.id}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/70 border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] shadow-xs"
+                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/80 border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] shadow-2xs font-rounded"
                 >
                   <span className="text-[var(--pink-primary)]">✨</span>
-                  <span className="font-medium text-[var(--text-primary)]">{m.label}</span>
+                  <span className="font-semibold text-[var(--text-primary)]">{m.label}</span>
                   <span className="text-[var(--text-muted)]">
                     ({new Date(m.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })})
                   </span>
@@ -149,43 +161,7 @@ export function FinalHeartSection({
           )}
         </div>
 
-        {/* Heart Photo Mosaic / Collage */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          whileInView={{ opacity: 1, scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.8 }}
-          className="relative max-w-2xl mx-auto py-6"
-        >
-          <div className="relative aspect-[16/11] rounded-3xl p-6 sm:p-8 bg-gradient-to-br from-white via-[var(--bg-surface)] to-[var(--pale-rose)] border border-[var(--border-medium)] shadow-xl overflow-hidden flex flex-col items-center justify-center text-center">
-            {/* Heart SVG Silhouette */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-10">
-              <svg width="340" height="340" viewBox="0 0 24 24" fill="var(--pink-primary)">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-              </svg>
-            </div>
-
-            {/* Collage of Floating Polaroid Moments */}
-            <div className="relative z-10 space-y-4">
-              <div className="inline-block p-3 rounded-full bg-[var(--pale-rose)] text-3xl animate-bounce">
-                💖
-              </div>
-              <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-[var(--text-primary)]">
-                You Are My Favorite Story
-              </h3>
-              <p className="max-w-md mx-auto text-sm sm:text-base text-[var(--text-secondary)] leading-relaxed">
-                Out of all the people, in all the places, in all the worlds... finding you will forever be the most wondrous thing that ever happened to me.
-              </p>
-              <div className="pt-2 flex items-center justify-center gap-2 text-xs text-[var(--pink-strong)] font-script text-xl">
-                <span>Always & Forever</span>
-                <span>•</span>
-                <span>My Heart is Yours</span>
-              </div>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Personalized Final Letter */}
+        {/* Personalized Final Letter / Last Secret */}
         {finalLetter && (
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -197,7 +173,9 @@ export function FinalHeartSection({
             {/* Elegant Header Accent */}
             <div className="flex items-center justify-center gap-3 mb-8">
               <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[var(--border-medium)]" />
-              <span className="font-script text-3xl text-[var(--pink-strong)] px-2">One Last Love Note</span>
+              <span className="font-handwritten text-3xl sm:text-4xl text-[var(--pink-strong)] px-2">
+                One Last Love Note ♡
+              </span>
               <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[var(--border-medium)]" />
             </div>
 
@@ -216,10 +194,10 @@ export function FinalHeartSection({
 
             {finalMessage && (
               <div className="mt-8 pt-6 border-t border-[var(--border-subtle)] text-center sm:text-right">
-                <p className="font-script text-2xl text-[var(--pink-strong)]">
+                <p className="font-handwritten text-2xl text-[var(--pink-strong)]">
                   {finalMessage}
                 </p>
-                <p className="text-xs uppercase tracking-wider text-[var(--text-muted)] mt-1">
+                <p className="text-xs uppercase tracking-wider text-[var(--text-muted)] mt-1 font-rounded">
                   — With endless love, {senderName}
                 </p>
               </div>
@@ -249,12 +227,12 @@ export function FinalHeartSection({
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             onClick={handleSendLove}
-            className="px-8 py-4 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white font-medium shadow-lg hover:shadow-xl transition-all cursor-pointer inline-flex items-center gap-3 text-base"
+            className="px-8 py-4 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white font-rounded font-semibold shadow-lg hover:shadow-xl transition-all cursor-pointer inline-flex items-center gap-3 text-base shadow-pink-300/40"
           >
             <span className="text-xl">💌</span>
             <span>{hasSentLove ? "Send More Love!" : "Send Love Back to Me"}</span>
             {loveCount > 0 && (
-              <span className="bg-white/25 px-2 py-0.5 rounded-full text-xs font-bold">
+              <span className="bg-white/25 px-2 py-0.5 rounded-full text-xs font-bold font-rounded">
                 {loveCount}
               </span>
             )}
@@ -264,7 +242,7 @@ export function FinalHeartSection({
             <motion.p
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
-              className="mt-4 font-script text-xl text-[var(--pink-strong)]"
+              className="mt-4 font-handwritten text-2xl text-[var(--pink-strong)]"
             >
               Your love has been sent right to my heart! 🥺💕
             </motion.p>
@@ -273,7 +251,7 @@ export function FinalHeartSection({
           <div className="mt-12">
             <button
               onClick={scrollToTop}
-              className="text-xs tracking-wider uppercase text-[var(--text-muted)] hover:text-[var(--pink-strong)] transition-colors cursor-pointer inline-flex items-center gap-1.5"
+              className="text-xs tracking-wider uppercase text-[var(--text-muted)] hover:text-[var(--pink-strong)] transition-colors cursor-pointer inline-flex items-center gap-1.5 font-rounded font-semibold"
             >
               <span>↑</span>
               <span>Back to beginning of our world</span>

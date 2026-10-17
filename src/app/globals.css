@@ -1,32 +1,39 @@
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Dancing+Script:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Dancing+Script:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
-  /* Romantic Pink Design System */
-  --bg-main: #FFF8FB;
-  --bg-surface: #FFF0F6;
-  --bg-blush: #FADCE8;
-  --pink-primary: #E98BB4;
-  --pink-strong: #D96D9C;
-  --pink-deep: #C4558A;
-  --pale-rose: #FCE7EF;
-  --warm-cream: #FFF9F0;
-  --lavender: #EDE5FA;
-  --lavender-soft: #F5F0FC;
-  --text-primary: #49323F;
-  --text-secondary: #806A78;
-  --text-muted: #A8939F;
-  --border-subtle: #F0DDE6;
-  --border-medium: #E8C8D8;
+  /* Dreamy Pastel Romantic Palette */
+  --bg-main: #FFF0F5;
+  --bg-blush: #FFF0F5;
+  --bg-surface: #FFE0EA;
+  --soft-pink: #FFE0EA;
+  --light-rose: #FFCADB;
+  --pale-rose: #FFCADB;
+  --pink-primary: #FF5F96;
+  --pink-strong: #E84D85;
+  --pink-deep: #C4386F;
+  --lavender: #EDE2FA;
+  --lavender-soft: #F7F0FF;
+  --pale-lavender: #F7F0FF;
+  --warm-cream: #FFF9F3;
   --white: #FFFFFF;
-  --shadow-pink: rgba(233, 139, 180, 0.12);
-  --shadow-pink-strong: rgba(233, 139, 180, 0.25);
-  --glow-pink: rgba(233, 139, 180, 0.3);
+  --romantic-plum: #51243F;
+  --text-primary: #51243F;
+  --muted-rose: #987589;
+  --text-secondary: #855870;
+  --text-muted: #987589;
+  --border-subtle: #F5D5E2;
+  --border-medium: #E8B4C9;
+  --shadow-pink: rgba(255, 95, 150, 0.14);
+  --shadow-pink-strong: rgba(232, 77, 133, 0.22);
+  --glow-pink: rgba(255, 95, 150, 0.35);
 
   /* Typography */
+  --font-rounded: 'Fredoka', 'Nunito', -apple-system, sans-serif;
   --font-serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
   --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
   --font-script: 'Dancing Script', cursive;
+  --font-handwritten: 'Caveat', 'Dancing Script', cursive;
 }
 
 @theme inline {
@@ -37,18 +44,24 @@
   --color-pink-deep: var(--pink-deep);
   --color-bg-surface: var(--bg-surface);
   --color-bg-blush: var(--bg-blush);
+  --color-soft-pink: var(--soft-pink);
+  --color-light-rose: var(--light-rose);
   --color-pale-rose: var(--pale-rose);
   --color-warm-cream: var(--warm-cream);
   --color-lavender: var(--lavender);
   --color-lavender-soft: var(--lavender-soft);
+  --color-pale-lavender: var(--pale-lavender);
   --color-text-primary: var(--text-primary);
   --color-text-secondary: var(--text-secondary);
   --color-text-muted: var(--text-muted);
+  --color-romantic-plum: var(--romantic-plum);
   --color-border-subtle: var(--border-subtle);
   --color-border-medium: var(--border-medium);
   --font-sans: var(--font-sans);
   --font-serif: var(--font-serif);
   --font-script: var(--font-script);
+  --font-rounded: var(--font-rounded);
+  --font-handwritten: var(--font-handwritten);
 }
 
 /* Base Styles */
@@ -168,11 +181,28 @@ body {
 .font-serif { font-family: var(--font-serif); }
 .font-sans { font-family: var(--font-sans); }
 .font-script { font-family: var(--font-script); }
+.font-rounded { font-family: var(--font-rounded); }
+.font-handwritten { font-family: var(--font-handwritten); }
 
 .animate-float { animation: float 6s ease-in-out infinite; }
 .animate-float-slow { animation: floatSlow 8s ease-in-out infinite; }
 .animate-pulse-soft { animation: pulse-soft 3s ease-in-out infinite; }
 .animate-heartbeat { animation: heartbeat 2s ease-in-out infinite; }
+.animate-bob { animation: bobSlow 4s ease-in-out infinite; }
+.animate-cute-wiggle { animation: cuteWiggle 3s ease-in-out infinite; }
+.animate-sparkle { animation: twinkle 2.5s ease-in-out infinite; }
+
+@keyframes bobSlow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+@keyframes cuteWiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-2.5deg); }
+  75% { transform: rotate(2.5deg); }
+}
+
 .animate-shimmer {
   background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
   background-size: 200% 100%;

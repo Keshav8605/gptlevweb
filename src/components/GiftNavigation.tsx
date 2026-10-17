@@ -11,21 +11,21 @@ export interface NavItem {
 }
 
 const defaultNavItems: NavItem[] = [
-  { id: "welcome", label: "Welcome", emoji: "💌" },
+  { id: "welcome", label: "You & Me", emoji: "🧸" },
   { id: "observations", label: "Things I Noticed", emoji: "👀" },
-  { id: "memories", label: "Our Memories", emoji: "📸" },
+  { id: "memories", label: "Polaroid Scrapbook", emoji: "📸" },
   { id: "secretWorld", label: "Secret World", emoji: "🔒" },
   { id: "deluluMode", label: "Delulu Mode", emoji: "🦋" },
-  { id: "quiz", label: "Our Quiz", emoji: "❓" },
-  { id: "letters", label: "My Letters", emoji: "💌" },
+  { id: "quiz", label: "Do You Love Me?", emoji: "💖" },
+  { id: "letters", label: "Love Letters", emoji: "💌" },
   { id: "notebook", label: "Our Notebook", emoji: "📖" },
   { id: "voice", label: "Voice Whispers", emoji: "🎙️" },
   { id: "datePlanner", label: "Date Planner", emoji: "🗺️" },
   { id: "openWhenLetters", label: "Open When...", emoji: "✉️" },
-  { id: "littleReasons", label: "Little Reasons", emoji: "💗" },
+  { id: "littleReasons", label: "Why I Love You", emoji: "💗" },
   { id: "digitalGifts", label: "Gifts For You", emoji: "🎁" },
   { id: "ourSong", label: "Our Song", emoji: "🎵" },
-  { id: "finalHeart", label: "Forever & Always", emoji: "❤️" },
+  { id: "finalHeart", label: "Heart Collage", emoji: "❤️" },
 ];
 
 interface GiftNavigationProps {

@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useCallback } from "react";
 import { SectionWrapper } from "../SectionWrapper";
+import { ShyHappyPanda } from "../CuteIllustrations";
 import type { LittleReason } from "@/lib/gift-data";
 
 export const defaultReasonsList: LittleReason[] = [
@@ -89,47 +90,73 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
   return (
     <SectionWrapper
       id="littleReasons"
-      title="Little Reasons Why I Love You"
-      subtitle="A collection of the countless daily moments and habits that make my heart adore you"
+      title=""
+      subtitle=""
       emoji="💗"
       bgVariant="cream"
     >
-      <div className="max-w-xl mx-auto">
-        {/* Top Control Bar: Counter & Favorites button */}
-        <div className="flex items-center justify-between mb-8 pb-3 border-b border-[var(--border-subtle)]">
-          <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold uppercase tracking-wider text-[var(--pink-strong)]">
-              Reason {currentIndex + 1} of {activeReasons.length}
-            </span>
-          </div>
+      <div className="max-w-2xl mx-auto text-center">
+        {/* Pink pill badge (Matching Reference 4) */}
+        <div className="inline-block px-4 py-1.5 rounded-full bg-[var(--pink-strong)] text-white text-xs font-rounded font-semibold tracking-wide shadow-xs mb-4">
+          a list. for u. only u.
+        </div>
+
+        {/* Multi-Font Styled Romantic Title (Matching Reference 4) */}
+        <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--romantic-plum)] leading-tight select-none mb-3">
+          <span className="font-rounded text-[#A588B8] pr-2">reasons</span>
+          <span className="font-script text-[var(--pink-primary)] font-normal text-5xl sm:text-6xl pr-2">why</span>
+          <span className="font-rounded text-[var(--romantic-plum)] pr-2">i love</span>
+          <span className="font-script text-[var(--pink-strong)] font-normal text-5xl sm:text-6xl">you</span>
+        </h2>
+
+        {/* Cute Illustrated Shy Panda (Matching Reference 4) */}
+        <div className="my-2">
+          <ShyHappyPanda size={140} />
+        </div>
+
+        {/* Playful Subtitle (Matching Reference 4) */}
+        <div className="space-y-1 mb-8">
+          <p className="font-handwritten text-lg sm:text-xl text-[var(--text-secondary)]">
+            i sat down, counted, it took a while.
+          </p>
+          <p className="font-rounded text-sm sm:text-base font-medium text-[var(--pink-strong)]">
+            there&apos;s like a million okay, here&apos;s some 🥹
+          </p>
+        </div>
+
+        {/* Top Control Bar: Reason Counter & Saved Favorites link */}
+        <div className="flex items-center justify-between px-2 mb-4 pb-2 border-b border-[var(--border-subtle)] text-xs">
+          <span className="font-rounded font-semibold tracking-wider text-[var(--pink-strong)] uppercase">
+            Reason #{currentIndex + 1} of {activeReasons.length}
+          </span>
 
           <button
             onClick={() => setShowFavoritesModal(true)}
-            className="text-xs font-semibold text-[var(--pink-deep)] hover:underline cursor-pointer flex items-center gap-1.5"
+            className="font-rounded font-semibold text-[var(--pink-deep)] hover:underline cursor-pointer flex items-center gap-1.5"
           >
             <span>♥ Saved Favorites ({savedFavorites.length})</span>
           </button>
         </div>
 
         {/* Reason Card Display */}
-        <div className="relative min-h-[260px] flex items-center justify-center">
+        <div className="relative min-h-[220px] flex items-center justify-center">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={currentReason?.id || currentIndex}
               custom={direction}
-              initial={{ opacity: 0, x: direction * 50, scale: 0.95 }}
+              initial={{ opacity: 0, x: direction * 40, scale: 0.95 }}
               animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: -direction * 50, scale: 0.95 }}
+              exit={{ opacity: 0, x: -direction * 40, scale: 0.95 }}
               transition={{ duration: 0.35, ease: "easeInOut" }}
-              className="w-full bg-white rounded-3xl p-8 sm:p-12 text-center border border-[var(--border-subtle)] shadow-[0_8px_30px_var(--shadow-pink)] relative overflow-hidden"
+              className="w-full bg-white rounded-3xl p-6 sm:p-10 text-center border border-[var(--border-subtle)] shadow-md relative overflow-hidden"
             >
               {/* Emoji badge */}
-              <div className="w-16 h-16 mx-auto rounded-full bg-[var(--pale-rose)] flex items-center justify-center text-3xl mb-6 shadow-xs">
+              <div className="w-14 h-14 mx-auto rounded-full bg-[var(--soft-pink)] flex items-center justify-center text-3xl mb-4 shadow-2xs">
                 {currentReason?.emoji || "💕"}
               </div>
 
               {/* Reason Text */}
-              <p className="font-serif text-xl sm:text-2xl font-medium leading-relaxed text-[var(--text-primary)] mb-6">
+              <p className="font-serif text-xl sm:text-2xl font-medium leading-relaxed text-[var(--romantic-plum)] mb-6">
                 &ldquo;{currentReason?.text}&rdquo;
               </p>
 
@@ -137,32 +164,32 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
               <div className="flex items-center justify-center">
                 <button
                   onClick={toggleFavorite}
-                  className={`px-4 py-1.5 rounded-full text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 border ${
+                  className={`px-5 py-2 rounded-full text-xs font-rounded font-semibold transition-all cursor-pointer flex items-center gap-1.5 border ${
                     isFavorited
-                      ? "bg-[var(--pink-primary)] text-white border-[var(--pink-strong)] shadow-sm"
+                      ? "bg-[var(--pink-primary)] text-white border-[var(--pink-strong)] shadow-xs"
                       : "bg-[var(--pale-rose)] text-[var(--pink-strong)] border-[var(--border-subtle)] hover:bg-[var(--bg-blush)]"
                   }`}
                 >
-                  <span>{isFavorited ? "♥ Saved to Favorites" : "♡ Save to Favorites"}</span>
+                  <span>{isFavorited ? "♥ Saved in My Heart" : "♡ Save to Favorites"}</span>
                 </button>
               </div>
             </motion.div>
           </AnimatePresence>
         </div>
 
-        {/* Controls: Prev, Random, Next */}
-        <div className="flex items-center justify-between mt-8 pt-2">
+        {/* Controls: Prev, Surprise Me, Next */}
+        <div className="flex items-center justify-between mt-6 pt-2">
           <button
             onClick={handlePrevious}
             disabled={currentIndex === 0}
-            className="px-4 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-[var(--text-secondary)] disabled:opacity-30 cursor-pointer"
+            className="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-medium text-[var(--text-secondary)] hover:bg-white/60 disabled:opacity-30 cursor-pointer transition-colors"
           >
             ← Previous
           </button>
 
           <button
             onClick={handleRandom}
-            className="px-5 py-2.5 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] hover:bg-[var(--bg-blush)] text-xs font-semibold cursor-pointer transition-colors shadow-xs"
+            className="px-6 py-2.5 rounded-full bg-white border border-[var(--border-medium)] text-[var(--pink-strong)] hover:bg-[var(--soft-pink)] text-xs font-rounded font-semibold cursor-pointer transition-all shadow-2xs hover:scale-105"
           >
             🎲 Surprise Me
           </button>
@@ -170,14 +197,14 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
           <button
             onClick={handleNext}
             disabled={currentIndex === activeReasons.length - 1}
-            className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-[var(--pink-strong)] text-white hover:bg-[var(--pink-deep)] disabled:opacity-30 cursor-pointer transition-colors"
+            className="px-6 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-semibold bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white hover:opacity-95 disabled:opacity-30 cursor-pointer transition-all shadow-xs hover:scale-105"
           >
             Next Reason →
           </button>
         </div>
 
-        {/* Subtle Progress Line */}
-        <div className="mt-6 h-1 rounded-full bg-[var(--border-subtle)] overflow-hidden">
+        {/* Progress Line */}
+        <div className="mt-5 h-1.5 rounded-full bg-[var(--border-subtle)] overflow-hidden">
           <motion.div
             className="h-full rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)]"
             animate={{ width: `${((currentIndex + 1) / activeReasons.length) * 100}%` }}
@@ -205,7 +232,7 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
             >
               <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)] mb-4">
                 <div>
-                  <h3 className="font-serif text-2xl font-semibold text-[var(--text-primary)]">
+                  <h3 className="font-rounded text-2xl font-bold text-[var(--romantic-plum)]">
                     Your Saved Reasons ♥
                   </h3>
                   <p className="text-xs text-[var(--text-muted)]">

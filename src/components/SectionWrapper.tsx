@@ -42,46 +42,40 @@ export function SectionWrapper({
       style={{ backgroundColor: bgColors[bgVariant] }}
     >
       <div className="max-w-5xl mx-auto">
-        {/* Section header */}
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-center mb-12 md:mb-16"
-        >
-          {emoji && (
-            <motion.span
-              className="text-3xl md:text-4xl inline-block mb-4"
-              initial={{ scale: 0 }}
-              animate={isInView ? { scale: 1 } : {}}
-              transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 12 }}
-            >
-              {emoji}
-            </motion.span>
-          )}
-          <h2
-            className="font-serif text-3xl md:text-4xl lg:text-5xl font-semibold"
-            style={{ color: "var(--text-primary)" }}
+        {/* Section header (only if title is provided) */}
+        {title && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.8, ease: "easeOut" }}
+            className="text-center mb-10 md:mb-14"
           >
-            {title}
-          </h2>
-          {subtitle && (
-            <p
-              className="mt-3 text-base md:text-lg max-w-xl mx-auto"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              {subtitle}
-            </p>
-          )}
-          {/* Decorative line */}
-          <div className="mt-6 flex items-center justify-center gap-2">
-            <div className="h-px w-12 md:w-16" style={{ background: "var(--border-medium)" }} />
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="var(--pink-primary)">
-              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-            </svg>
-            <div className="h-px w-12 md:w-16" style={{ background: "var(--border-medium)" }} />
-          </div>
-        </motion.div>
+            {emoji && (
+              <motion.span
+                className="text-3xl md:text-4xl inline-block mb-3"
+                initial={{ scale: 0 }}
+                animate={isInView ? { scale: 1 } : {}}
+                transition={{ delay: 0.2, type: "spring", stiffness: 200, damping: 12 }}
+              >
+                {emoji}
+              </motion.span>
+            )}
+            <h2 className="font-rounded text-3xl md:text-4xl lg:text-5xl font-bold text-[var(--romantic-plum)] tracking-tight">
+              {title}
+            </h2>
+            {subtitle && (
+              <p className="mt-2.5 font-handwritten text-lg sm:text-xl md:text-2xl text-[var(--text-secondary)] max-w-xl mx-auto">
+                {subtitle}
+              </p>
+            )}
+            {/* Cute Decorative heart line */}
+            <div className="mt-4 flex items-center justify-center gap-2">
+              <div className="h-px w-10 md:w-16 bg-[var(--border-medium)] opacity-70" />
+              <span className="text-xs text-[var(--pink-primary)] animate-pulse-soft">♥</span>
+              <div className="h-px w-10 md:w-16 bg-[var(--border-medium)] opacity-70" />
+            </div>
+          </motion.div>
+        )}
 
         {/* Section content */}
         <motion.div
