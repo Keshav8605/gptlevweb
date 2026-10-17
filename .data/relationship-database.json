@@ -1,0 +1,1916 @@
+{
+  "config": {
+    "giftId": "gift_world_demo",
+    "creatorPasscode": "love2024",
+    "recipientInviteToken": "sweetheart",
+    "invitationStatus": "active",
+    "creatorName": "Babe",
+    "recipientName": "Baby"
+  },
+  "reactions": [
+    {
+      "id": "rx_demo_1",
+      "targetType": "observation",
+      "targetId": "ob1",
+      "emoji": "🥺",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-16T22:04:22.374Z"
+    },
+    {
+      "id": "rx_1792220103249_rbkc",
+      "targetType": "observation",
+      "targetId": "ob1",
+      "emoji": "💖",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T06:55:03.249Z"
+    }
+  ],
+  "comments": [
+    {
+      "id": "cm_demo_1",
+      "targetType": "observation",
+      "targetId": "ob1",
+      "content": "I didn't think you ever noticed that! You make me blush so hard.",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-16T22:04:22.374Z",
+      "isViewedByCreator": false
+    },
+    {
+      "id": "cm_1792218123134_m55p",
+      "targetType": "memory",
+      "targetId": "m1",
+      "content": "I remember this day so vividly. You looked handsome in the rain.",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T06:22:03.134Z",
+      "isViewedByCreator": false
+    },
+    {
+      "id": "cm_1792218147209_u912",
+      "targetType": "memory",
+      "targetId": "m1",
+      "content": "I remember this day so vividly. You looked handsome in the rain.",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T06:22:27.209Z",
+      "isViewedByCreator": false
+    },
+    {
+      "id": "cm_1792218607644_vcez",
+      "targetType": "memory",
+      "targetId": "m1",
+      "content": "I remember this day so vividly. You looked handsome in the rain.",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T06:30:07.644Z",
+      "isViewedByCreator": false
+    },
+    {
+      "id": "cm_1792218940160_59rj",
+      "targetType": "memory",
+      "targetId": "m1",
+      "content": "I remember this day so vividly. You looked handsome in the rain.",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T06:35:40.160Z",
+      "isViewedByCreator": false
+    },
+    {
+      "id": "cm_1792219088680_s5hf",
+      "targetType": "memory",
+      "targetId": "m1",
+      "content": "I remember this day so vividly. You looked handsome in the rain.",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T06:38:08.680Z",
+      "isViewedByCreator": false
+    },
+    {
+      "id": "cm_1792219159606_souw",
+      "targetType": "memory",
+      "targetId": "m1",
+      "content": "I remember this day so vividly. You looked handsome in the rain.",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T06:39:19.606Z",
+      "isViewedByCreator": false
+    },
+    {
+      "id": "cm_1792220103313_bcmx",
+      "targetType": "memory",
+      "targetId": "m1",
+      "content": "I remember this day so vividly. You looked handsome in the rain.",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T06:55:03.313Z",
+      "isViewedByCreator": false
+    }
+  ],
+  "journalEntries": [
+    {
+      "id": "jn_demo_1",
+      "title": "The day you smiled at me like that",
+      "content": "I was thinking about the moment we were sitting in that little corner café, and you started laughing so hard your eyes crinkled. I remember whispering to myself: this is where I want to stay forever.",
+      "prompt": "A memory I never want to forget",
+      "moodEmoji": "☕",
+      "author": "creator",
+      "authorName": "Babe",
+      "createdAt": "2026-10-15T22:04:22.374Z",
+      "reactions": {
+        "❤️": [
+          "Baby"
+        ]
+      },
+      "replies": [
+        {
+          "id": "jnr_demo_1",
+          "content": "You kept staring at me and I wondered if I had chocolate on my cheek! 🙈 I love you so much.",
+          "author": "recipient",
+          "authorName": "Baby",
+          "createdAt": "2026-10-16T10:04:22.374Z"
+        }
+      ],
+      "isViewedByCreator": true
+    },
+    {
+      "id": "jn_1792218123160_d1tb",
+      "title": "Under the stars",
+      "content": "Listening to the crickets while holding your hand.",
+      "prompt": "A moment I felt closest to you",
+      "moodEmoji": "✨",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T06:22:03.160Z",
+      "reactions": {},
+      "replies": [],
+      "isViewedByCreator": false
+    },
+    {
+      "id": "jn_1792218147251_rat8",
+      "title": "Under the stars",
+      "content": "Listening to the crickets while holding your hand.",
+      "prompt": "A moment I felt closest to you",
+      "moodEmoji": "✨",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T06:22:27.251Z",
+      "reactions": {},
+      "replies": [],
+      "isViewedByCreator": false
+    },
+    {
+      "id": "jn_1792218607715_gk5i",
+      "title": "Under the stars",
+      "content": "Listening to the crickets while holding your hand.",
+      "prompt": "A moment I felt closest to you",
+      "moodEmoji": "✨",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T06:30:07.715Z",
+      "reactions": {},
+      "replies": [],
+      "isViewedByCreator": false
+    },
+    {
+      "id": "jn_1792218940207_h5f3",
+      "title": "Under the stars",
+      "content": "Listening to the crickets while holding your hand.",
+      "prompt": "A moment I felt closest to you",
+      "moodEmoji": "✨",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T06:35:40.207Z",
+      "reactions": {},
+      "replies": [],
+      "isViewedByCreator": false
+    },
+    {
+      "id": "jn_1792219088771_vx22",
+      "title": "Under the stars",
+      "content": "Listening to the crickets while holding your hand.",
+      "prompt": "A moment I felt closest to you",
+      "moodEmoji": "✨",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T06:38:08.771Z",
+      "reactions": {},
+      "replies": [],
+      "isViewedByCreator": false
+    },
+    {
+      "id": "jn_1792219159663_0z16",
+      "title": "Under the stars",
+      "content": "Listening to the crickets while holding your hand.",
+      "prompt": "A moment I felt closest to you",
+      "moodEmoji": "✨",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T06:39:19.663Z",
+      "reactions": {},
+      "replies": [],
+      "isViewedByCreator": false
+    },
+    {
+      "id": "jn_1792220103340_k385",
+      "title": "Under the stars",
+      "content": "Listening to the crickets while holding your hand.",
+      "prompt": "A moment I felt closest to you",
+      "moodEmoji": "✨",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T06:55:03.340Z",
+      "reactions": {},
+      "replies": [],
+      "isViewedByCreator": false
+    }
+  ],
+  "voiceMessages": [],
+  "dateIdeas": [
+    {
+      "id": "idea_sunset_picnic",
+      "title": "Sunset Picnic at the Overlook",
+      "description": "Pack a wicker basket with our favorite artisan cheeses, fresh strawberries, and chilled sparkling cider. We'll spread out a soft blanket and watch the sky melt into lavender and gold.",
+      "coverPhoto": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+      "category": "outdoor_adventures",
+      "costRange": "low",
+      "costEstimateText": "$15 - $25 (Snacks & cider)",
+      "estimatedDuration": "2 hours",
+      "estimatedDurationMinutes": 120,
+      "environment": "outdoor",
+      "location": "Scenic Ridge Overlook",
+      "practicalNotes": "Bring an extra warm cardigan or throw blanket for when the sun dips below the hills.",
+      "accessibilityNotes": "Paved gentle pathway to the picnic knoll with wooden benches nearby.",
+      "author": "creator",
+      "authorName": "Babe",
+      "createdAt": "2026-10-10T12:00:00.000Z",
+      "isHidden": false,
+      "sortOrder": 1,
+      "isCustom": false
+    },
+    {
+      "id": "idea_cafe_hopping",
+      "title": "Artisanal Café Hopping & Pastry Crawl",
+      "description": "Spend a slow afternoon trying three distinct cozy neighborhood cafés. We'll order one specialty beverage and one warm pastry at each spot and score them in our little notebook.",
+      "coverPhoto": "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80",
+      "category": "food_cafes",
+      "costRange": "low",
+      "costEstimateText": "$20 - $35",
+      "estimatedDuration": "2.5 hours",
+      "estimatedDurationMinutes": 150,
+      "environment": "indoor",
+      "location": "Old Town Cobblestone Quarter",
+      "practicalNotes": "Come with an appetite for matcha lattes, cardamom buns, and deep conversations.",
+      "accessibilityNotes": "Level street entrances with comfortable indoor seating.",
+      "author": "creator",
+      "authorName": "Babe",
+      "createdAt": "2026-10-10T12:00:00.000Z",
+      "isHidden": false,
+      "sortOrder": 2,
+      "isCustom": false
+    },
+    {
+      "id": "idea_blanket_fort",
+      "title": "Living Room Blanket Fort & Film Marathon",
+      "description": "Construct a palace out of every soft blanket and fairy light in the apartment. Squeeze inside with warm stove-popped caramel popcorn and binge our favorite films.",
+      "coverPhoto": "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80",
+      "category": "cozy_home",
+      "costRange": "free",
+      "costEstimateText": "Free (Zero cost)",
+      "estimatedDuration": "3 hours",
+      "estimatedDurationMinutes": 180,
+      "environment": "indoor",
+      "location": "Our Living Room",
+      "practicalNotes": "Fairy lights, giant cushions, and pajamas required.",
+      "accessibilityNotes": "Ultra relaxed home floor and couch setting.",
+      "author": "creator",
+      "authorName": "Babe",
+      "createdAt": "2026-10-10T12:00:00.000Z",
+      "isHidden": false,
+      "sortOrder": 3,
+      "isCustom": false
+    },
+    {
+      "id": "idea_scenic_drive",
+      "title": "Scenic Long Drive with Our Roadtrip Playlist",
+      "description": "No strict destination in mind. We roll the windows down, blast the songs we both know every single lyric to, and stop whenever an interesting roadside fruit stand or lookout appears.",
+      "coverPhoto": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80",
+      "category": "spontaneous_adventures",
+      "costRange": "low",
+      "costEstimateText": "$15 - $25 (Fuel & treats)",
+      "estimatedDuration": "3 hours",
+      "estimatedDurationMinutes": 180,
+      "environment": "both",
+      "location": "Pine Valley & Coastal Highway",
+      "practicalNotes": "Charge phones, download our roadtrip playlist, and pack gummy candies.",
+      "accessibilityNotes": "Comfortable car ride with accessible viewpoints.",
+      "author": "creator",
+      "authorName": "Babe",
+      "createdAt": "2026-10-10T12:00:00.000Z",
+      "isHidden": false,
+      "sortOrder": 4,
+      "isCustom": false
+    },
+    {
+      "id": "idea_cooking_pasta",
+      "title": "Homemade Pasta & Candlelight Cooking",
+      "description": "We tie our aprons on, put on soft acoustic jazz, and roll out fresh tagliatelle dough from scratch. Complete with simmering browned-butter sage sauce, freshly grated parmesan, and wine.",
+      "coverPhoto": "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80",
+      "category": "cozy_home",
+      "costRange": "low",
+      "costEstimateText": "$20 - $30 (Ingredients & wine)",
+      "estimatedDuration": "2.5 hours",
+      "estimatedDurationMinutes": 150,
+      "environment": "indoor",
+      "location": "Our Kitchen",
+      "practicalNotes": "Expect a little dusting of flour on our noses!",
+      "accessibilityNotes": "Kitchen workspace with counter stools.",
+      "author": "creator",
+      "authorName": "Babe",
+      "createdAt": "2026-10-10T12:00:00.000Z",
+      "isHidden": false,
+      "sortOrder": 5,
+      "isCustom": false
+    },
+    {
+      "id": "idea_pottery_painting",
+      "title": "Pottery Sculpting or Canvas Painting",
+      "description": "Sit side-by-side behind the potter's wheel or in front of twin easels. We'll sculpt or paint something inspired by each other—no artistic skills required, just pure fun and giggles.",
+      "coverPhoto": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=80",
+      "category": "creative_activities",
+      "costRange": "medium",
+      "costEstimateText": "$45 - $65 (Studio pass & clay)",
+      "estimatedDuration": "2 hours",
+      "estimatedDurationMinutes": 120,
+      "environment": "indoor",
+      "location": "The Artisan Studio",
+      "practicalNotes": "Wear clothes you wouldn't mind getting a tiny smudge of clay or paint on.",
+      "accessibilityNotes": "Seated ceramic studio stations with accessible wash basins.",
+      "author": "creator",
+      "authorName": "Babe",
+      "createdAt": "2026-10-10T12:00:00.000Z",
+      "isHidden": false,
+      "sortOrder": 6,
+      "isCustom": false
+    },
+    {
+      "id": "idea_arcade_bowling",
+      "title": "Retro Arcade & Glow Bowling Showdown",
+      "description": "Skeeball, air hockey, and cosmic glow bowling. Winner gets to pick the midnight snack and gets a victory kiss.",
+      "coverPhoto": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80",
+      "category": "spontaneous_adventures",
+      "costRange": "low",
+      "costEstimateText": "$25 - $40",
+      "estimatedDuration": "2.5 hours",
+      "estimatedDurationMinutes": 150,
+      "environment": "indoor",
+      "location": "Neon Strike Lanes & Arcade",
+      "practicalNotes": "Bring your competitive spirit!",
+      "accessibilityNotes": "Wheelchair accessible bowling ramps and wide arcade aisles.",
+      "author": "creator",
+      "authorName": "Babe",
+      "createdAt": "2026-10-10T12:00:00.000Z",
+      "isHidden": false,
+      "sortOrder": 7,
+      "isCustom": false
+    },
+    {
+      "id": "idea_midnight_stargazing",
+      "title": "Midnight Stargazing Under the Constellations",
+      "description": "Drive away from city lights, lay back on the hood or a thick wool blanket, and gaze up at the Milky Way. We'll identify constellations and make wishes on shooting stars.",
+      "coverPhoto": "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=800&q=80",
+      "category": "romantic_evenings",
+      "costRange": "free",
+      "costEstimateText": "Free (Zero cost)",
+      "estimatedDuration": "2 hours",
+      "estimatedDurationMinutes": 120,
+      "environment": "outdoor",
+      "location": "Dark Sky Nature Preserve Hill",
+      "practicalNotes": "Thermos of hot chocolate, thick jackets, and star-map app.",
+      "accessibilityNotes": "Open clearing right next to scenic vehicle pull-off.",
+      "author": "creator",
+      "authorName": "Babe",
+      "createdAt": "2026-10-10T12:00:00.000Z",
+      "isHidden": false,
+      "sortOrder": 8,
+      "isCustom": false
+    },
+    {
+      "id": "idea_recreating_first_date",
+      "title": "Recreating Our Very First Date",
+      "description": "Walk the exact steps, sit at the same corner table, and reminisce about how butterflies were fluttering in our chests the first time our eyes met.",
+      "coverPhoto": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80",
+      "category": "special_occasions",
+      "costRange": "medium",
+      "costEstimateText": "$50 - $80",
+      "estimatedDuration": "3.5 hours",
+      "estimatedDurationMinutes": 210,
+      "environment": "both",
+      "location": "Where Our Story Started",
+      "practicalNotes": "Bonus points for wearing similar outfits or colors from that magical day.",
+      "accessibilityNotes": "Full accessibility according to original venue.",
+      "author": "creator",
+      "authorName": "Babe",
+      "createdAt": "2026-10-10T12:00:00.000Z",
+      "isHidden": false,
+      "sortOrder": 9,
+      "isCustom": false
+    },
+    {
+      "id": "idea_secret_tasting_menu",
+      "title": "Secret Tasting Menu at a New Restaurant",
+      "description": "Dress to the nines and indulge in a romantic multi-course culinary adventure. Dim lights, soft music, and exquisite desserts.",
+      "coverPhoto": "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=800&q=80",
+      "category": "romantic_evenings",
+      "costRange": "high",
+      "costEstimateText": "$80 - $140",
+      "estimatedDuration": "2.5 hours",
+      "estimatedDurationMinutes": 150,
+      "environment": "indoor",
+      "location": "Boutique Candlelit Dining Room",
+      "practicalNotes": "Semi-formal romantic attire recommended.",
+      "accessibilityNotes": "Ground-floor entrance, elevator, spacious dining area.",
+      "author": "creator",
+      "authorName": "Babe",
+      "createdAt": "2026-10-10T12:00:00.000Z",
+      "isHidden": false,
+      "sortOrder": 10,
+      "isCustom": false
+    },
+    {
+      "id": "idea_old_bookstore",
+      "title": "Quiet Afternoon in an Old Bookstore",
+      "description": "Get lost between tall mahogany shelves. We each pick one book or poetry piece that reminds us of each other, tuck a secret note inside, and read our favorite paragraphs together in a quiet corner.",
+      "coverPhoto": "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80",
+      "category": "budget_friendly",
+      "costRange": "free",
+      "costEstimateText": "Free / Under $15 (Coffee & book)",
+      "estimatedDuration": "2 hours",
+      "estimatedDurationMinutes": 120,
+      "environment": "indoor",
+      "location": "The Whispering Pages Bookshop",
+      "practicalNotes": "Perfect for a slow rainy afternoon.",
+      "accessibilityNotes": "Ramps available and cushioned reading armchairs.",
+      "author": "creator",
+      "authorName": "Babe",
+      "createdAt": "2026-10-10T12:00:00.000Z",
+      "isHidden": false,
+      "sortOrder": 11,
+      "isCustom": false
+    },
+    {
+      "id": "idea_sunrise_pastries",
+      "title": "Watching the Sunrise with Warm Pastries",
+      "description": "Wake up before the rest of the world, slip into oversized hoodies, pick up fresh morning croissants right as the bakery ovens open, and watch the ocean turn gold.",
+      "coverPhoto": "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=800&q=80",
+      "category": "outdoor_adventures",
+      "costRange": "low",
+      "costEstimateText": "$10 - $20",
+      "estimatedDuration": "2 hours",
+      "estimatedDurationMinutes": 120,
+      "environment": "outdoor",
+      "location": "East Shore Wooden Pier",
+      "practicalNotes": "Set an early alarm and bundle up warm.",
+      "accessibilityNotes": "Boardwalk path with railing and benches.",
+      "author": "creator",
+      "authorName": "Babe",
+      "createdAt": "2026-10-10T12:00:00.000Z",
+      "isHidden": false,
+      "sortOrder": 12,
+      "isCustom": false
+    },
+    {
+      "id": "idea_botanical_garden",
+      "title": "Exploring a Botanical Haven & Secret Garden",
+      "description": "Wander hand-in-hand through lush tropical glasshouses, blooming orchid corridors, and hidden stone archways. A tranquil paradise filled with floral scent.",
+      "coverPhoto": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80",
+      "category": "outdoor_adventures",
+      "costRange": "low",
+      "costEstimateText": "$20 - $30",
+      "estimatedDuration": "3 hours",
+      "estimatedDurationMinutes": 180,
+      "environment": "both",
+      "location": "Glasshouse Conservatory & Gardens",
+      "practicalNotes": "Wear comfortable walking shoes and bring a camera for portraits.",
+      "accessibilityNotes": "Paved ADA-compliant garden pathways throughout.",
+      "author": "creator",
+      "authorName": "Babe",
+      "createdAt": "2026-10-10T12:00:00.000Z",
+      "isHidden": false,
+      "sortOrder": 13,
+      "isCustom": false
+    },
+    {
+      "id": "idea_surprise_mystery_date",
+      "title": "A Romantic Mystery Date Planned by Me",
+      "description": "A curated surprise where every stop is carefully kept secret until we arrive. All you need to do is show up, relax, and let yourself be spoiled.",
+      "coverPhoto": "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=800&q=80",
+      "category": "special_occasions",
+      "costRange": "medium",
+      "costEstimateText": "$40 - $70",
+      "estimatedDuration": "3.5 hours",
+      "estimatedDurationMinutes": 210,
+      "environment": "both",
+      "location": "Classified Destination 🤫",
+      "practicalNotes": "Wear your favorite comfortable yet cute outfit; all logistics are handled.",
+      "accessibilityNotes": "Tailored to be comfortable and relaxing.",
+      "author": "creator",
+      "authorName": "Babe",
+      "createdAt": "2026-10-10T12:00:00.000Z",
+      "isHidden": false,
+      "sortOrder": 14,
+      "isCustom": false
+    }
+  ],
+  "datePreferences": [
+    {
+      "id": "pref_init_1",
+      "ideaId": "idea_sunset_picnic",
+      "participantRole": "recipient",
+      "participantName": "Baby",
+      "status": "really_want",
+      "isFavorite": true,
+      "isShortlisted": true,
+      "personalNote": "I want to watch the sunset with you so badly!",
+      "updatedAt": "2026-10-17T05:52:33.312Z"
+    },
+    {
+      "id": "pref_init_2",
+      "ideaId": "idea_cafe_hopping",
+      "participantRole": "recipient",
+      "participantName": "Baby",
+      "status": "sounds_cute",
+      "isFavorite": false,
+      "isShortlisted": true,
+      "personalNote": "I'll try the matcha latte with oat milk.",
+      "updatedAt": "2026-10-17T05:52:33.312Z"
+    }
+  ],
+  "dateProposals": [
+    {
+      "id": "prop_demo_confirmed",
+      "title": "Sunset Picnic & Stargazing Adventure",
+      "description": "An evening dedicated to sweet treats, glowing twilight, and constellations.",
+      "isSurprise": false,
+      "surpriseRevealed": true,
+      "itinerary": [
+        {
+          "id": "stop_1",
+          "ideaId": "idea_sunset_picnic",
+          "title": "Sunset Picnic at the Overlook",
+          "location": "Panoramic Hill Park",
+          "estimatedDurationMinutes": 120,
+          "estimatedCostText": "$25",
+          "notes": "I'll pack the checkered blanket, strawberries, and sparkling cider.",
+          "travelOrBreakMinutesAfter": 20,
+          "travelNotes": "Gentle 15-minute scenic drive up to the preserve summit."
+        },
+        {
+          "id": "stop_2",
+          "ideaId": "idea_midnight_stargazing",
+          "title": "Midnight Stargazing Under the Constellations",
+          "location": "Dark Sky Meadow Ridge",
+          "estimatedDurationMinutes": 90,
+          "estimatedCostText": "Free",
+          "notes": "Bring thermos of hot cocoa."
+        }
+      ],
+      "proposedDate": "2026-10-20",
+      "proposedStartTime": "17:30",
+      "timeZone": "America/New_York",
+      "totalEstimatedDurationMinutes": 230,
+      "estimatedTotalBudget": "$25 - $35",
+      "proposerRole": "creator",
+      "proposerName": "Babe",
+      "targetPartnerRole": "recipient",
+      "targetPartnerName": "Baby",
+      "personalMessage": "I cannot wait to watch the sun go down with you wrapped in my arms. Wear your favorite cozy cardigan! ♡",
+      "status": "confirmed",
+      "confirmedAt": "2026-10-16T05:52:33.312Z",
+      "history": [
+        {
+          "id": "hist_1",
+          "timestamp": "2026-10-15T05:52:33.312Z",
+          "authorRole": "creator",
+          "authorName": "Babe",
+          "action": "proposed",
+          "message": "Created date proposal."
+        },
+        {
+          "id": "hist_2",
+          "timestamp": "2026-10-16T05:52:33.312Z",
+          "authorRole": "recipient",
+          "authorName": "Baby",
+          "action": "accepted",
+          "message": "Yes yes yes! I'm bringing the homemade cookies! 🍪💕"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "chk_1",
+          "task": "Pack the picnic blanket & cute wicker basket",
+          "isCompleted": true,
+          "completedBy": "Babe",
+          "assignedTo": "creator",
+          "notes": "Checkered pink one",
+          "createdAt": "2026-10-17T05:52:33.312Z"
+        },
+        {
+          "id": "chk_2",
+          "task": "Pick up fresh strawberries & bakery baguettes",
+          "isCompleted": false,
+          "assignedTo": "both",
+          "createdAt": "2026-10-17T05:52:33.312Z"
+        },
+        {
+          "id": "chk_3",
+          "task": "Fill thermos with warm marshmallow hot cocoa",
+          "isCompleted": false,
+          "assignedTo": "recipient",
+          "createdAt": "2026-10-17T05:52:33.312Z"
+        },
+        {
+          "id": "chk_4",
+          "task": "Bring camera and download stargazing constellation app",
+          "isCompleted": false,
+          "assignedTo": "creator",
+          "createdAt": "2026-10-17T05:52:33.312Z"
+        }
+      ],
+      "createdAt": "2026-10-15T05:52:33.312Z",
+      "updatedAt": "2026-10-16T05:52:33.312Z"
+    },
+    {
+      "id": "prop_demo_pending",
+      "title": "Artisanal Café Hopping & Bookstore Crawl",
+      "description": "A slow Sunday exploring cobblestone bookshops and rating matcha pastries.",
+      "isSurprise": false,
+      "surpriseRevealed": true,
+      "itinerary": [
+        {
+          "id": "stop_p1",
+          "ideaId": "idea_cafe_hopping",
+          "title": "Artisanal Café Hopping & Pastry Crawl",
+          "location": "Historic Arts District",
+          "estimatedDurationMinutes": 120,
+          "estimatedCostText": "$25",
+          "notes": "Try the lavender honey latte!",
+          "travelOrBreakMinutesAfter": 15,
+          "travelNotes": "Stroll across the square."
+        },
+        {
+          "id": "stop_p2",
+          "ideaId": "idea_old_bookstore",
+          "title": "Quiet Afternoon in an Old Bookstore",
+          "location": "The Whispering Pages Bookshop",
+          "estimatedDurationMinutes": 90,
+          "estimatedCostText": "Free",
+          "notes": "We find a book for each other."
+        }
+      ],
+      "proposedDate": "2026-10-24",
+      "proposedStartTime": "14:00",
+      "timeZone": "America/New_York",
+      "totalEstimatedDurationMinutes": 225,
+      "estimatedTotalBudget": "$30 - $40",
+      "proposerRole": "creator",
+      "proposerName": "Babe",
+      "targetPartnerRole": "recipient",
+      "targetPartnerName": "Baby",
+      "personalMessage": "What do you think about next weekend for this? We can take our time and read together! ☕📖",
+      "status": "proposed",
+      "history": [
+        {
+          "id": "hist_p1",
+          "timestamp": "2026-10-17T05:52:33.312Z",
+          "authorRole": "creator",
+          "authorName": "Babe",
+          "action": "proposed",
+          "message": "Proposed date for next Sunday afternoon."
+        }
+      ],
+      "checklist": [
+        {
+          "id": "chk_p1",
+          "task": "Charge e-reader or bring notebook",
+          "isCompleted": false,
+          "assignedTo": "both",
+          "createdAt": "2026-10-17T05:52:33.312Z"
+        }
+      ],
+      "createdAt": "2026-10-17T05:52:33.312Z",
+      "updatedAt": "2026-10-17T05:52:33.312Z"
+    },
+    {
+      "id": "prop_1792218147318_phil",
+      "title": "Moonlit Seaside Stroll & Gelato",
+      "isSurprise": false,
+      "surpriseRevealed": true,
+      "itinerary": [
+        {
+          "title": "Artisan Gelato at Dolceria",
+          "estimatedDurationMinutes": 45,
+          "notes": "Two scoops of pistacchio and dark chocolate"
+        },
+        {
+          "title": "Seaside Boardwalk Walk",
+          "estimatedDurationMinutes": 60,
+          "notes": "Holding hands by the waves"
+        }
+      ],
+      "proposedDate": "2026-10-26",
+      "proposedStartTime": "20:00",
+      "timeZone": "America/New_York",
+      "totalEstimatedDurationMinutes": 120,
+      "estimatedTotalBudget": "$30 - $50",
+      "proposerRole": "creator",
+      "proposerName": "Romeo",
+      "targetPartnerRole": "recipient",
+      "targetPartnerName": "Baby",
+      "status": "completed",
+      "history": [
+        {
+          "id": "hist_1792218147318_1",
+          "timestamp": "2026-10-17T06:22:27.318Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "proposed",
+          "message": "Proposed date for 2026-10-25."
+        },
+        {
+          "id": "hist_1792218148339",
+          "timestamp": "2026-10-17T06:22:28.339Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "accepted",
+          "message": "I cannot wait for gelato with you!"
+        },
+        {
+          "id": "hist_1792218148365",
+          "timestamp": "2026-10-17T06:22:28.365Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "rescheduled",
+          "message": "Moved by 30 mins for the sunset glow"
+        },
+        {
+          "id": "hist_1792218148400",
+          "timestamp": "2026-10-17T06:22:28.400Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "completed",
+          "message": "Marked date as completed! Ready to save memories ♡"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "chk_1792218147318_1",
+          "task": "Confirm arrival time and pick an outfit",
+          "isCompleted": false,
+          "assignedTo": "both",
+          "createdAt": "2026-10-17T06:22:27.318Z"
+        }
+      ],
+      "createdAt": "2026-10-17T06:22:27.318Z",
+      "updatedAt": "2026-10-17T06:22:28.400Z",
+      "confirmedAt": "2026-10-17T06:22:28.339Z",
+      "completedAt": "2026-10-17T06:22:28.400Z"
+    },
+    {
+      "id": "prop_1792218607821_gpj0",
+      "title": "Moonlit Seaside Stroll & Gelato",
+      "isSurprise": false,
+      "surpriseRevealed": true,
+      "itinerary": [
+        {
+          "title": "Artisan Gelato at Dolceria",
+          "estimatedDurationMinutes": 45,
+          "notes": "Two scoops of pistacchio and dark chocolate"
+        },
+        {
+          "title": "Seaside Boardwalk Walk",
+          "estimatedDurationMinutes": 60,
+          "notes": "Holding hands by the waves"
+        }
+      ],
+      "proposedDate": "2026-10-26",
+      "proposedStartTime": "20:00",
+      "timeZone": "America/New_York",
+      "totalEstimatedDurationMinutes": 120,
+      "estimatedTotalBudget": "$30 - $50",
+      "proposerRole": "creator",
+      "proposerName": "Romeo",
+      "targetPartnerRole": "recipient",
+      "targetPartnerName": "Baby",
+      "status": "completed",
+      "history": [
+        {
+          "id": "hist_1792218607821_1",
+          "timestamp": "2026-10-17T06:30:07.821Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "proposed",
+          "message": "Proposed date for 2026-10-25."
+        },
+        {
+          "id": "hist_1792218607905",
+          "timestamp": "2026-10-17T06:30:07.905Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "accepted",
+          "message": "I cannot wait for gelato with you!"
+        },
+        {
+          "id": "hist_1792218607928",
+          "timestamp": "2026-10-17T06:30:07.928Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "rescheduled",
+          "message": "Moved by 30 mins for the sunset glow"
+        },
+        {
+          "id": "hist_1792218607967",
+          "timestamp": "2026-10-17T06:30:07.967Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "completed",
+          "message": "Marked date as completed! Ready to save memories ♡"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "chk_1792218607821_1",
+          "task": "Confirm arrival time and pick an outfit",
+          "isCompleted": false,
+          "assignedTo": "both",
+          "createdAt": "2026-10-17T06:30:07.821Z"
+        }
+      ],
+      "createdAt": "2026-10-17T06:30:07.821Z",
+      "updatedAt": "2026-10-17T06:30:07.967Z",
+      "confirmedAt": "2026-10-17T06:30:07.905Z",
+      "completedAt": "2026-10-17T06:30:07.967Z"
+    },
+    {
+      "id": "prop_1792218940269_brga",
+      "title": "Moonlit Seaside Stroll & Gelato",
+      "isSurprise": false,
+      "surpriseRevealed": true,
+      "itinerary": [
+        {
+          "title": "Artisan Gelato at Dolceria",
+          "estimatedDurationMinutes": 45,
+          "notes": "Two scoops of pistacchio and dark chocolate"
+        },
+        {
+          "title": "Seaside Boardwalk Walk",
+          "estimatedDurationMinutes": 60,
+          "notes": "Holding hands by the waves"
+        }
+      ],
+      "proposedDate": "2026-10-26",
+      "proposedStartTime": "20:00",
+      "timeZone": "America/New_York",
+      "totalEstimatedDurationMinutes": 120,
+      "estimatedTotalBudget": "$30 - $50",
+      "proposerRole": "creator",
+      "proposerName": "Romeo",
+      "targetPartnerRole": "recipient",
+      "targetPartnerName": "Baby",
+      "status": "completed",
+      "history": [
+        {
+          "id": "hist_1792218940269_1",
+          "timestamp": "2026-10-17T06:35:40.269Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "proposed",
+          "message": "Proposed date for 2026-10-25."
+        },
+        {
+          "id": "hist_1792218940348",
+          "timestamp": "2026-10-17T06:35:40.348Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "accepted",
+          "message": "I cannot wait for gelato with you!"
+        },
+        {
+          "id": "hist_1792218940368",
+          "timestamp": "2026-10-17T06:35:40.368Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "rescheduled",
+          "message": "Moved by 30 mins for the sunset glow"
+        },
+        {
+          "id": "hist_1792218940434",
+          "timestamp": "2026-10-17T06:35:40.434Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "completed",
+          "message": "Marked date as completed! Ready to save memories ♡"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "chk_1792218940269_1",
+          "task": "Confirm arrival time and pick an outfit",
+          "isCompleted": false,
+          "assignedTo": "both",
+          "createdAt": "2026-10-17T06:35:40.269Z"
+        }
+      ],
+      "createdAt": "2026-10-17T06:35:40.269Z",
+      "updatedAt": "2026-10-17T06:35:40.434Z",
+      "confirmedAt": "2026-10-17T06:35:40.348Z",
+      "completedAt": "2026-10-17T06:35:40.434Z"
+    },
+    {
+      "id": "prop_1792219088878_24ra",
+      "title": "Moonlit Seaside Stroll & Gelato",
+      "isSurprise": false,
+      "surpriseRevealed": true,
+      "itinerary": [
+        {
+          "title": "Artisan Gelato at Dolceria",
+          "estimatedDurationMinutes": 45,
+          "notes": "Two scoops of pistacchio and dark chocolate"
+        },
+        {
+          "title": "Seaside Boardwalk Walk",
+          "estimatedDurationMinutes": 60,
+          "notes": "Holding hands by the waves"
+        }
+      ],
+      "proposedDate": "2026-10-26",
+      "proposedStartTime": "20:00",
+      "timeZone": "America/New_York",
+      "totalEstimatedDurationMinutes": 120,
+      "estimatedTotalBudget": "$30 - $50",
+      "proposerRole": "creator",
+      "proposerName": "Romeo",
+      "targetPartnerRole": "recipient",
+      "targetPartnerName": "Baby",
+      "status": "completed",
+      "history": [
+        {
+          "id": "hist_1792219088878_1",
+          "timestamp": "2026-10-17T06:38:08.878Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "proposed",
+          "message": "Proposed date for 2026-10-25."
+        },
+        {
+          "id": "hist_1792219088913",
+          "timestamp": "2026-10-17T06:38:08.913Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "accepted",
+          "message": "I cannot wait for gelato with you!"
+        },
+        {
+          "id": "hist_1792219088967",
+          "timestamp": "2026-10-17T06:38:08.967Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "rescheduled",
+          "message": "Moved by 30 mins for the sunset glow"
+        },
+        {
+          "id": "hist_1792219088985",
+          "timestamp": "2026-10-17T06:38:08.984Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "completed",
+          "message": "Marked date as completed! Ready to save memories ♡"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "chk_1792219088878_1",
+          "task": "Confirm arrival time and pick an outfit",
+          "isCompleted": false,
+          "assignedTo": "both",
+          "createdAt": "2026-10-17T06:38:08.878Z"
+        }
+      ],
+      "createdAt": "2026-10-17T06:38:08.878Z",
+      "updatedAt": "2026-10-17T06:38:08.984Z",
+      "confirmedAt": "2026-10-17T06:38:08.913Z",
+      "completedAt": "2026-10-17T06:38:08.984Z"
+    },
+    {
+      "id": "prop_1792219159828_5mss",
+      "title": "Moonlit Seaside Stroll & Gelato",
+      "isSurprise": false,
+      "surpriseRevealed": true,
+      "itinerary": [
+        {
+          "title": "Artisan Gelato at Dolceria",
+          "estimatedDurationMinutes": 45,
+          "notes": "Two scoops of pistacchio and dark chocolate"
+        },
+        {
+          "title": "Seaside Boardwalk Walk",
+          "estimatedDurationMinutes": 60,
+          "notes": "Holding hands by the waves"
+        }
+      ],
+      "proposedDate": "2026-10-26",
+      "proposedStartTime": "20:00",
+      "timeZone": "America/New_York",
+      "totalEstimatedDurationMinutes": 120,
+      "estimatedTotalBudget": "$30 - $50",
+      "proposerRole": "creator",
+      "proposerName": "Romeo",
+      "targetPartnerRole": "recipient",
+      "targetPartnerName": "Baby",
+      "status": "completed",
+      "history": [
+        {
+          "id": "hist_1792219159828_1",
+          "timestamp": "2026-10-17T06:39:19.828Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "proposed",
+          "message": "Proposed date for 2026-10-25."
+        },
+        {
+          "id": "hist_1792219159885",
+          "timestamp": "2026-10-17T06:39:19.885Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "accepted",
+          "message": "I cannot wait for gelato with you!"
+        },
+        {
+          "id": "hist_1792219159897",
+          "timestamp": "2026-10-17T06:39:19.897Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "rescheduled",
+          "message": "Moved by 30 mins for the sunset glow"
+        },
+        {
+          "id": "hist_1792219159932",
+          "timestamp": "2026-10-17T06:39:19.932Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "completed",
+          "message": "Marked date as completed! Ready to save memories ♡"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "chk_1792219159828_1",
+          "task": "Confirm arrival time and pick an outfit",
+          "isCompleted": false,
+          "assignedTo": "both",
+          "createdAt": "2026-10-17T06:39:19.828Z"
+        }
+      ],
+      "createdAt": "2026-10-17T06:39:19.828Z",
+      "updatedAt": "2026-10-17T06:39:19.932Z",
+      "confirmedAt": "2026-10-17T06:39:19.885Z",
+      "completedAt": "2026-10-17T06:39:19.932Z"
+    },
+    {
+      "id": "prop_1792220103396_5z4z",
+      "title": "Moonlit Seaside Stroll & Gelato",
+      "isSurprise": false,
+      "surpriseRevealed": true,
+      "itinerary": [
+        {
+          "title": "Artisan Gelato at Dolceria",
+          "estimatedDurationMinutes": 45,
+          "notes": "Two scoops of pistacchio and dark chocolate"
+        },
+        {
+          "title": "Seaside Boardwalk Walk",
+          "estimatedDurationMinutes": 60,
+          "notes": "Holding hands by the waves"
+        }
+      ],
+      "proposedDate": "2026-10-26",
+      "proposedStartTime": "20:00",
+      "timeZone": "America/New_York",
+      "totalEstimatedDurationMinutes": 120,
+      "estimatedTotalBudget": "$30 - $50",
+      "proposerRole": "creator",
+      "proposerName": "Romeo",
+      "targetPartnerRole": "recipient",
+      "targetPartnerName": "Baby",
+      "status": "completed",
+      "history": [
+        {
+          "id": "hist_1792220103396_1",
+          "timestamp": "2026-10-17T06:55:03.396Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "proposed",
+          "message": "Proposed date for 2026-10-25."
+        },
+        {
+          "id": "hist_1792220103431",
+          "timestamp": "2026-10-17T06:55:03.431Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "accepted",
+          "message": "I cannot wait for gelato with you!"
+        },
+        {
+          "id": "hist_1792220103473",
+          "timestamp": "2026-10-17T06:55:03.472Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "rescheduled",
+          "message": "Moved by 30 mins for the sunset glow"
+        },
+        {
+          "id": "hist_1792220103491",
+          "timestamp": "2026-10-17T06:55:03.490Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "completed",
+          "message": "Marked date as completed! Ready to save memories ♡"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "chk_1792220103396_1",
+          "task": "Confirm arrival time and pick an outfit",
+          "isCompleted": false,
+          "assignedTo": "both",
+          "createdAt": "2026-10-17T06:55:03.396Z"
+        }
+      ],
+      "createdAt": "2026-10-17T06:55:03.396Z",
+      "updatedAt": "2026-10-17T06:55:03.490Z",
+      "confirmedAt": "2026-10-17T06:55:03.431Z",
+      "completedAt": "2026-10-17T06:55:03.490Z"
+    }
+  ],
+  "dateMemories": [
+    {
+      "id": "mem_date_1",
+      "proposalId": "prop_past_pasta",
+      "dateTitle": "Homemade Tagliatelle & Candlelight Evening",
+      "completedDate": "2026-10-11",
+      "photos": [
+        "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80",
+        "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80"
+      ],
+      "description": "We ended up covering half the kitchen counter in flour, but the pasta was heavenly and we couldn't stop laughing.",
+      "favoriteMoment": "When you wiped a smudge of flour on my nose and laughed so hard you had to sit down.",
+      "funniestMoment": "Dropping a single piece of dough on the floor and both staring at it in total silence.",
+      "personalNote": "I love cooking with you. Even messy kitchens feel like paradise when you're there.",
+      "ratingEmoji": "⭐⭐⭐⭐⭐",
+      "inspiredNextIdea": "Let's try making handmade sourdough or pizza next!",
+      "authorRole": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-11T10:59:13.312Z"
+    },
+    {
+      "id": "dmem_1792218148423_4iva",
+      "proposalId": "prop_1792218147318_phil",
+      "dateTitle": "Moonlit Seaside Stroll & Gelato",
+      "completedDate": "2026-10-17",
+      "photos": [],
+      "description": "",
+      "favoriteMoment": "When you wiped gelato off my nose with your thumb and kissed me.",
+      "funniestMoment": "",
+      "personalNote": "",
+      "ratingEmoji": "⭐⭐⭐⭐⭐",
+      "authorRole": "recipient",
+      "authorName": "Juliet",
+      "createdAt": "2026-10-17T06:22:28.423Z"
+    },
+    {
+      "id": "dmem_1792218607999_jlwp",
+      "proposalId": "prop_1792218607821_gpj0",
+      "dateTitle": "Moonlit Seaside Stroll & Gelato",
+      "completedDate": "2026-10-17",
+      "photos": [],
+      "description": "",
+      "favoriteMoment": "When you wiped gelato off my nose with your thumb and kissed me.",
+      "funniestMoment": "",
+      "personalNote": "",
+      "ratingEmoji": "⭐⭐⭐⭐⭐",
+      "authorRole": "recipient",
+      "authorName": "Juliet",
+      "createdAt": "2026-10-17T06:30:07.999Z"
+    },
+    {
+      "id": "dmem_1792218940458_l5tz",
+      "proposalId": "prop_1792218940269_brga",
+      "dateTitle": "Moonlit Seaside Stroll & Gelato",
+      "completedDate": "2026-10-17",
+      "photos": [],
+      "description": "",
+      "favoriteMoment": "When you wiped gelato off my nose with your thumb and kissed me.",
+      "funniestMoment": "",
+      "personalNote": "",
+      "ratingEmoji": "⭐⭐⭐⭐⭐",
+      "authorRole": "recipient",
+      "authorName": "Juliet",
+      "createdAt": "2026-10-17T06:35:40.458Z"
+    },
+    {
+      "id": "dmem_1792219089043_pxt8",
+      "proposalId": "prop_1792219088878_24ra",
+      "dateTitle": "Moonlit Seaside Stroll & Gelato",
+      "completedDate": "2026-10-17",
+      "photos": [],
+      "description": "",
+      "favoriteMoment": "When you wiped gelato off my nose with your thumb and kissed me.",
+      "funniestMoment": "",
+      "personalNote": "",
+      "ratingEmoji": "⭐⭐⭐⭐⭐",
+      "authorRole": "recipient",
+      "authorName": "Juliet",
+      "createdAt": "2026-10-17T06:38:09.043Z"
+    },
+    {
+      "id": "dmem_1792219159960_8b6a",
+      "proposalId": "prop_1792219159828_5mss",
+      "dateTitle": "Moonlit Seaside Stroll & Gelato",
+      "completedDate": "2026-10-17",
+      "photos": [],
+      "description": "",
+      "favoriteMoment": "When you wiped gelato off my nose with your thumb and kissed me.",
+      "funniestMoment": "",
+      "personalNote": "",
+      "ratingEmoji": "⭐⭐⭐⭐⭐",
+      "authorRole": "recipient",
+      "authorName": "Juliet",
+      "createdAt": "2026-10-17T06:39:19.960Z"
+    },
+    {
+      "id": "dmem_1792220103550_0xnv",
+      "proposalId": "prop_1792220103396_5z4z",
+      "dateTitle": "Moonlit Seaside Stroll & Gelato",
+      "completedDate": "2026-10-17",
+      "photos": [],
+      "description": "",
+      "favoriteMoment": "When you wiped gelato off my nose with your thumb and kissed me.",
+      "funniestMoment": "",
+      "personalNote": "",
+      "ratingEmoji": "⭐⭐⭐⭐⭐",
+      "authorRole": "recipient",
+      "authorName": "Juliet",
+      "createdAt": "2026-10-17T06:55:03.550Z"
+    }
+  ],
+  "dateNotifications": [
+    {
+      "id": "notif_1792220103491_560a",
+      "type": "post_date_memory_prompt",
+      "title": "How was our date? 📸💕",
+      "message": "\"Moonlit Seaside Stroll & Gelato\" is complete! Add photographs and favorite memories to our scrapbook.",
+      "proposalId": "prop_1792220103396_5z4z",
+      "targetRole": "both",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:55:03.491Z",
+      "dedupeKey": "complete_prop_1792220103396_5z4z"
+    },
+    {
+      "id": "notif_1792220103473_jpvk",
+      "type": "rescheduled",
+      "title": "Date Rescheduled 🗓️",
+      "message": "Romeo rescheduled \"Moonlit Seaside Stroll & Gelato\" to 2026-10-26 at 20:00.",
+      "proposalId": "prop_1792220103396_5z4z",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:55:03.473Z",
+      "dedupeKey": "resched_prop_1792220103396_5z4z_1792220103473"
+    },
+    {
+      "id": "notif_1792220103431_abrj",
+      "type": "proposal_accepted",
+      "title": "Proposal Accepted! 🎉",
+      "message": "Juliet accepted \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25! Adventure confirmed ♡",
+      "proposalId": "prop_1792220103396_5z4z",
+      "targetRole": "creator",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:55:03.431Z",
+      "dedupeKey": "accept_prop_1792220103396_5z4z"
+    },
+    {
+      "id": "notif_1792220103396_j8ky",
+      "type": "new_proposal",
+      "title": "New Date Proposal! 💌",
+      "message": "Romeo proposed \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25 at 19:30.",
+      "proposalId": "prop_1792220103396_5z4z",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:55:03.396Z",
+      "dedupeKey": "notif_prop_prop_1792220103396_5z4z"
+    },
+    {
+      "id": "notif_1792219159932_qewz",
+      "type": "post_date_memory_prompt",
+      "title": "How was our date? 📸💕",
+      "message": "\"Moonlit Seaside Stroll & Gelato\" is complete! Add photographs and favorite memories to our scrapbook.",
+      "proposalId": "prop_1792219159828_5mss",
+      "targetRole": "both",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:39:19.932Z",
+      "dedupeKey": "complete_prop_1792219159828_5mss"
+    },
+    {
+      "id": "notif_1792219159897_jh4r",
+      "type": "rescheduled",
+      "title": "Date Rescheduled 🗓️",
+      "message": "Romeo rescheduled \"Moonlit Seaside Stroll & Gelato\" to 2026-10-26 at 20:00.",
+      "proposalId": "prop_1792219159828_5mss",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:39:19.897Z",
+      "dedupeKey": "resched_prop_1792219159828_5mss_1792219159897"
+    },
+    {
+      "id": "notif_1792219159885_90mc",
+      "type": "proposal_accepted",
+      "title": "Proposal Accepted! 🎉",
+      "message": "Juliet accepted \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25! Adventure confirmed ♡",
+      "proposalId": "prop_1792219159828_5mss",
+      "targetRole": "creator",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:39:19.885Z",
+      "dedupeKey": "accept_prop_1792219159828_5mss"
+    },
+    {
+      "id": "notif_1792219159828_7ctq",
+      "type": "new_proposal",
+      "title": "New Date Proposal! 💌",
+      "message": "Romeo proposed \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25 at 19:30.",
+      "proposalId": "prop_1792219159828_5mss",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:39:19.828Z",
+      "dedupeKey": "notif_prop_prop_1792219159828_5mss"
+    },
+    {
+      "id": "notif_1792219088985_td1u",
+      "type": "post_date_memory_prompt",
+      "title": "How was our date? 📸💕",
+      "message": "\"Moonlit Seaside Stroll & Gelato\" is complete! Add photographs and favorite memories to our scrapbook.",
+      "proposalId": "prop_1792219088878_24ra",
+      "targetRole": "both",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:38:08.985Z",
+      "dedupeKey": "complete_prop_1792219088878_24ra"
+    },
+    {
+      "id": "notif_1792219088967_2q0g",
+      "type": "rescheduled",
+      "title": "Date Rescheduled 🗓️",
+      "message": "Romeo rescheduled \"Moonlit Seaside Stroll & Gelato\" to 2026-10-26 at 20:00.",
+      "proposalId": "prop_1792219088878_24ra",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:38:08.967Z",
+      "dedupeKey": "resched_prop_1792219088878_24ra_1792219088967"
+    },
+    {
+      "id": "notif_1792219088914_p0ud",
+      "type": "proposal_accepted",
+      "title": "Proposal Accepted! 🎉",
+      "message": "Juliet accepted \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25! Adventure confirmed ♡",
+      "proposalId": "prop_1792219088878_24ra",
+      "targetRole": "creator",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:38:08.914Z",
+      "dedupeKey": "accept_prop_1792219088878_24ra"
+    },
+    {
+      "id": "notif_1792219088878_m23t",
+      "type": "new_proposal",
+      "title": "New Date Proposal! 💌",
+      "message": "Romeo proposed \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25 at 19:30.",
+      "proposalId": "prop_1792219088878_24ra",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:38:08.878Z",
+      "dedupeKey": "notif_prop_prop_1792219088878_24ra"
+    },
+    {
+      "id": "notif_1792218940434_4ott",
+      "type": "post_date_memory_prompt",
+      "title": "How was our date? 📸💕",
+      "message": "\"Moonlit Seaside Stroll & Gelato\" is complete! Add photographs and favorite memories to our scrapbook.",
+      "proposalId": "prop_1792218940269_brga",
+      "targetRole": "both",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:35:40.434Z",
+      "dedupeKey": "complete_prop_1792218940269_brga"
+    },
+    {
+      "id": "notif_1792218940368_lsgz",
+      "type": "rescheduled",
+      "title": "Date Rescheduled 🗓️",
+      "message": "Romeo rescheduled \"Moonlit Seaside Stroll & Gelato\" to 2026-10-26 at 20:00.",
+      "proposalId": "prop_1792218940269_brga",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:35:40.368Z",
+      "dedupeKey": "resched_prop_1792218940269_brga_1792218940368"
+    },
+    {
+      "id": "notif_1792218940348_ubax",
+      "type": "proposal_accepted",
+      "title": "Proposal Accepted! 🎉",
+      "message": "Juliet accepted \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25! Adventure confirmed ♡",
+      "proposalId": "prop_1792218940269_brga",
+      "targetRole": "creator",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:35:40.348Z",
+      "dedupeKey": "accept_prop_1792218940269_brga"
+    },
+    {
+      "id": "notif_1792218940269_1w47",
+      "type": "new_proposal",
+      "title": "New Date Proposal! 💌",
+      "message": "Romeo proposed \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25 at 19:30.",
+      "proposalId": "prop_1792218940269_brga",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:35:40.269Z",
+      "dedupeKey": "notif_prop_prop_1792218940269_brga"
+    },
+    {
+      "id": "notif_1792218607967_0jk2",
+      "type": "post_date_memory_prompt",
+      "title": "How was our date? 📸💕",
+      "message": "\"Moonlit Seaside Stroll & Gelato\" is complete! Add photographs and favorite memories to our scrapbook.",
+      "proposalId": "prop_1792218607821_gpj0",
+      "targetRole": "both",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:30:07.967Z",
+      "dedupeKey": "complete_prop_1792218607821_gpj0"
+    },
+    {
+      "id": "notif_1792218607928_hp3q",
+      "type": "rescheduled",
+      "title": "Date Rescheduled 🗓️",
+      "message": "Romeo rescheduled \"Moonlit Seaside Stroll & Gelato\" to 2026-10-26 at 20:00.",
+      "proposalId": "prop_1792218607821_gpj0",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:30:07.928Z",
+      "dedupeKey": "resched_prop_1792218607821_gpj0_1792218607928"
+    },
+    {
+      "id": "notif_1792218607905_36np",
+      "type": "proposal_accepted",
+      "title": "Proposal Accepted! 🎉",
+      "message": "Juliet accepted \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25! Adventure confirmed ♡",
+      "proposalId": "prop_1792218607821_gpj0",
+      "targetRole": "creator",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:30:07.905Z",
+      "dedupeKey": "accept_prop_1792218607821_gpj0"
+    },
+    {
+      "id": "notif_1792218607821_3bbs",
+      "type": "new_proposal",
+      "title": "New Date Proposal! 💌",
+      "message": "Romeo proposed \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25 at 19:30.",
+      "proposalId": "prop_1792218607821_gpj0",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:30:07.821Z",
+      "dedupeKey": "notif_prop_prop_1792218607821_gpj0"
+    },
+    {
+      "id": "notif_1792218148400_daxd",
+      "type": "post_date_memory_prompt",
+      "title": "How was our date? 📸💕",
+      "message": "\"Moonlit Seaside Stroll & Gelato\" is complete! Add photographs and favorite memories to our scrapbook.",
+      "proposalId": "prop_1792218147318_phil",
+      "targetRole": "both",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:22:28.400Z",
+      "dedupeKey": "complete_prop_1792218147318_phil"
+    },
+    {
+      "id": "notif_1792218148365_8h9c",
+      "type": "rescheduled",
+      "title": "Date Rescheduled 🗓️",
+      "message": "Romeo rescheduled \"Moonlit Seaside Stroll & Gelato\" to 2026-10-26 at 20:00.",
+      "proposalId": "prop_1792218147318_phil",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:22:28.365Z",
+      "dedupeKey": "resched_prop_1792218147318_phil_1792218148365"
+    },
+    {
+      "id": "notif_1792218148339_ezqj",
+      "type": "proposal_accepted",
+      "title": "Proposal Accepted! 🎉",
+      "message": "Juliet accepted \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25! Adventure confirmed ♡",
+      "proposalId": "prop_1792218147318_phil",
+      "targetRole": "creator",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:22:28.339Z",
+      "dedupeKey": "accept_prop_1792218147318_phil"
+    },
+    {
+      "id": "notif_1792218147318_sogd",
+      "type": "new_proposal",
+      "title": "New Date Proposal! 💌",
+      "message": "Romeo proposed \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25 at 19:30.",
+      "proposalId": "prop_1792218147318_phil",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T06:22:27.318Z",
+      "dedupeKey": "notif_prop_prop_1792218147318_phil"
+    },
+    {
+      "id": "notif_demo_1",
+      "type": "new_proposal",
+      "title": "New Date Proposal! 💌",
+      "message": "Babe proposed 'Artisanal Café Hopping & Bookstore Crawl' for next Sunday at 2:00 PM.",
+      "proposalId": "prop_demo_pending",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T05:52:33.312Z"
+    },
+    {
+      "id": "notif_demo_2",
+      "type": "proposal_accepted",
+      "title": "Adventure Confirmed! 🎉",
+      "message": "Baby accepted 'Sunset Picnic & Stargazing Adventure'! Countdown has begun ♡",
+      "proposalId": "prop_demo_confirmed",
+      "targetRole": "both",
+      "isRead": true,
+      "createdAt": "2026-10-16T05:52:33.312Z"
+    }
+  ],
+  "notificationSettings": {
+    "upcomingReminders": true,
+    "proposalAlerts": true,
+    "memoryPrompts": true
+  },
+  "gifts": [
+    {
+      "id": "gift_world_demo",
+      "slug": "sweetheart",
+      "title": "A Little World For You 💕",
+      "status": "published",
+      "createdAt": "2026-10-10T12:00:00.000Z",
+      "updatedAt": "2026-10-17T06:11:03.097Z",
+      "publishedAt": "2026-10-10T12:00:00.000Z",
+      "senderName": "Your Love",
+      "senderNickname": "Babe",
+      "recipientName": "My Everything",
+      "recipientNickname": "Baby",
+      "dateFirstMet": "2023-06-15",
+      "dateOfficialCouple": "2023-08-20",
+      "welcomeTitle": "I Made Something For You",
+      "welcomeSubtitle": "A little world, just for us ✨",
+      "welcomeMessage": "Because you deserve to know how special you are to me. Every pixel on this page holds a piece of my heart. Take your time exploring — this is all for you.",
+      "enabledSections": [
+        "welcome",
+        "observations",
+        "memories",
+        "secretWorld",
+        "deluluMode",
+        "quiz",
+        "letters",
+        "notebook",
+        "voice",
+        "datePlanner",
+        "openWhenLetters",
+        "littleReasons",
+        "digitalGifts",
+        "ourSong",
+        "finalHeart"
+      ],
+      "sectionOrder": [
+        "welcome",
+        "observations",
+        "memories",
+        "secretWorld",
+        "deluluMode",
+        "quiz",
+        "letters",
+        "notebook",
+        "voice",
+        "datePlanner",
+        "openWhenLetters",
+        "littleReasons",
+        "digitalGifts",
+        "ourSong",
+        "finalHeart"
+      ],
+      "customMilestones": [
+        {
+          "id": "1",
+          "label": "First Date",
+          "date": "2023-07-02"
+        },
+        {
+          "id": "2",
+          "label": "First Trip Together",
+          "date": "2024-01-15"
+        }
+      ],
+      "secretPassword": "iloveyou",
+      "secretHint": "What I whisper before we fall asleep...",
+      "secretContent": "You are the greatest dream my heart has ever dared to imagine. Forever and always.",
+      "featuredSong": {
+        "title": "Golden Hour (Our Melody)",
+        "artist": "JVKE / Acoustic Lofi",
+        "dedication": "Dedicated to the golden light in your eyes whenever you laugh.",
+        "whyItMatters": "Reminds me of our long drive under the twilight sky."
+      },
+      "finalLetter": "If I had to live a thousand lifetimes, I would search for you in every single one of them. Thank you for making my life softer, sweeter, and infinitely brighter.",
+      "finalMessage": "Forever yours, with all my love.",
+      "privacy": {
+        "isPasswordProtected": false,
+        "passcode": "love2024",
+        "recipientInviteToken": "sweetheart",
+        "invitationStatus": "active",
+        "allowResponses": true,
+        "allowRecipientContributions": true
+      }
+    },
+    {
+      "id": "gift_1792218049167_pwqn",
+      "slug": "test-qa-1792218048761",
+      "title": "Test Romantic Sanctuary ♡",
+      "status": "draft",
+      "createdAt": "2026-10-17T06:20:49.167Z",
+      "updatedAt": "2026-10-17T06:20:50.254Z",
+      "senderName": "Romeo",
+      "senderNickname": "Babe",
+      "recipientName": "Juliet",
+      "recipientNickname": "My Love",
+      "welcomeTitle": "A Secret Garden",
+      "welcomeSubtitle": "Just for you",
+      "welcomeMessage": "Updated love message with more tenderness.",
+      "enabledSections": [
+        "welcome",
+        "observations",
+        "memories",
+        "secretWorld",
+        "finalHeart"
+      ],
+      "sectionOrder": [
+        "welcome",
+        "observations",
+        "memories",
+        "secretWorld",
+        "finalHeart"
+      ],
+      "secretPassword": "iloveyou",
+      "secretHint": "What I always whisper to you...",
+      "secretContent": "You are the greatest dream my heart has ever dared to imagine.",
+      "featuredSong": {
+        "title": "Golden Hour (Our Melody)",
+        "artist": "JVKE / Acoustic Lofi",
+        "dedication": "Dedicated to the brightest light in my world."
+      },
+      "finalLetter": "Thank you for making my life softer, sweeter, and infinitely brighter. Forever yours.",
+      "finalMessage": "Forever and always yours.",
+      "privacy": {
+        "isPasswordProtected": false,
+        "passcode": "qa-pass-123",
+        "recipientInviteToken": "inv-1792218049137",
+        "invitationStatus": "active",
+        "allowResponses": true,
+        "allowRecipientContributions": true
+      }
+    },
+    {
+      "id": "gift_1792218050271_2xuj",
+      "slug": "test-romantic-sanctuary-copy",
+      "title": "Test Romantic Sanctuary ♡ (Copy)",
+      "status": "draft",
+      "createdAt": "2026-10-17T06:20:50.271Z",
+      "updatedAt": "2026-10-17T06:20:50.271Z",
+      "senderName": "Romeo",
+      "senderNickname": "Babe",
+      "recipientName": "Juliet",
+      "recipientNickname": "My Love",
+      "welcomeTitle": "A Secret Garden",
+      "welcomeSubtitle": "Just for you",
+      "welcomeMessage": "Updated love message with more tenderness.",
+      "enabledSections": [
+        "welcome",
+        "observations",
+        "memories",
+        "secretWorld",
+        "finalHeart"
+      ],
+      "sectionOrder": [
+        "welcome",
+        "observations",
+        "memories",
+        "secretWorld",
+        "finalHeart"
+      ],
+      "secretPassword": "iloveyou",
+      "secretHint": "What I always whisper to you...",
+      "secretContent": "You are the greatest dream my heart has ever dared to imagine.",
+      "featuredSong": {
+        "title": "Golden Hour (Our Melody)",
+        "artist": "JVKE / Acoustic Lofi",
+        "dedication": "Dedicated to the brightest light in my world."
+      },
+      "finalLetter": "Thank you for making my life softer, sweeter, and infinitely brighter. Forever yours.",
+      "finalMessage": "Forever and always yours.",
+      "privacy": {
+        "isPasswordProtected": false,
+        "passcode": "qa-pass-123",
+        "recipientInviteToken": "sweetheart-8j3y",
+        "invitationStatus": "active",
+        "allowResponses": true,
+        "allowRecipientContributions": true
+      }
+    },
+    {
+      "id": "gift_1792218079772_ekg0",
+      "slug": "test-qa-1792218079476",
+      "title": "Test Romantic Sanctuary ♡",
+      "status": "unpublished",
+      "createdAt": "2026-10-17T06:21:19.772Z",
+      "updatedAt": "2026-10-17T06:21:20.992Z",
+      "senderName": "Romeo",
+      "senderNickname": "Babe",
+      "recipientName": "Juliet",
+      "recipientNickname": "My Love",
+      "welcomeTitle": "A Secret Garden",
+      "welcomeSubtitle": "Just for you",
+      "welcomeMessage": "Updated love message with more tenderness.",
+      "enabledSections": [
+        "welcome",
+        "observations",
+        "memories",
+        "secretWorld",
+        "finalHeart"
+      ],
+      "sectionOrder": [
+        "welcome",
+        "observations",
+        "memories",
+        "secretWorld",
+        "finalHeart"
+      ],
+      "secretPassword": "iloveyou",
+      "secretHint": "What I always whisper to you...",
+      "secretContent": "You are the greatest dream my heart has ever dared to imagine.",
+      "featuredSong": {
+        "title": "Golden Hour (Our Melody)",
+        "artist": "JVKE / Acoustic Lofi",
+        "dedication": "Dedicated to the brightest light in my world."
+      },
+      "finalLetter": "Thank you for making my life softer, sweeter, and infinitely brighter. Forever yours.",
+      "finalMessage": "Forever and always yours.",
+      "privacy": {
+        "isPasswordProtected": false,
+        "passcode": "qa-pass-123",
+        "recipientInviteToken": "inv-1792218079756",
+        "invitationStatus": "active",
+        "allowResponses": true,
+        "allowRecipientContributions": true
+      }
+    },
+    {
+      "id": "gift_1792218097140_zs71",
+      "slug": "test-qa-1792218096804",
+      "title": "Test Romantic Sanctuary ♡",
+      "status": "published",
+      "createdAt": "2026-10-17T06:21:37.140Z",
+      "updatedAt": "2026-10-17T06:21:37.329Z",
+      "senderName": "Romeo",
+      "senderNickname": "Babe",
+      "recipientName": "Juliet",
+      "recipientNickname": "My Love",
+      "welcomeTitle": "A Secret Garden",
+      "welcomeSubtitle": "Just for you",
+      "welcomeMessage": "Updated love message with more tenderness.",
+      "enabledSections": [
+        "welcome",
+        "observations",
+        "memories",
+        "secretWorld",
+        "finalHeart"
+      ],
+      "sectionOrder": [
+        "welcome",
+        "observations",
+        "memories",
+        "secretWorld",
+        "finalHeart"
+      ],
+      "secretPassword": "iloveyou",
+      "secretHint": "What I always whisper to you...",
+      "secretContent": "You are the greatest dream my heart has ever dared to imagine.",
+      "featuredSong": {
+        "title": "Golden Hour (Our Melody)",
+        "artist": "JVKE / Acoustic Lofi",
+        "dedication": "Dedicated to the brightest light in my world."
+      },
+      "finalLetter": "Thank you for making my life softer, sweeter, and infinitely brighter. Forever yours.",
+      "finalMessage": "Forever and always yours.",
+      "privacy": {
+        "isPasswordProtected": false,
+        "passcode": "qa-pass-123",
+        "recipientInviteToken": "inv-1792218097114",
+        "invitationStatus": "active",
+        "allowResponses": true,
+        "allowRecipientContributions": true
+      },
+      "publishedAt": "2026-10-17T06:21:37.329Z"
+    },
+    {
+      "id": "gift_1792218122818_knoe",
+      "slug": "test-qa-1792218122583",
+      "title": "Test Romantic Sanctuary ♡",
+      "status": "published",
+      "createdAt": "2026-10-17T06:22:02.818Z",
+      "updatedAt": "2026-10-17T06:22:02.956Z",
+      "senderName": "Romeo",
+      "senderNickname": "Babe",
+      "recipientName": "Juliet",
+      "recipientNickname": "My Love",
+      "welcomeTitle": "A Secret Garden",
+      "welcomeSubtitle": "Just for you",
+      "welcomeMessage": "Updated love message with more tenderness.",
+      "enabledSections": [
+        "welcome",
+        "observations",
+        "memories",
+        "secretWorld",
+        "finalHeart"
+      ],
+      "sectionOrder": [
+        "welcome",
+        "observations",
+        "memories",
+        "secretWorld",
+        "finalHeart"
+      ],
+      "secretPassword": "iloveyou",
+      "secretHint": "What I always whisper to you...",
+      "secretContent": "You are the greatest dream my heart has ever dared to imagine.",
+      "featuredSong": {
+        "title": "Golden Hour (Our Melody)",
+        "artist": "JVKE / Acoustic Lofi",
+        "dedication": "Dedicated to the brightest light in my world."
+      },
+      "finalLetter": "Thank you for making my life softer, sweeter, and infinitely brighter. Forever yours.",
+      "finalMessage": "Forever and always yours.",
+      "privacy": {
+        "isPasswordProtected": false,
+        "passcode": "qa-pass-123",
+        "recipientInviteToken": "inv-1792218122801",
+        "invitationStatus": "active",
+        "allowResponses": true,
+        "allowRecipientContributions": true
+      },
+      "publishedAt": "2026-10-17T06:22:02.956Z"
+    }
+  ],
+  "mediaAssets": [
+    {
+      "id": "media_1",
+      "giftId": "gift_world_demo",
+      "name": "Sunlit Picnic Blanket.jpg",
+      "type": "image",
+      "mimeType": "image/jpeg",
+      "sizeBytes": 245000,
+      "dataUrl": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+      "caption": "Sunset picnic setup at the ridge overlook",
+      "createdAt": "2026-10-10T12:00:00.000Z"
+    },
+    {
+      "id": "media_2",
+      "giftId": "gift_world_demo",
+      "name": "Artisan Coffee & Pastries.jpg",
+      "type": "image",
+      "mimeType": "image/jpeg",
+      "sizeBytes": 310000,
+      "dataUrl": "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80",
+      "caption": "Our favorite corner bakery table",
+      "createdAt": "2026-10-10T12:00:00.000Z"
+    },
+    {
+      "id": "media_3",
+      "giftId": "gift_world_demo",
+      "name": "Stargazing Meadow.jpg",
+      "type": "image",
+      "mimeType": "image/jpeg",
+      "sizeBytes": 198000,
+      "dataUrl": "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=800&q=80",
+      "caption": "Midnight constellations preserve",
+      "createdAt": "2026-10-10T12:00:00.000Z"
+    }
+  ]
+}
