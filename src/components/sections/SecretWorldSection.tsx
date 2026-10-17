@@ -238,7 +238,7 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
 
               {/* Secret Letter */}
               {revealedData?.letter && (
-                <div className="space-y-4 max-w-xl mx-auto p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-[var(--bg-main)] to-[var(--bg-surface)] border border-[var(--border-subtle)] text-sm sm:text-base leading-relaxed text-[var(--text-secondary)] mb-8">
+                <div className="space-y-4 max-w-xl mx-auto p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-[var(--bg-main)] to-[var(--bg-surface)] border border-[var(--border-subtle)] font-serif italic text-base sm:text-lg leading-relaxed text-[var(--text-primary)] mb-8">
                   {revealedData.letter.split("\n\n").map((para, i) => (
                     <p key={i} className="leading-loose">
                       {para}

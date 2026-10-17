@@ -209,10 +209,10 @@ function OpenLetterOverlay({
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 + i * 0.12 }}
-              className="text-sm md:text-base"
+              className="text-base md:text-lg font-serif italic leading-relaxed"
               style={{
-                color: "var(--text-secondary)",
-                lineHeight: 2,
+                color: "var(--text-primary)",
+                lineHeight: 1.9,
               }}
             >
               {paragraph}

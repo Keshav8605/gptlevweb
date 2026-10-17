@@ -218,7 +218,7 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
                 </div>
               )}
 
-              <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-6">
+              <p className="text-base sm:text-lg font-serif italic text-[var(--text-primary)] leading-relaxed mb-6">
                 {selectedMemory.description}
               </p>
 

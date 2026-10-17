@@ -60,7 +60,7 @@ export function SectionWrapper({
                 {emoji}
               </motion.span>
             )}
-            <h2 className="font-rounded text-3xl md:text-4xl lg:text-5xl font-bold text-[var(--romantic-plum)] tracking-tight">
+            <h2 className="font-rounded cute-love-stroke text-3xl md:text-4xl lg:text-5xl font-bold text-[var(--romantic-plum)] tracking-tight select-none">
               {title}
             </h2>
             {subtitle && (

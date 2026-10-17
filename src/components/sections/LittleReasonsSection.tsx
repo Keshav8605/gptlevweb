@@ -102,7 +102,7 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
         </div>
 
         {/* Multi-Font Styled Romantic Title (Matching Reference 4) */}
-        <h2 className="text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--romantic-plum)] leading-tight select-none mb-3">
+        <h2 className="cute-love-stroke text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--romantic-plum)] leading-tight select-none mb-3">
           <span className="font-rounded text-[#A588B8] pr-2">reasons</span>
           <span className="font-script text-[var(--pink-primary)] font-normal text-5xl sm:text-6xl pr-2">why</span>
           <span className="font-rounded text-[var(--romantic-plum)] pr-2">i love</span>

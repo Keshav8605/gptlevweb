@@ -152,11 +152,10 @@ function LetterCard({
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.2 + i * 0.1 }}
-                    className="text-sm md:text-base leading-relaxed"
+                    className="text-base md:text-lg leading-relaxed font-serif italic"
                     style={{
-                      color: "var(--text-secondary)",
-                      lineHeight: 2,
-                      fontFamily: "var(--font-sans)",
+                      color: "var(--text-primary)",
+                      lineHeight: 1.9,
                     }}
                   >
                     {paragraph}

@@ -194,7 +194,7 @@ export function FinalHeartSection({
               <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[var(--border-medium)]" />
             </div>
 
-            <div className="space-y-6 text-sm sm:text-base leading-relaxed text-[var(--text-secondary)] font-sans">
+            <div className="space-y-6 text-base sm:text-lg leading-relaxed text-[var(--text-primary)] font-serif italic">
               {finalLetter.split("\n\n").map((para, idx) => (
                 <p key={idx} className="leading-loose">
                   {idx === 0 ? (

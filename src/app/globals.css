@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Comfortaa:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Dancing+Script:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700;800&family=Caveat:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Dancing+Script:wght@500;600;700&family=Fredoka:wght@500;600;700&family=Nunito:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -28,11 +28,18 @@
   --shadow-pink-strong: rgba(232, 77, 133, 0.22);
   --glow-pink: rgba(255, 95, 150, 0.35);
 
-  /* Typography - Cute Love, Decent, Classy, Beautiful & Adorable */
-  --font-heading: 'Comfortaa', 'Quicksand', 'Fredoka', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-rounded: 'Comfortaa', 'Quicksand', 'Fredoka', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  /* Three-Font System:
+     Font A (Display): Fredoka + Baloo 2 (Chunky, rounded, playful, lovable)
+     Font B (Romantic Serif): Cormorant Garamond (Elegant, intimate, emotional messages)
+     Font C (Body & UI): Nunito (Friendly, soft rounded, ultra-readable)
+     Accents: Caveat & Dancing Script (Handwritten love notes)
+  */
+  --font-display: 'Fredoka', 'Baloo 2', cursive, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-heading: 'Fredoka', 'Baloo 2', cursive, -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-rounded: 'Fredoka', 'Baloo 2', cursive, -apple-system, BlinkMacSystemFont, sans-serif;
   --font-serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
-  --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
+  --font-body: 'Nunito', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-sans: 'Nunito', 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-script: 'Dancing Script', cursive;
   --font-handwritten: 'Caveat', 'Dancing Script', cursive;
 }
@@ -58,11 +65,13 @@
   --color-romantic-plum: var(--romantic-plum);
   --color-border-subtle: var(--border-subtle);
   --color-border-medium: var(--border-medium);
-  --font-sans: var(--font-sans);
-  --font-serif: var(--font-serif);
-  --font-script: var(--font-script);
-  --font-rounded: var(--font-rounded);
+  --font-display: var(--font-display);
   --font-heading: var(--font-heading);
+  --font-rounded: var(--font-rounded);
+  --font-serif: var(--font-serif);
+  --font-body: var(--font-body);
+  --font-sans: var(--font-sans);
+  --font-script: var(--font-script);
   --font-handwritten: var(--font-handwritten);
 }
 
@@ -179,22 +188,83 @@ body {
   50% { opacity: 1; transform: scale(1.2); }
 }
 
-/* Typography & Headings: Cute Love, Decent, Classy, Beautiful & Adorable */
-h1, h2, h3, h4, h5, h6,
-h1.font-serif, h2.font-serif, h3.font-serif, h4.font-serif, h5.font-serif, h6.font-serif,
+/* ========================================================
+   THREE-FONT TYPOGRAPHY SYSTEM
+   Font A (Display): Fredoka & Baloo 2 (Bubbly, chunky, cute, romantic)
+   Font B (Romantic Serif): Cormorant Garamond (Love letters, deep emotions, quotes)
+   Font C (Body & UI): Nunito (Friendly, soft rounded, super readable)
+   Accents: Caveat & Dancing Script (Authentic handwritten love notes)
+   ======================================================== */
+
+/* Font A: Chunky Rounded Love Display Headings */
+.font-display,
 .font-heading,
 .font-rounded {
-  font-family: var(--font-heading) !important;
+  font-family: var(--font-display) !important;
+}
+
+/* Major Headings default to Fredoka rounded display font, unless specifically designated with .font-serif or .font-handwritten */
+h1:not(.font-serif):not(.font-handwritten),
+h2:not(.font-serif):not(.font-handwritten),
+h3:not(.font-serif):not(.font-handwritten),
+h4:not(.font-serif):not(.font-handwritten),
+h5:not(.font-serif):not(.font-handwritten),
+h6:not(.font-serif):not(.font-handwritten) {
+  font-family: var(--font-display);
   letter-spacing: -0.012em;
 }
 
-/* Utility Classes */
-.font-heading { font-family: var(--font-heading) !important; }
-.font-rounded { font-family: var(--font-rounded) !important; }
-.font-serif { font-family: var(--font-serif); }
-.font-sans { font-family: var(--font-sans); }
-.font-script { font-family: var(--font-script); }
-.font-handwritten { font-family: var(--font-handwritten); }
+/* Font B: Elegant Romantic Serif for Love Letters, Emotional Messages & Quotations */
+.font-serif,
+.font-romantic-serif {
+  font-family: var(--font-serif) !important;
+}
+
+/* Font C: Readable Body & UI */
+.font-body,
+.font-sans,
+p:not(.font-serif):not(.font-display):not(.font-rounded):not(.font-handwritten):not(.font-script),
+input,
+textarea,
+select,
+label,
+button:not(.font-display):not(.font-serif):not(.font-handwritten) {
+  font-family: var(--font-body);
+}
+
+.font-script { font-family: var(--font-script) !important; }
+.font-handwritten { font-family: var(--font-handwritten) !important; }
+
+/* Cute Love Chunky White Stroke Styles for Headings (inspired by reference image) */
+.cute-love-stroke,
+.cute-love-sticker,
+.cute-love-outline,
+h2.font-rounded {
+  -webkit-text-stroke: 7.5px #ffffff;
+  paint-order: stroke fill;
+  letter-spacing: 0.01em;
+  text-shadow:
+    -3px -3px 0 #ffffff,
+     3px -3px 0 #ffffff,
+    -3px  3px 0 #ffffff,
+     3px  3px 0 #ffffff,
+    -4px  0   0 #ffffff,
+     4px  0   0 #ffffff,
+     0   -4px 0 #ffffff,
+     0    4px 0 #ffffff,
+    -5px -5px 0 #ffffff,
+     5px -5px 0 #ffffff,
+    -5px  5px 0 #ffffff,
+     5px  5px 0 #ffffff,
+     0    5px 16px rgba(255, 95, 150, 0.28);
+}
+
+.cute-love-stroke span.inline-block,
+.cute-love-sticker span.inline-block,
+.cute-love-outline span.inline-block,
+h2.font-rounded span.inline-block {
+  -webkit-text-stroke: 0px transparent !important;
+}
 
 .animate-float { animation: float 6s ease-in-out infinite; }
 .animate-float-slow { animation: floatSlow 8s ease-in-out infinite; }

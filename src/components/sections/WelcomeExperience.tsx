@@ -214,18 +214,22 @@ export function WelcomeExperience({
           <span className="text-xs">✨</span>
         </motion.div>
 
-        {/* Main Title: "you & me" in Playful Rounded Display Font (Inspired by Reference 2) */}
+        {/* Main Title: "You & Me" in Chunky Rounded Display Font (Inspired by Reference) */}
         <motion.h1
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="font-rounded text-6xl sm:text-7xl md:text-8xl font-bold tracking-tight text-[var(--romantic-plum)] leading-none select-none"
+          className="font-display cute-love-outline text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-bold tracking-tight text-[var(--romantic-plum)] leading-none select-none my-2"
         >
-          {title ? (
+          {title && !title.includes("&") ? (
             title
           ) : (
             <>
-              you <span className="font-script text-[var(--pink-primary)] font-normal px-1 text-7xl sm:text-8xl md:text-9xl">&amp;</span> me
+              {(title || "You & Me").split("&")[0].trim()}{" "}
+              <span className="font-script text-[var(--pink-primary)] font-normal px-2 text-7xl sm:text-8xl md:text-9xl lg:text-[10rem] align-middle">
+                &amp;
+              </span>{" "}
+              {(title || "You & Me").split("&")[1]?.trim() || "Me"}
             </>
           )}
         </motion.h1>

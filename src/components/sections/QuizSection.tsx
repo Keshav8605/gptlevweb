@@ -146,7 +146,7 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
       bgVariant="default"
     >
       <div className="max-w-2xl mx-auto text-center">
-        <h2 className="font-rounded text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--romantic-plum)] mb-8 select-none">
+        <h2 className="font-display cute-love-outline text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--romantic-plum)] mb-8 select-none">
           Do You Love Me? <span className="inline-block animate-pulse-soft text-[var(--pink-primary)]">💖</span>
         </h2>
 

@@ -187,7 +187,7 @@ export const defaultGiftConfig: GiftConfig = {
   recipientName: "My Everything",
   recipientNickname: "Baby",
   
-  welcomeTitle: "I Made Something For You",
+  welcomeTitle: "You & Me",
   welcomeSubtitle: "A little world, just for us ✨",
   welcomeMessage: "Because you deserve to know how special you are to me. Every pixel on this page holds a piece of my heart. Take your time exploring — this is all for you.",
   
