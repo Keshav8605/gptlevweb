@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { SectionWrapper } from "../SectionWrapper";
 import { RomanticCharacter } from "../RomanticCharacter";
 import type { DeluluScenario } from "@/lib/gift-data";
@@ -161,6 +162,10 @@ export function DeluluSection({ scenarios = defaultDeluluScenarios }: DeluluSect
   const activeScenarios = scenarios.length > 0 ? scenarios : defaultDeluluScenarios;
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [returnParam] = useState<string>(() => {
+    if (typeof window === "undefined") return "/#deluluMode";
+    return window.location.pathname + (window.location.search || "") + "#deluluMode";
+  });
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>(() => {
     if (typeof window === "undefined") return {};
     try {
@@ -170,6 +175,41 @@ export function DeluluSection({ scenarios = defaultDeluluScenarios }: DeluluSect
       return {};
     }
   });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const performScrollToDelulu = () => {
+      const isDeluluTarget =
+        window.location.hash === "#deluluMode" ||
+        sessionStorage.getItem("scroll_to_delulu_on_load") === "true";
+
+      if (isDeluluTarget) {
+        sessionStorage.removeItem("scroll_to_delulu_on_load");
+        const el = document.getElementById("deluluMode");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+    };
+
+    // Trigger scroll restoration on mount and layout settle
+    performScrollToDelulu();
+    const t1 = setTimeout(performScrollToDelulu, 80);
+    const t2 = setTimeout(performScrollToDelulu, 250);
+    const t3 = setTimeout(performScrollToDelulu, 600);
+
+    window.addEventListener("hashchange", performScrollToDelulu);
+    window.addEventListener("popstate", performScrollToDelulu);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      window.removeEventListener("hashchange", performScrollToDelulu);
+      window.removeEventListener("popstate", performScrollToDelulu);
+    };
+  }, []);
 
   const currentScenario = activeScenarios[currentIndex];
   const selectedOptionId = selectedAnswers[currentScenario?.id];
@@ -335,6 +375,39 @@ export function DeluluSection({ scenarios = defaultDeluluScenarios }: DeluluSect
             </div>
           </motion.div>
         </AnimatePresence>
+
+        {/* Story Universe Promotional Entry Card */}
+        <div className="mt-8 bg-white/90 backdrop-blur-xs rounded-3xl p-6 sm:p-7 border border-[var(--border-subtle)] shadow-[0_6px_25px_var(--shadow-pink)] text-center">
+          <div className="flex items-center justify-center gap-2 mb-1.5">
+            <span className="text-xs text-[var(--pink-primary)] select-none">✨</span>
+            <h4 className="font-serif italic leading-tight">
+              <span className="text-lg sm:text-xl text-[#855870] font-medium mr-1.5">
+                One click.
+              </span>
+              <span className="text-xl sm:text-2xl text-[var(--pink-primary)] font-bold">
+                Endless worlds.
+              </span>
+            </h4>
+            <span className="text-xs text-[var(--pink-primary)] select-none">♡</span>
+          </div>
+
+          <p className="font-serif italic text-xs sm:text-sm text-[#987589] mb-4">
+            Stories made for your kind of delulu.
+          </p>
+
+          <Link
+            href={`/story-universe?from=${encodeURIComponent(returnParam)}`}
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                sessionStorage.setItem("story_universe_return_to", returnParam);
+              }
+            }}
+            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-[var(--pink-strong)] text-white hover:bg-[var(--pink-deep)] shadow-sm hover:shadow-md cursor-pointer transition-all"
+            id="btn-explore-story-universe"
+          >
+            Explore Other Worlds →
+          </Link>
+        </div>
       </div>
     </SectionWrapper>
   );
