@@ -25,6 +25,15 @@
       "author": "recipient",
       "authorName": "Baby",
       "createdAt": "2026-10-17T09:18:46.609Z"
+    },
+    {
+      "id": "rx_1792238926261_1pem",
+      "targetType": "observation",
+      "targetId": "ob1",
+      "emoji": "💖",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T12:08:46.261Z"
     }
   ],
   "comments": [
@@ -256,6 +265,36 @@
       "author": "recipient",
       "authorName": "Baby",
       "createdAt": "2026-10-17T11:25:17.461Z",
+      "isViewedByCreator": false
+    },
+    {
+      "id": "cm_1792238418191_msvk",
+      "targetType": "memory",
+      "targetId": "m1",
+      "content": "I remember this day so vividly. You looked handsome in the rain.",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T12:00:18.191Z",
+      "isViewedByCreator": false
+    },
+    {
+      "id": "cm_1792238682857_4hqm",
+      "targetType": "memory",
+      "targetId": "m1",
+      "content": "I remember this day so vividly. You looked handsome in the rain.",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T12:04:42.857Z",
+      "isViewedByCreator": false
+    },
+    {
+      "id": "cm_1792238926284_sr04",
+      "targetType": "memory",
+      "targetId": "m1",
+      "content": "I remember this day so vividly. You looked handsome in the rain.",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T12:08:46.284Z",
       "isViewedByCreator": false
     }
   ],
@@ -567,6 +606,45 @@
       "author": "recipient",
       "authorName": "Baby",
       "createdAt": "2026-10-17T11:25:17.511Z",
+      "reactions": {},
+      "replies": [],
+      "isViewedByCreator": false
+    },
+    {
+      "id": "jn_1792238418239_qms5",
+      "title": "Under the stars",
+      "content": "Listening to the crickets while holding your hand.",
+      "prompt": "A moment I felt closest to you",
+      "moodEmoji": "✨",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T12:00:18.239Z",
+      "reactions": {},
+      "replies": [],
+      "isViewedByCreator": false
+    },
+    {
+      "id": "jn_1792238682921_zh8m",
+      "title": "Under the stars",
+      "content": "Listening to the crickets while holding your hand.",
+      "prompt": "A moment I felt closest to you",
+      "moodEmoji": "✨",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T12:04:42.921Z",
+      "reactions": {},
+      "replies": [],
+      "isViewedByCreator": false
+    },
+    {
+      "id": "jn_1792238926333_c53k",
+      "title": "Under the stars",
+      "content": "Listening to the crickets while holding your hand.",
+      "prompt": "A moment I felt closest to you",
+      "moodEmoji": "✨",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-17T12:08:46.333Z",
       "reactions": {},
       "replies": [],
       "isViewedByCreator": false
@@ -2622,6 +2700,231 @@
       "updatedAt": "2026-10-17T11:25:17.715Z",
       "confirmedAt": "2026-10-17T11:25:17.619Z",
       "completedAt": "2026-10-17T11:25:17.715Z"
+    },
+    {
+      "id": "prop_1792238418305_j3wl",
+      "title": "Moonlit Seaside Stroll & Gelato",
+      "isSurprise": false,
+      "surpriseRevealed": true,
+      "itinerary": [
+        {
+          "title": "Artisan Gelato at Dolceria",
+          "estimatedDurationMinutes": 45,
+          "notes": "Two scoops of pistacchio and dark chocolate"
+        },
+        {
+          "title": "Seaside Boardwalk Walk",
+          "estimatedDurationMinutes": 60,
+          "notes": "Holding hands by the waves"
+        }
+      ],
+      "proposedDate": "2026-10-26",
+      "proposedStartTime": "20:00",
+      "timeZone": "America/New_York",
+      "totalEstimatedDurationMinutes": 120,
+      "estimatedTotalBudget": "$30 - $50",
+      "proposerRole": "creator",
+      "proposerName": "Romeo",
+      "targetPartnerRole": "recipient",
+      "targetPartnerName": "Baby",
+      "status": "completed",
+      "history": [
+        {
+          "id": "hist_1792238418305_1",
+          "timestamp": "2026-10-17T12:00:18.305Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "proposed",
+          "message": "Proposed date for 2026-10-25."
+        },
+        {
+          "id": "hist_1792238418340",
+          "timestamp": "2026-10-17T12:00:18.340Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "accepted",
+          "message": "I cannot wait for gelato with you!"
+        },
+        {
+          "id": "hist_1792238418389",
+          "timestamp": "2026-10-17T12:00:18.389Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "rescheduled",
+          "message": "Moved by 30 mins for the sunset glow"
+        },
+        {
+          "id": "hist_1792238418411",
+          "timestamp": "2026-10-17T12:00:18.411Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "completed",
+          "message": "Marked date as completed! Ready to save memories ♡"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "chk_1792238418306_1",
+          "task": "Confirm arrival time and pick an outfit",
+          "isCompleted": false,
+          "assignedTo": "both",
+          "createdAt": "2026-10-17T12:00:18.306Z"
+        }
+      ],
+      "createdAt": "2026-10-17T12:00:18.306Z",
+      "updatedAt": "2026-10-17T12:00:18.411Z",
+      "confirmedAt": "2026-10-17T12:00:18.340Z",
+      "completedAt": "2026-10-17T12:00:18.411Z"
+    },
+    {
+      "id": "prop_1792238682988_z5vu",
+      "title": "Moonlit Seaside Stroll & Gelato",
+      "isSurprise": false,
+      "surpriseRevealed": true,
+      "itinerary": [
+        {
+          "title": "Artisan Gelato at Dolceria",
+          "estimatedDurationMinutes": 45,
+          "notes": "Two scoops of pistacchio and dark chocolate"
+        },
+        {
+          "title": "Seaside Boardwalk Walk",
+          "estimatedDurationMinutes": 60,
+          "notes": "Holding hands by the waves"
+        }
+      ],
+      "proposedDate": "2026-10-26",
+      "proposedStartTime": "20:00",
+      "timeZone": "America/New_York",
+      "totalEstimatedDurationMinutes": 120,
+      "estimatedTotalBudget": "$30 - $50",
+      "proposerRole": "creator",
+      "proposerName": "Romeo",
+      "targetPartnerRole": "recipient",
+      "targetPartnerName": "Baby",
+      "status": "completed",
+      "history": [
+        {
+          "id": "hist_1792238682988_1",
+          "timestamp": "2026-10-17T12:04:42.988Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "proposed",
+          "message": "Proposed date for 2026-10-25."
+        },
+        {
+          "id": "hist_1792238683020",
+          "timestamp": "2026-10-17T12:04:43.020Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "accepted",
+          "message": "I cannot wait for gelato with you!"
+        },
+        {
+          "id": "hist_1792238683061",
+          "timestamp": "2026-10-17T12:04:43.061Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "rescheduled",
+          "message": "Moved by 30 mins for the sunset glow"
+        },
+        {
+          "id": "hist_1792238683082",
+          "timestamp": "2026-10-17T12:04:43.082Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "completed",
+          "message": "Marked date as completed! Ready to save memories ♡"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "chk_1792238682988_1",
+          "task": "Confirm arrival time and pick an outfit",
+          "isCompleted": false,
+          "assignedTo": "both",
+          "createdAt": "2026-10-17T12:04:42.988Z"
+        }
+      ],
+      "createdAt": "2026-10-17T12:04:42.988Z",
+      "updatedAt": "2026-10-17T12:04:43.082Z",
+      "confirmedAt": "2026-10-17T12:04:43.020Z",
+      "completedAt": "2026-10-17T12:04:43.082Z"
+    },
+    {
+      "id": "prop_1792238926411_kd3t",
+      "title": "Moonlit Seaside Stroll & Gelato",
+      "isSurprise": false,
+      "surpriseRevealed": true,
+      "itinerary": [
+        {
+          "title": "Artisan Gelato at Dolceria",
+          "estimatedDurationMinutes": 45,
+          "notes": "Two scoops of pistacchio and dark chocolate"
+        },
+        {
+          "title": "Seaside Boardwalk Walk",
+          "estimatedDurationMinutes": 60,
+          "notes": "Holding hands by the waves"
+        }
+      ],
+      "proposedDate": "2026-10-26",
+      "proposedStartTime": "20:00",
+      "timeZone": "America/New_York",
+      "totalEstimatedDurationMinutes": 120,
+      "estimatedTotalBudget": "$30 - $50",
+      "proposerRole": "creator",
+      "proposerName": "Romeo",
+      "targetPartnerRole": "recipient",
+      "targetPartnerName": "Baby",
+      "status": "completed",
+      "history": [
+        {
+          "id": "hist_1792238926411_1",
+          "timestamp": "2026-10-17T12:08:46.411Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "proposed",
+          "message": "Proposed date for 2026-10-25."
+        },
+        {
+          "id": "hist_1792238926509",
+          "timestamp": "2026-10-17T12:08:46.509Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "accepted",
+          "message": "I cannot wait for gelato with you!"
+        },
+        {
+          "id": "hist_1792238926533",
+          "timestamp": "2026-10-17T12:08:46.533Z",
+          "authorRole": "creator",
+          "authorName": "Romeo",
+          "action": "rescheduled",
+          "message": "Moved by 30 mins for the sunset glow"
+        },
+        {
+          "id": "hist_1792238926601",
+          "timestamp": "2026-10-17T12:08:46.601Z",
+          "authorRole": "recipient",
+          "authorName": "Juliet",
+          "action": "completed",
+          "message": "Marked date as completed! Ready to save memories ♡"
+        }
+      ],
+      "checklist": [
+        {
+          "id": "chk_1792238926411_1",
+          "task": "Confirm arrival time and pick an outfit",
+          "isCompleted": false,
+          "assignedTo": "both",
+          "createdAt": "2026-10-17T12:08:46.411Z"
+        }
+      ],
+      "createdAt": "2026-10-17T12:08:46.411Z",
+      "updatedAt": "2026-10-17T12:08:46.601Z",
+      "confirmedAt": "2026-10-17T12:08:46.509Z",
+      "completedAt": "2026-10-17T12:08:46.601Z"
     }
   ],
   "dateMemories": [
@@ -2958,9 +3261,186 @@
       "authorRole": "recipient",
       "authorName": "Juliet",
       "createdAt": "2026-10-17T11:25:17.759Z"
+    },
+    {
+      "id": "dmem_1792238418469_h62x",
+      "proposalId": "prop_1792238418305_j3wl",
+      "dateTitle": "Moonlit Seaside Stroll & Gelato",
+      "completedDate": "2026-10-17",
+      "photos": [],
+      "description": "",
+      "favoriteMoment": "When you wiped gelato off my nose with your thumb and kissed me.",
+      "funniestMoment": "",
+      "personalNote": "",
+      "ratingEmoji": "⭐⭐⭐⭐⭐",
+      "authorRole": "recipient",
+      "authorName": "Juliet",
+      "createdAt": "2026-10-17T12:00:18.469Z"
+    },
+    {
+      "id": "dmem_1792238683129_rx2f",
+      "proposalId": "prop_1792238682988_z5vu",
+      "dateTitle": "Moonlit Seaside Stroll & Gelato",
+      "completedDate": "2026-10-17",
+      "photos": [],
+      "description": "",
+      "favoriteMoment": "When you wiped gelato off my nose with your thumb and kissed me.",
+      "funniestMoment": "",
+      "personalNote": "",
+      "ratingEmoji": "⭐⭐⭐⭐⭐",
+      "authorRole": "recipient",
+      "authorName": "Juliet",
+      "createdAt": "2026-10-17T12:04:43.129Z"
+    },
+    {
+      "id": "dmem_1792238926622_gnhk",
+      "proposalId": "prop_1792238926411_kd3t",
+      "dateTitle": "Moonlit Seaside Stroll & Gelato",
+      "completedDate": "2026-10-17",
+      "photos": [],
+      "description": "",
+      "favoriteMoment": "When you wiped gelato off my nose with your thumb and kissed me.",
+      "funniestMoment": "",
+      "personalNote": "",
+      "ratingEmoji": "⭐⭐⭐⭐⭐",
+      "authorRole": "recipient",
+      "authorName": "Juliet",
+      "createdAt": "2026-10-17T12:08:46.622Z"
     }
   ],
   "dateNotifications": [
+    {
+      "id": "notif_1792238926601_6v85",
+      "type": "post_date_memory_prompt",
+      "title": "How was our date? 📸💕",
+      "message": "\"Moonlit Seaside Stroll & Gelato\" is complete! Add photographs and favorite memories to our scrapbook.",
+      "proposalId": "prop_1792238926411_kd3t",
+      "targetRole": "both",
+      "isRead": false,
+      "createdAt": "2026-10-17T12:08:46.601Z",
+      "dedupeKey": "complete_prop_1792238926411_kd3t"
+    },
+    {
+      "id": "notif_1792238926533_ehir",
+      "type": "rescheduled",
+      "title": "Date Rescheduled 🗓️",
+      "message": "Romeo rescheduled \"Moonlit Seaside Stroll & Gelato\" to 2026-10-26 at 20:00.",
+      "proposalId": "prop_1792238926411_kd3t",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T12:08:46.533Z",
+      "dedupeKey": "resched_prop_1792238926411_kd3t_1792238926533"
+    },
+    {
+      "id": "notif_1792238926509_v02s",
+      "type": "proposal_accepted",
+      "title": "Proposal Accepted! 🎉",
+      "message": "Juliet accepted \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25! Adventure confirmed ♡",
+      "proposalId": "prop_1792238926411_kd3t",
+      "targetRole": "creator",
+      "isRead": false,
+      "createdAt": "2026-10-17T12:08:46.509Z",
+      "dedupeKey": "accept_prop_1792238926411_kd3t"
+    },
+    {
+      "id": "notif_1792238926412_ep4z",
+      "type": "new_proposal",
+      "title": "New Date Proposal! 💌",
+      "message": "Romeo proposed \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25 at 19:30.",
+      "proposalId": "prop_1792238926411_kd3t",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T12:08:46.412Z",
+      "dedupeKey": "notif_prop_prop_1792238926411_kd3t"
+    },
+    {
+      "id": "notif_1792238683082_f5zt",
+      "type": "post_date_memory_prompt",
+      "title": "How was our date? 📸💕",
+      "message": "\"Moonlit Seaside Stroll & Gelato\" is complete! Add photographs and favorite memories to our scrapbook.",
+      "proposalId": "prop_1792238682988_z5vu",
+      "targetRole": "both",
+      "isRead": false,
+      "createdAt": "2026-10-17T12:04:43.082Z",
+      "dedupeKey": "complete_prop_1792238682988_z5vu"
+    },
+    {
+      "id": "notif_1792238683061_lrin",
+      "type": "rescheduled",
+      "title": "Date Rescheduled 🗓️",
+      "message": "Romeo rescheduled \"Moonlit Seaside Stroll & Gelato\" to 2026-10-26 at 20:00.",
+      "proposalId": "prop_1792238682988_z5vu",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T12:04:43.061Z",
+      "dedupeKey": "resched_prop_1792238682988_z5vu_1792238683061"
+    },
+    {
+      "id": "notif_1792238683020_dvvi",
+      "type": "proposal_accepted",
+      "title": "Proposal Accepted! 🎉",
+      "message": "Juliet accepted \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25! Adventure confirmed ♡",
+      "proposalId": "prop_1792238682988_z5vu",
+      "targetRole": "creator",
+      "isRead": false,
+      "createdAt": "2026-10-17T12:04:43.020Z",
+      "dedupeKey": "accept_prop_1792238682988_z5vu"
+    },
+    {
+      "id": "notif_1792238682988_ycuk",
+      "type": "new_proposal",
+      "title": "New Date Proposal! 💌",
+      "message": "Romeo proposed \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25 at 19:30.",
+      "proposalId": "prop_1792238682988_z5vu",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T12:04:42.988Z",
+      "dedupeKey": "notif_prop_prop_1792238682988_z5vu"
+    },
+    {
+      "id": "notif_1792238418411_2g8x",
+      "type": "post_date_memory_prompt",
+      "title": "How was our date? 📸💕",
+      "message": "\"Moonlit Seaside Stroll & Gelato\" is complete! Add photographs and favorite memories to our scrapbook.",
+      "proposalId": "prop_1792238418305_j3wl",
+      "targetRole": "both",
+      "isRead": false,
+      "createdAt": "2026-10-17T12:00:18.411Z",
+      "dedupeKey": "complete_prop_1792238418305_j3wl"
+    },
+    {
+      "id": "notif_1792238418389_tvst",
+      "type": "rescheduled",
+      "title": "Date Rescheduled 🗓️",
+      "message": "Romeo rescheduled \"Moonlit Seaside Stroll & Gelato\" to 2026-10-26 at 20:00.",
+      "proposalId": "prop_1792238418305_j3wl",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T12:00:18.389Z",
+      "dedupeKey": "resched_prop_1792238418305_j3wl_1792238418389"
+    },
+    {
+      "id": "notif_1792238418340_hbyh",
+      "type": "proposal_accepted",
+      "title": "Proposal Accepted! 🎉",
+      "message": "Juliet accepted \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25! Adventure confirmed ♡",
+      "proposalId": "prop_1792238418305_j3wl",
+      "targetRole": "creator",
+      "isRead": false,
+      "createdAt": "2026-10-17T12:00:18.340Z",
+      "dedupeKey": "accept_prop_1792238418305_j3wl"
+    },
+    {
+      "id": "notif_1792238418306_tajw",
+      "type": "new_proposal",
+      "title": "New Date Proposal! 💌",
+      "message": "Romeo proposed \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25 at 19:30.",
+      "proposalId": "prop_1792238418305_j3wl",
+      "targetRole": "recipient",
+      "isRead": false,
+      "createdAt": "2026-10-17T12:00:18.306Z",
+      "dedupeKey": "notif_prop_prop_1792238418305_j3wl"
+    },
     {
       "id": "notif_1792236317715_giae",
       "type": "post_date_memory_prompt",
@@ -3378,138 +3858,6 @@
       "isRead": false,
       "createdAt": "2026-10-17T08:21:31.115Z",
       "dedupeKey": "resched_prop_1792225291052_6qsv_1792225291115"
-    },
-    {
-      "id": "notif_1792225291082_jr58",
-      "type": "proposal_accepted",
-      "title": "Proposal Accepted! 🎉",
-      "message": "Juliet accepted \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25! Adventure confirmed ♡",
-      "proposalId": "prop_1792225291052_6qsv",
-      "targetRole": "creator",
-      "isRead": false,
-      "createdAt": "2026-10-17T08:21:31.082Z",
-      "dedupeKey": "accept_prop_1792225291052_6qsv"
-    },
-    {
-      "id": "notif_1792225291053_gw8b",
-      "type": "new_proposal",
-      "title": "New Date Proposal! 💌",
-      "message": "Romeo proposed \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25 at 19:30.",
-      "proposalId": "prop_1792225291052_6qsv",
-      "targetRole": "recipient",
-      "isRead": false,
-      "createdAt": "2026-10-17T08:21:31.053Z",
-      "dedupeKey": "notif_prop_prop_1792225291052_6qsv"
-    },
-    {
-      "id": "notif_1792224748005_dfx3",
-      "type": "post_date_memory_prompt",
-      "title": "How was our date? 📸💕",
-      "message": "\"Moonlit Seaside Stroll & Gelato\" is complete! Add photographs and favorite memories to our scrapbook.",
-      "proposalId": "prop_1792224747842_s9f0",
-      "targetRole": "both",
-      "isRead": false,
-      "createdAt": "2026-10-17T08:12:28.005Z",
-      "dedupeKey": "complete_prop_1792224747842_s9f0"
-    },
-    {
-      "id": "notif_1792224747976_krq8",
-      "type": "rescheduled",
-      "title": "Date Rescheduled 🗓️",
-      "message": "Romeo rescheduled \"Moonlit Seaside Stroll & Gelato\" to 2026-10-26 at 20:00.",
-      "proposalId": "prop_1792224747842_s9f0",
-      "targetRole": "recipient",
-      "isRead": false,
-      "createdAt": "2026-10-17T08:12:27.976Z",
-      "dedupeKey": "resched_prop_1792224747842_s9f0_1792224747976"
-    },
-    {
-      "id": "notif_1792224747887_hhli",
-      "type": "proposal_accepted",
-      "title": "Proposal Accepted! 🎉",
-      "message": "Juliet accepted \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25! Adventure confirmed ♡",
-      "proposalId": "prop_1792224747842_s9f0",
-      "targetRole": "creator",
-      "isRead": false,
-      "createdAt": "2026-10-17T08:12:27.887Z",
-      "dedupeKey": "accept_prop_1792224747842_s9f0"
-    },
-    {
-      "id": "notif_1792224747843_oi2q",
-      "type": "new_proposal",
-      "title": "New Date Proposal! 💌",
-      "message": "Romeo proposed \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25 at 19:30.",
-      "proposalId": "prop_1792224747842_s9f0",
-      "targetRole": "recipient",
-      "isRead": false,
-      "createdAt": "2026-10-17T08:12:27.843Z",
-      "dedupeKey": "notif_prop_prop_1792224747842_s9f0"
-    },
-    {
-      "id": "notif_1792224171801_1mj9",
-      "type": "post_date_memory_prompt",
-      "title": "How was our date? 📸💕",
-      "message": "\"Moonlit Seaside Stroll & Gelato\" is complete! Add photographs and favorite memories to our scrapbook.",
-      "proposalId": "prop_1792224171711_ljxv",
-      "targetRole": "both",
-      "isRead": false,
-      "createdAt": "2026-10-17T08:02:51.801Z",
-      "dedupeKey": "complete_prop_1792224171711_ljxv"
-    },
-    {
-      "id": "notif_1792224171777_6psv",
-      "type": "rescheduled",
-      "title": "Date Rescheduled 🗓️",
-      "message": "Romeo rescheduled \"Moonlit Seaside Stroll & Gelato\" to 2026-10-26 at 20:00.",
-      "proposalId": "prop_1792224171711_ljxv",
-      "targetRole": "recipient",
-      "isRead": false,
-      "createdAt": "2026-10-17T08:02:51.777Z",
-      "dedupeKey": "resched_prop_1792224171711_ljxv_1792224171777"
-    },
-    {
-      "id": "notif_1792224171740_fuab",
-      "type": "proposal_accepted",
-      "title": "Proposal Accepted! 🎉",
-      "message": "Juliet accepted \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25! Adventure confirmed ♡",
-      "proposalId": "prop_1792224171711_ljxv",
-      "targetRole": "creator",
-      "isRead": false,
-      "createdAt": "2026-10-17T08:02:51.740Z",
-      "dedupeKey": "accept_prop_1792224171711_ljxv"
-    },
-    {
-      "id": "notif_1792224171711_sh91",
-      "type": "new_proposal",
-      "title": "New Date Proposal! 💌",
-      "message": "Romeo proposed \"Moonlit Seaside Stroll & Gelato\" for 2026-10-25 at 19:30.",
-      "proposalId": "prop_1792224171711_ljxv",
-      "targetRole": "recipient",
-      "isRead": false,
-      "createdAt": "2026-10-17T08:02:51.711Z",
-      "dedupeKey": "notif_prop_prop_1792224171711_ljxv"
-    },
-    {
-      "id": "notif_1792221629061_mbb2",
-      "type": "post_date_memory_prompt",
-      "title": "How was our date? 📸💕",
-      "message": "\"Moonlit Seaside Stroll & Gelato\" is complete! Add photographs and favorite memories to our scrapbook.",
-      "proposalId": "prop_1792221628926_t601",
-      "targetRole": "both",
-      "isRead": false,
-      "createdAt": "2026-10-17T07:20:29.061Z",
-      "dedupeKey": "complete_prop_1792221628926_t601"
-    },
-    {
-      "id": "notif_1792221629040_7v54",
-      "type": "rescheduled",
-      "title": "Date Rescheduled 🗓️",
-      "message": "Romeo rescheduled \"Moonlit Seaside Stroll & Gelato\" to 2026-10-26 at 20:00.",
-      "proposalId": "prop_1792221628926_t601",
-      "targetRole": "recipient",
-      "isRead": false,
-      "createdAt": "2026-10-17T07:20:29.040Z",
-      "dedupeKey": "resched_prop_1792221628926_t601_1792221629040"
     }
   ],
   "notificationSettings": {
