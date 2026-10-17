@@ -23,7 +23,7 @@ export function ObservationsSection({ observations }: ObservationsSectionProps) 
       <div className="flex justify-center -mt-3 mb-8">
         <RomanticCharacter
           character="tenderCouple"
-          size={135}
+          size={180}
           animation="soft-breathe"
           sparkles
         />

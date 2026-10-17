@@ -193,7 +193,7 @@ export function WelcomeExperience({
         >
           <RomanticCharacter
             character="kissingCouple"
-            size={180}
+            size={230}
             priority
             sparkles
             animation="gentle-float"

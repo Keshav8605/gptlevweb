@@ -37,8 +37,8 @@ export const ROMANTIC_CHARACTERS: Record<CharacterIdentifier, CharacterAssetConf
     title: "Joyful Leaping Hug",
     alt: "Two adorable characters leaping into a loving embrace with sweet hearts above",
     aspectRatio: "540 / 510",
-    defaultWidth: 180,
-    defaultHeight: 170,
+    defaultWidth: 230,
+    defaultHeight: 217,
     mood: "Ecstatic celebration, overwhelming love, joyful reunion",
   },
   cozyCouple: {
@@ -48,8 +48,8 @@ export const ROMANTIC_CHARACTERS: Record<CharacterIdentifier, CharacterAssetConf
     title: "Cozy Blanket Snuggle & Kisses",
     alt: "Two cute characters snuggled under a pink heart blanket sharing sweet kisses",
     aspectRatio: "640 / 480",
-    defaultWidth: 190,
-    defaultHeight: 142,
+    defaultWidth: 240,
+    defaultHeight: 180,
     mood: "Cozy comfort, bedtime dreams, gentle closeness, quiet intimacy",
   },
   kissingCouple: {
@@ -59,8 +59,8 @@ export const ROMANTIC_CHARACTERS: Record<CharacterIdentifier, CharacterAssetConf
     title: "Sweet Cheek Kiss & Daydreams",
     alt: "Cute bear kissing partner's cheek with a floating pink heart and dreamy thoughts",
     aspectRatio: "300 / 260",
-    defaultWidth: 170,
-    defaultHeight: 147,
+    defaultWidth: 220,
+    defaultHeight: 191,
     mood: "Playful romance, sweet daydreaming, storybook affection",
   },
   tenderCouple: {
@@ -70,8 +70,8 @@ export const ROMANTIC_CHARACTERS: Record<CharacterIdentifier, CharacterAssetConf
     title: "Tender Forehead Kiss",
     alt: "Loving character giving a tender forehead kiss with two pink floating hearts",
     aspectRatio: "500 / 480",
-    defaultWidth: 175,
-    defaultHeight: 168,
+    defaultWidth: 225,
+    defaultHeight: 216,
     mood: "Deep devotion, gentle comfort, heartfelt promise, romantic tenderness",
   },
 };

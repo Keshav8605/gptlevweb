@@ -538,7 +538,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
         <div className="flex justify-center -mt-3 mb-6">
           <RomanticCharacter
             character="huggingCouple"
-            size={135}
+            size={180}
             animation="gentle-float"
             sparkles
           />

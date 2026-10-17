@@ -107,7 +107,7 @@ export function FinalHeartSection({
             <div className="mb-2">
               <RomanticCharacter
                 character="tenderCouple"
-                size={145}
+                size={195}
                 animation="soft-breathe"
                 sparkles
               />
@@ -179,7 +179,7 @@ export function FinalHeartSection({
             <div className="flex justify-center mb-6">
               <RomanticCharacter
                 character="kissingCouple"
-                size={160}
+                size={210}
                 animation="gentle-float"
                 sparkles
               />

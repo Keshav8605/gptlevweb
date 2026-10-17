@@ -113,7 +113,7 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
         <div className="my-2 flex justify-center">
           <RomanticCharacter
             character="tenderCouple"
-            size={155}
+            size={200}
             animation="gentle-float"
             sparkles
           />

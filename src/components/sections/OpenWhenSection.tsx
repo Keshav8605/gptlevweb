@@ -36,7 +36,7 @@ export function OpenWhenSection({ letters }: OpenWhenSectionProps) {
       <div className="flex justify-center -mt-3 mb-6">
         <RomanticCharacter
           character="cozyCouple"
-          size={135}
+          size={180}
           animation="soft-breathe"
           sparkles
         />
@@ -223,7 +223,7 @@ function OpenLetterOverlay({
           <div className="flex justify-center pt-2 pb-2">
             <RomanticCharacter
               character="tenderCouple"
-              size={120}
+              size={160}
               animation="gentle-float"
               sparkles
             />

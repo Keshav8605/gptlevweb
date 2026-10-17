@@ -34,7 +34,7 @@ export function BucketListSection({ items }: BucketListSectionProps) {
       <div className="flex justify-center -mt-3 mb-6">
         <RomanticCharacter
           character="cozyCouple"
-          size={140}
+          size={185}
           animation="gentle-float"
           sparkles
         />

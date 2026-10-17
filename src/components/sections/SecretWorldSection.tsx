@@ -128,7 +128,7 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
               <div className="flex justify-center mb-6">
                 <RomanticCharacter
                   character="cozyCouple"
-                  size={165}
+                  size={215}
                   animation="soft-breathe"
                   sparkles
                 />
@@ -223,7 +223,7 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                 <div className="flex justify-center mb-4">
                   <RomanticCharacter
                     character="huggingCouple"
-                    size={165}
+                    size={215}
                     animation="gentle-float"
                     sparkles
                   />

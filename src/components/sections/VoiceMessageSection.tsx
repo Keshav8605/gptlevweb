@@ -311,7 +311,7 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
           <div className="flex justify-center mb-5">
             <RomanticCharacter
               character="kissingCouple"
-              size={135}
+              size={180}
               animation="gentle-float"
               sparkles
             />

@@ -26,7 +26,7 @@ export function LettersSection({ letters }: LettersSectionProps) {
       <div className="flex justify-center -mt-3 mb-6">
         <RomanticCharacter
           character="tenderCouple"
-          size={135}
+          size={180}
           animation="soft-breathe"
           sparkles
         />

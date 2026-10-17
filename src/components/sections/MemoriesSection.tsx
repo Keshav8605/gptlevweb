@@ -102,7 +102,7 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
         <div className="flex justify-center -mt-3 mb-6">
           <RomanticCharacter
             character="kissingCouple"
-            size={130}
+            size={175}
             animation="subtle-tilt"
             sparkles
           />

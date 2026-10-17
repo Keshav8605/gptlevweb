@@ -195,7 +195,7 @@ export function NotebookSection({
         <div className="flex justify-center -mt-3 mb-6">
           <RomanticCharacter
             character="cozyCouple"
-            size={135}
+            size={180}
             animation="soft-breathe"
             sparkles
           />

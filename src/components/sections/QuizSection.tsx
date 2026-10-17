@@ -172,7 +172,7 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
             <div className="my-3 flex justify-center">
               <RomanticCharacter
                 character="tenderCouple"
-                size={175}
+                size={225}
                 animation="soft-breathe"
                 sparkles
               />
@@ -206,7 +206,7 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
             <div className="mb-3 flex justify-center">
               <RomanticCharacter
                 character="huggingCouple"
-                size={185}
+                size={235}
                 animation="gentle-float"
                 sparkles
               />

@@ -131,7 +131,7 @@ export function DigitalGiftsSection({ gifts = defaultGiftsList }: DigitalGiftsSe
         <div className="flex justify-center -mt-3 mb-6">
           <RomanticCharacter
             character="huggingCouple"
-            size={135}
+            size={180}
             animation="subtle-tilt"
             sparkles
           />
