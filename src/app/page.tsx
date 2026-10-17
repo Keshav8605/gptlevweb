@@ -22,6 +22,7 @@ import { OurSongSection } from "@/components/sections/OurSongSection";
 import { FinalHeartSection } from "@/components/sections/FinalHeartSection";
 import { CreatorStudio } from "@/components/creator/CreatorStudio";
 import { ParticipantAccessModal } from "@/components/auth/ParticipantAccessModal";
+import { scrollToChapter } from "@/lib/motion";
 
 export default function Home() {
   const [, setHasStartedExploring] = useState(false);
@@ -54,10 +55,7 @@ export default function Home() {
 
   const handleEnterWorld = () => {
     setHasStartedExploring(true);
-    const firstSection = document.getElementById("observations");
-    if (firstSection) {
-      firstSection.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    scrollToChapter("observations");
   };
 
   return (

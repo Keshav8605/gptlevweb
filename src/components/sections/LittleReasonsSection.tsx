@@ -94,6 +94,10 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
       subtitle=""
       emoji="💗"
       bgVariant="cream"
+      chapterNumber={11}
+      nextSectionId="digitalGifts"
+      nextSectionLabel="Gifts For You"
+      nextSectionEmoji="🎁"
     >
       <div className="max-w-2xl mx-auto text-center">
         {/* Pink pill badge (Matching Reference 4) */}

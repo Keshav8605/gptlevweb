@@ -532,6 +532,10 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
       subtitle="Where we explore date ideas, propose magical days, negotiate timing, and build forever memories"
       emoji="🗺️"
       bgVariant="blush"
+      chapterNumber={9}
+      nextSectionId="openWhenLetters"
+      nextSectionLabel="Open When..."
+      nextSectionEmoji="✉️"
     >
       <div className="max-w-6xl mx-auto space-y-6">
         {/* Playful adventurous couple companion */}

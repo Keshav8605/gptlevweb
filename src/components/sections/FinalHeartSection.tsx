@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { HeartPhotoCollage } from "../HeartPhotoCollage";
+import { FramedPhotoCollage } from "../FramedPhotoCollage";
 import { RomanticCharacter } from "../RomanticCharacter";
 import type { Milestone } from "@/lib/gift-data";
 
@@ -37,6 +38,7 @@ export function FinalHeartSection({
   });
   const [hasSentLove, setHasSentLove] = useState(false);
   const [loveCount, setLoveCount] = useState(0);
+  const [collageStyle, setCollageStyle] = useState<"heart" | "polaroid">("heart");
   const [floatingIcons, setFloatingIcons] = useState<
     { id: number; x: number; y: number; icon: string }[]
   >([]);
@@ -89,11 +91,108 @@ export function FinalHeartSection({
       subtitle="Every picture, every heartbeat, every step leading right to you ♡"
       emoji="❤️"
       bgVariant="blush"
+      chapterNumber={14}
+      nextSectionId="welcome"
+      nextSectionLabel="Relive Our Love Story From the Beginning"
+      nextSectionEmoji="✨"
     >
       <div className="max-w-4xl mx-auto space-y-16">
-        {/* The Emotional Climax: Genuine Heart-Shaped Photo Collage */}
+        {/* The Emotional Climax: Interactive Two-Style Photo Collage */}
         <div className="relative">
-          <HeartPhotoCollage />
+          <AnimatePresence mode="wait">
+            {collageStyle === "heart" ? (
+              <motion.div
+                key="heart-collage"
+                id="panel-heart"
+                role="tabpanel"
+                aria-labelledby="tab-heart"
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.28, ease: "easeInOut" }}
+              >
+                <HeartPhotoCollage />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="polaroid-collage"
+                id="panel-polaroid"
+                role="tabpanel"
+                aria-labelledby="tab-polaroid"
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.28, ease: "easeInOut" }}
+              >
+                <FramedPhotoCollage />
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Choose Our Memory Style Toggle directly below the collage */}
+          <div className="mt-4 mb-2 flex flex-col items-center justify-center space-y-3">
+            <div className="flex items-center gap-2">
+              <span className="text-sm">✨</span>
+              <h3 className="font-rounded font-bold text-base sm:text-lg text-[var(--plum-dark)] tracking-wide">
+                Choose Our Memory Style ♡
+              </h3>
+              <span className="text-sm">✨</span>
+            </div>
+
+            <div
+              role="tablist"
+              aria-label="Collage Style Selector"
+              className="inline-flex p-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[var(--border-subtle)] shadow-[0_4px_16px_rgba(81,36,63,0.08)] gap-1.5"
+            >
+              <button
+                type="button"
+                role="tab"
+                id="tab-heart"
+                aria-selected={collageStyle === "heart"}
+                aria-controls="panel-heart"
+                onClick={() => setCollageStyle("heart")}
+                className={`relative px-4 sm:px-6 py-2 rounded-full font-rounded font-bold text-xs sm:text-sm transition-all duration-300 flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)] ${
+                  collageStyle === "heart"
+                    ? "text-white shadow-md shadow-pink-500/20"
+                    : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:bg-white/60"
+                }`}
+              >
+                {collageStyle === "heart" && (
+                  <motion.div
+                    layoutId="activeCollagePill"
+                    className="absolute inset-0 rounded-full bg-gradient-to-r from-[var(--pink-primary)] via-[#FF6584] to-[var(--pink-strong)] -z-10"
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  />
+                )}
+                <span>♡</span>
+                <span>Heart Collage</span>
+              </button>
+
+              <button
+                type="button"
+                role="tab"
+                id="tab-polaroid"
+                aria-selected={collageStyle === "polaroid"}
+                aria-controls="panel-polaroid"
+                onClick={() => setCollageStyle("polaroid")}
+                className={`relative px-4 sm:px-6 py-2 rounded-full font-rounded font-bold text-xs sm:text-sm transition-all duration-300 flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)] ${
+                  collageStyle === "polaroid"
+                    ? "text-white shadow-md shadow-pink-500/20"
+                    : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:bg-white/60"
+                }`}
+              >
+                {collageStyle === "polaroid" && (
+                  <motion.div
+                    layoutId="activeCollagePill"
+                    className="absolute inset-0 rounded-full bg-gradient-to-r from-[var(--pink-primary)] via-[#FF6584] to-[var(--pink-strong)] -z-10"
+                    transition={{ type: "spring", stiffness: 350, damping: 30 }}
+                  />
+                )}
+                <span>♡</span>
+                <span>Polaroid Frame</span>
+              </button>
+            </div>
+          </div>
         </div>
 
         {/* Relationship Counter */}

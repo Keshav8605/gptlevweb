@@ -4,6 +4,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
+import { scrollToChapter } from "@/lib/motion";
+
 export interface NavItem {
   id: string;
   label: string;
@@ -56,11 +58,8 @@ export function GiftNavigation({
   }, []);
 
   const scrollToSection = (id: string) => {
-    const element = document.getElementById(id);
-    if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
-      setIsOpen(false);
-    }
+    scrollToChapter(id);
+    setIsOpen(false);
   };
 
   return (

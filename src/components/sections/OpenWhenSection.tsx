@@ -31,6 +31,10 @@ export function OpenWhenSection({ letters }: OpenWhenSectionProps) {
       subtitle="Little letters waiting for the right moment"
       emoji="✉️"
       bgVariant="lavender"
+      chapterNumber={10}
+      nextSectionId="littleReasons"
+      nextSectionLabel="Why I Love You"
+      nextSectionEmoji="💗"
     >
       {/* Cozy envelope companion */}
       <div className="flex justify-center -mt-3 mb-6">

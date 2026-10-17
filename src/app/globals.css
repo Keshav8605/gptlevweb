@@ -330,6 +330,35 @@ h2.font-rounded span.inline-block {
   border: 1px solid rgba(233, 139, 180, 0.2);
 }
 
+/* Cinematic Chapter Destination Highlight */
+.chapter-destination-highlight {
+  animation: chapterGlow 1.4s ease-out;
+}
+
+@keyframes chapterGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 95, 150, 0.4);
+  }
+  30% {
+    box-shadow: 0 0 45px 8px rgba(255, 95, 150, 0.22);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 95, 150, 0);
+  }
+}
+
+/* Tactile Romantic Buttons */
+.btn-romantic-primary {
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn-romantic-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 24px rgba(255, 95, 150, 0.35);
+}
+.btn-romantic-primary:active {
+  transform: translateY(0px) scale(0.97);
+}
+
 /* Reduced Motion */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
@@ -339,3 +368,4 @@ h2.font-rounded span.inline-block {
   }
   html { scroll-behavior: auto; }
 }
+

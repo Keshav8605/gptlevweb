@@ -189,6 +189,10 @@ export function NotebookSection({
       subtitle="A quiet, shared journal where we leave thoughts, memories, and whispered notes for each other"
       emoji="📝"
       bgVariant="cream"
+      chapterNumber={7}
+      nextSectionId="voice"
+      nextSectionLabel="Voice Whispers"
+      nextSectionEmoji="🎙️"
     >
       <div className="max-w-3xl mx-auto space-y-8">
         {/* Cozy notebook journal companion */}

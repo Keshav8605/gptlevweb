@@ -21,6 +21,10 @@ export function LettersSection({ letters }: LettersSectionProps) {
       subtitle="Words I carry in my heart — now written down for you"
       emoji="💌"
       bgVariant="cream"
+      chapterNumber={6}
+      nextSectionId="notebook"
+      nextSectionLabel="Our Little Notebook"
+      nextSectionEmoji="📖"
     >
       {/* Gentle love letters character companion */}
       <div className="flex justify-center -mt-3 mb-6">

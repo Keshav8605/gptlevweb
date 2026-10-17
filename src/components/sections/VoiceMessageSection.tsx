@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect, useRef } from "react";
+import { SectionWrapper } from "../SectionWrapper";
 import { RomanticCharacter } from "../RomanticCharacter";
 import type { VoiceMessage } from "@/lib/server-db";
 
@@ -299,54 +300,31 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
   };
 
   return (
-    <section id="voice" className="section-padding relative overflow-hidden bg-[var(--bg-main)]">
-      {/* Decorative ambient background */}
-      <div className="absolute top-1/4 right-0 w-96 h-96 bg-[var(--pale-rose)]/40 rounded-full blur-3xl pointer-events-none -z-10" />
-      <div className="absolute bottom-10 left-0 w-96 h-96 bg-[var(--bg-blush)]/50 rounded-full blur-3xl pointer-events-none -z-10" />
+    <SectionWrapper
+      id="voice"
+      title="Voice Notes Just For Us"
+      subtitle="Because sometimes text isn't enough. Leave little voice messages, bedtime goodnights, laugh-out-loud thoughts, or sweet whispers that can be replayed forever."
+      emoji="🎙️"
+      bgVariant="default"
+      chapterNumber={8}
+      nextSectionId="datePlanner"
+      nextSectionLabel="Plan Our Next Adventure"
+      nextSectionEmoji="🗺️"
+    >
+      <div className="max-w-4xl mx-auto">
+        {/* Sweet voice whispers couple companion */}
+        <div className="flex justify-center -mt-3 mb-5">
+          <RomanticCharacter
+            character="kissingCouple"
+            size={180}
+            animation="gentle-float"
+            sparkles
+          />
+        </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6">
-        {/* Section Header */}
-        <div className="text-center mb-10">
-          {/* Sweet voice whispers couple companion */}
-          <div className="flex justify-center mb-5">
-            <RomanticCharacter
-              character="kissingCouple"
-              size={180}
-              animation="gentle-float"
-              sparkles
-            />
-          </div>
-
-          <motion.div
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[var(--pale-rose)] border border-[var(--border-subtle)] text-[var(--pink-strong)] text-xs font-semibold mb-3"
-          >
-            <span>🎙️</span>
-            <span>Intimate Voice Whispers</span>
-          </motion.div>
-          <motion.h2
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.1 }}
-            className="font-serif text-3xl sm:text-4xl lg:text-5xl font-bold text-[var(--text-primary)] mb-3"
-          >
-            Voice Notes Just For Us
-          </motion.h2>
-          <motion.p
-            initial={{ opacity: 0, y: 15 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ delay: 0.2 }}
-            className="text-sm sm:text-base text-[var(--text-secondary)] max-w-lg mx-auto"
-          >
-            Because sometimes text isn&apos;t enough. Leave little voice messages, bedtime goodnights, laugh-out-loud thoughts, or sweet whispers that can be replayed forever.
-          </motion.p>
-
-          {/* Current Participant Banner */}
-          <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/80 border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] shadow-sm">
+        {/* Current Participant Banner */}
+        <div className="flex justify-center mb-8">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-white/90 border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] shadow-2xs">
             <span>Speaking as:</span>
             <span className="font-semibold text-[var(--pink-strong)]">
               {participantName} ({role === "creator" ? "Creator" : "Recipient"})
@@ -681,6 +659,6 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
           )}
         </div>
       </div>
-    </section>
+    </SectionWrapper>
   );
 }
