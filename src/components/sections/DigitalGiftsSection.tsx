@@ -125,6 +125,10 @@ export function DigitalGiftsSection({ gifts = defaultGiftsList }: DigitalGiftsSe
       subtitle="Tiny promises waiting in your pocket — redeem them whenever you want, no expiration date 🎁"
       emoji="🎁"
       bgVariant="cream"
+      chapterNumber={12}
+      nextSectionId="ourSong"
+      nextSectionLabel="Our Song"
+      nextSectionEmoji="🎵"
     >
       <div className="max-w-4xl mx-auto space-y-8">
         {/* Affectionate Gift Character Companion */}

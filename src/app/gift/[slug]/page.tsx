@@ -25,6 +25,7 @@ import { OurSongSection } from "@/components/sections/OurSongSection";
 import { FinalHeartSection } from "@/components/sections/FinalHeartSection";
 import { ParticipantAccessModal } from "@/components/auth/ParticipantAccessModal";
 import { CreatorStudio } from "@/components/creator/CreatorStudio";
+import { scrollToChapter } from "@/lib/motion";
 
 function GiftRecipientContent({
   params,
@@ -97,10 +98,7 @@ function GiftRecipientContent({
   };
 
   const handleEnterWorld = () => {
-    const firstSection = document.getElementById("observations");
-    if (firstSection) {
-      firstSection.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
+    scrollToChapter("observations");
   };
 
   // 1. Loading State

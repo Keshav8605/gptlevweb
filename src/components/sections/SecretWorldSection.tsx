@@ -113,6 +113,10 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
       subtitle="A sanctuary protected by a truth known only to the two of us"
       emoji="🔒"
       bgVariant="surface"
+      chapterNumber={3}
+      nextSectionId="deluluMode"
+      nextSectionLabel="Delulu Mode"
+      nextSectionEmoji="🦋"
     >
       <div className="max-w-2xl mx-auto">
         <AnimatePresence mode="wait">

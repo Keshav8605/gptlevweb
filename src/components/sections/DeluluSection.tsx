@@ -209,6 +209,10 @@ export function DeluluSection({ scenarios = defaultDeluluScenarios }: DeluluSect
       subtitle="Playful relationship scenarios — pick your path, discover my reaction 🦋"
       emoji="🦋"
       bgVariant="blush"
+      chapterNumber={4}
+      nextSectionId="quiz"
+      nextSectionLabel="Do You Love Me?"
+      nextSectionEmoji="💖"
     >
       <div className="max-w-2xl mx-auto">
         {/* Playful couple companion */}

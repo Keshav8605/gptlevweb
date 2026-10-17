@@ -127,6 +127,10 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
       subtitle="The melodies that immediately bring every memory of you rushing back"
       emoji="🎵"
       bgVariant="blush"
+      chapterNumber={13}
+      nextSectionId="finalHeart"
+      nextSectionLabel="Our Heart Collage"
+      nextSectionEmoji="❤️"
     >
       <div className="max-w-2xl mx-auto">
         {/* Featured song card */}

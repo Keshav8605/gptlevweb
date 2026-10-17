@@ -98,6 +98,10 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
       subtitle="Every picture holds a little story."
       emoji="📸"
       bgVariant="default"
+      chapterNumber={2}
+      nextSectionId="secretWorld"
+      nextSectionLabel="Our Secret World"
+      nextSectionEmoji="🔒"
     >
       <div className="max-w-5xl mx-auto">
         {/* Subtle character accent for memory scrapbook */}

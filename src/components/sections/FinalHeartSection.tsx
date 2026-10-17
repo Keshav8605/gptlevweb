@@ -91,6 +91,10 @@ export function FinalHeartSection({
       subtitle="Every picture, every heartbeat, every step leading right to you ♡"
       emoji="❤️"
       bgVariant="blush"
+      chapterNumber={14}
+      nextSectionId="welcome"
+      nextSectionLabel="Relive Our Love Story From the Beginning"
+      nextSectionEmoji="✨"
     >
       <div className="max-w-4xl mx-auto space-y-16">
         {/* The Emotional Climax: Interactive Two-Style Photo Collage */}

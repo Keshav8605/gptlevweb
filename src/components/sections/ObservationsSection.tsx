@@ -18,6 +18,10 @@ export function ObservationsSection({ observations }: ObservationsSectionProps) 
       subtitle="The little habits, expressions, and details that make you completely unforgettable"
       emoji="👀"
       bgVariant="surface"
+      chapterNumber={1}
+      nextSectionId="memories"
+      nextSectionLabel="Our Memories Scrapbook"
+      nextSectionEmoji="📸"
     >
       {/* Gentle Romantic Character Accent */}
       <div className="flex justify-center -mt-3 mb-8">
@@ -37,8 +41,9 @@ export function ObservationsSection({ observations }: ObservationsSectionProps) 
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-40px" }}
-              transition={{ delay: i * 0.08, duration: 0.6 }}
-              className="rounded-3xl p-6 sm:p-7 transition-all duration-300 relative overflow-hidden flex flex-col justify-between group bg-white border border-[var(--border-subtle)] shadow-xs hover:shadow-xl hover:-translate-y-1.5"
+              whileHover={{ y: -6, scale: 1.02 }}
+              transition={{ delay: i * 0.08, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="rounded-3xl p-6 sm:p-7 transition-shadow duration-300 relative overflow-hidden flex flex-col justify-between group bg-white border border-[var(--border-subtle)] shadow-xs hover:shadow-2xl"
             >
               {/* Cute Washi-tape sticker accent at top */}
               <div
