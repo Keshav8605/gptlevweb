@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Dancing+Script:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Comfortaa:wght@400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=DM+Sans:ital,opsz,wght@0,9..40,100..1000;1,9..40,100..1000&family=Dancing+Script:wght@400;500;600;700&family=Fredoka:wght@400;500;600;700&family=Quicksand:wght@500;600;700&display=swap');
 @import "tailwindcss";
 
 :root {
@@ -28,8 +28,9 @@
   --shadow-pink-strong: rgba(232, 77, 133, 0.22);
   --glow-pink: rgba(255, 95, 150, 0.35);
 
-  /* Typography */
-  --font-rounded: 'Fredoka', 'Nunito', -apple-system, sans-serif;
+  /* Typography - Cute Love, Decent, Classy, Beautiful & Adorable */
+  --font-heading: 'Comfortaa', 'Quicksand', 'Fredoka', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-rounded: 'Comfortaa', 'Quicksand', 'Fredoka', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   --font-serif: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
   --font-sans: 'DM Sans', system-ui, -apple-system, sans-serif;
   --font-script: 'Dancing Script', cursive;
@@ -61,6 +62,7 @@
   --font-serif: var(--font-serif);
   --font-script: var(--font-script);
   --font-rounded: var(--font-rounded);
+  --font-heading: var(--font-heading);
   --font-handwritten: var(--font-handwritten);
 }
 
@@ -177,11 +179,21 @@ body {
   50% { opacity: 1; transform: scale(1.2); }
 }
 
+/* Typography & Headings: Cute Love, Decent, Classy, Beautiful & Adorable */
+h1, h2, h3, h4, h5, h6,
+h1.font-serif, h2.font-serif, h3.font-serif, h4.font-serif, h5.font-serif, h6.font-serif,
+.font-heading,
+.font-rounded {
+  font-family: var(--font-heading) !important;
+  letter-spacing: -0.012em;
+}
+
 /* Utility Classes */
+.font-heading { font-family: var(--font-heading) !important; }
+.font-rounded { font-family: var(--font-rounded) !important; }
 .font-serif { font-family: var(--font-serif); }
 .font-sans { font-family: var(--font-sans); }
 .font-script { font-family: var(--font-script); }
-.font-rounded { font-family: var(--font-rounded); }
 .font-handwritten { font-family: var(--font-handwritten); }
 
 .animate-float { animation: float 6s ease-in-out infinite; }
