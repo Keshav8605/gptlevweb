@@ -54,7 +54,13 @@ export function verifySecretPassword(
   lockedUntilSeconds?: number;
 } {
   const now = Date.now();
-  const record = rateLimitMap.get(clientKey) || { attempts: 0, lockedUntil: 0 };
+  let record = rateLimitMap.get(clientKey) || { attempts: 0, lockedUntil: 0 };
+
+  // If previous lockout expired, reset attempts
+  if (record.lockedUntil > 0 && record.lockedUntil <= now) {
+    record = { attempts: 0, lockedUntil: 0 };
+    rateLimitMap.set(clientKey, record);
+  }
 
   // Check if locked out
   if (record.lockedUntil > now) {
