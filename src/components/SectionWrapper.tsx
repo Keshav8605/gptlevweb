@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { ReactNode, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 import { scrollToChapter } from "@/lib/motion";
+import { useStoryScene } from "@/context/StorySceneContext";
 
 interface SectionWrapperProps {
   id: string;
@@ -42,13 +43,29 @@ export function SectionWrapper({
 }: SectionWrapperProps) {
   const ref = useRef<HTMLElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [isLocalTransitioning, setIsLocalTransitioning] = useState(false);
+
+  let sceneContext: ReturnType<typeof useStoryScene> | null = null;
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    sceneContext = useStoryScene();
+  } catch {
+    sceneContext = null;
+  }
 
   const handleContinueNext = () => {
-    if (!nextSectionId || isTransitioning) return;
-    setIsTransitioning(true);
+    if (!nextSectionId) return;
+
+    if (sceneContext) {
+      if (sceneContext.isTransitioning) return;
+      sceneContext.goToChapter(nextSectionId);
+      return;
+    }
+
+    if (isLocalTransitioning) return;
+    setIsLocalTransitioning(true);
     scrollToChapter(nextSectionId, () => {
-      setTimeout(() => setIsTransitioning(false), 900);
+      setTimeout(() => setIsLocalTransitioning(false), 900);
     });
   };
 
@@ -126,29 +143,47 @@ export function SectionWrapper({
         </motion.div>
 
         {/* Cinematic Chapter Transition Cue (Bottom of Section) */}
-        {nextSectionId && nextSectionLabel && (
+        {(nextSectionId || sceneContext?.canGoPrev) && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.4 }}
             className="mt-14 sm:mt-16 pt-8 border-t border-[var(--border-subtle)]/70 flex flex-col items-center text-center"
           >
-            <p className="text-[11px] font-rounded font-semibold uppercase tracking-widest text-[var(--text-muted)] mb-3">
-              Ready for the next moment?
+            <p className="text-[11px] font-rounded font-semibold uppercase tracking-widest text-[var(--text-muted)] mb-4">
+              Turn the page of our storybook
             </p>
-            <button
-              onClick={handleContinueNext}
-              disabled={isTransitioning}
-              className="group relative px-6 sm:px-8 py-2.5 sm:py-3 rounded-full bg-white/90 hover:bg-white border border-[var(--border-medium)] text-[var(--romantic-plum)] hover:text-[var(--pink-strong)] font-rounded font-bold text-xs sm:text-sm shadow-xs hover:shadow-lg hover:shadow-pink-200/50 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-300 flex items-center gap-2.5 cursor-pointer"
-            >
-              <span className="text-sm group-hover:rotate-12 transition-transform duration-300">
-                {nextSectionEmoji}
-              </span>
-              <span>Continue Our Story: {nextSectionLabel}</span>
-              <span className="text-xs group-hover:translate-y-0.5 transition-transform duration-300 text-[var(--pink-primary)]">
-                {nextSectionId === "welcome" ? "↑" : "↓"}
-              </span>
-            </button>
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 w-full max-w-xl">
+              {sceneContext?.canGoPrev && (
+                <button
+                  type="button"
+                  onClick={() => sceneContext?.goToPrevChapter()}
+                  disabled={sceneContext?.isTransitioning}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-white/90 hover:bg-white border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:text-[var(--pink-strong)] font-rounded font-semibold text-xs transition-all hover:-translate-x-0.5 active:scale-95 cursor-pointer shadow-2xs flex items-center justify-center gap-1.5 disabled:opacity-50"
+                >
+                  <span>←</span>
+                  <span>Back: {sceneContext.prevChapter?.label}</span>
+                </button>
+              )}
+
+              {nextSectionId && nextSectionLabel && (
+                <button
+                  type="button"
+                  onClick={handleContinueNext}
+                  disabled={sceneContext?.isTransitioning || isLocalTransitioning}
+                  className="w-full sm:w-auto group relative px-7 py-3 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white font-rounded font-bold text-xs sm:text-sm shadow-md hover:shadow-xl hover:shadow-pink-300/50 hover:scale-105 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-60"
+                >
+                  <span className="text-sm group-hover:rotate-12 transition-transform duration-300">
+                    {nextSectionEmoji}
+                  </span>
+                  <span>Continue Our Story: {nextSectionLabel}</span>
+                  <span className="text-xs group-hover:translate-x-1 transition-transform duration-300">
+                    {nextSectionId === "welcome" ? "✨" : "♡ →"}
+                  </span>
+                </button>
+              )}
+            </div>
           </motion.div>
         )}
       </div>

@@ -6,6 +6,7 @@ import { SectionWrapper } from "../SectionWrapper";
 import { HeartPhotoCollage } from "../HeartPhotoCollage";
 import { FramedPhotoCollage } from "../FramedPhotoCollage";
 import { RomanticCharacter } from "../RomanticCharacter";
+import { useStoryScene } from "@/context/StorySceneContext";
 import type { Milestone } from "@/lib/gift-data";
 
 interface FinalHeartSectionProps {
@@ -80,7 +81,19 @@ export function FinalHeartSection({
     }, 1500);
   };
 
-  const scrollToTop = () => {
+  let sceneContext: ReturnType<typeof useStoryScene> | null = null;
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    sceneContext = useStoryScene();
+  } catch {
+    sceneContext = null;
+  }
+
+  const handleReturnToBeginning = () => {
+    if (sceneContext) {
+      sceneContext.goToChapter("welcome", "heart-portal");
+      return;
+    }
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -364,7 +377,7 @@ export function FinalHeartSection({
 
           <div className="mt-12">
             <button
-              onClick={scrollToTop}
+              onClick={handleReturnToBeginning}
               className="text-xs tracking-wider uppercase text-[var(--text-muted)] hover:text-[var(--pink-strong)] transition-colors cursor-pointer inline-flex items-center gap-1.5 font-rounded font-semibold"
             >
               <span>↑</span>

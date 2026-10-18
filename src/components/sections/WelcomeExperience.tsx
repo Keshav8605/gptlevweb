@@ -3,6 +3,7 @@
 import { motion } from "framer-motion";
 import { useState } from "react";
 import { RomanticCharacter } from "../RomanticCharacter";
+import { useStoryScene } from "@/context/StorySceneContext";
 
 interface WelcomeExperienceProps {
   recipientNickname: string;
@@ -21,6 +22,22 @@ export function WelcomeExperience({
   onEnter,
 }: WelcomeExperienceProps) {
   const [photoLoaded, setPhotoLoaded] = useState<Record<string, boolean>>({});
+
+  let sceneContext: ReturnType<typeof useStoryScene> | null = null;
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    sceneContext = useStoryScene();
+  } catch {
+    sceneContext = null;
+  }
+
+  const handleStartStory = () => {
+    if (sceneContext) {
+      sceneContext.goToChapter("observations", "heart-portal");
+      return;
+    }
+    onEnter();
+  };
 
   // 4 Curated Romantic Hero Polaroids (matching Reference 2)
   const heroPolaroids = [
@@ -274,23 +291,23 @@ export function WelcomeExperience({
           className="mt-8 flex flex-col items-center gap-4"
         >
           <button
-            onClick={onEnter}
+            onClick={handleStartStory}
             className="group relative px-9 py-3.5 rounded-full text-white font-rounded font-semibold text-base sm:text-lg bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] shadow-lg shadow-pink-300/40 hover:shadow-xl hover:shadow-pink-400/50 hover:scale-105 active:scale-95 cursor-pointer transition-all duration-300 flex items-center gap-2"
           >
             <span>Let&apos;s continue</span>
             <span className="text-xl group-hover:scale-125 transition-transform duration-300">♡</span>
           </button>
 
-          {/* Scroll Cue (Inspired by Reference 2) */}
+          {/* Story Cue */}
           <div className="flex flex-col items-center gap-1.5 pt-3">
             <span className="text-[10px] font-bold tracking-widest uppercase font-rounded text-[var(--pink-strong)]">
-              SCROLL FOR THE FULL STORY ↓
+              BEGIN OUR LOVE STORYBOOK ♡
             </span>
             <button
-              onClick={onEnter}
-              className="px-3 py-1 rounded-full bg-[var(--pale-rose)]/70 text-[var(--pink-deep)] text-[10px] font-semibold animate-bounce cursor-pointer hover:bg-[var(--pale-rose)]"
+              onClick={handleStartStory}
+              className="px-3.5 py-1 rounded-full bg-[var(--pale-rose)]/70 text-[var(--pink-deep)] text-[11px] font-semibold animate-bounce cursor-pointer hover:bg-[var(--pale-rose)]"
             >
-              keep going
+              open chapter 1 ✨
             </button>
           </div>
         </motion.div>

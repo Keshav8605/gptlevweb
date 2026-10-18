@@ -25,7 +25,8 @@ import { OurSongSection } from "@/components/sections/OurSongSection";
 import { FinalHeartSection } from "@/components/sections/FinalHeartSection";
 import { ParticipantAccessModal } from "@/components/auth/ParticipantAccessModal";
 import { CreatorStudio } from "@/components/creator/CreatorStudio";
-import { scrollToChapter } from "@/lib/motion";
+import { StorySceneProvider } from "@/context/StorySceneContext";
+import { StorySceneContainer, SceneDefinition } from "@/components/scenes/StorySceneContainer";
 
 function GiftRecipientContent({
   params,
@@ -97,9 +98,7 @@ function GiftRecipientContent({
     loadGift(passcodeAttempt.trim());
   };
 
-  const handleEnterWorld = () => {
-    scrollToChapter("observations");
-  };
+  const handleEnterWorld = () => {};
 
   // 1. Loading State
   if (isLoading) {
@@ -238,8 +237,189 @@ function GiftRecipientContent({
     "finalHeart",
   ];
 
+  const storyScenes: SceneDefinition[] = [];
+
+  if (enabledSet.has("welcome")) {
+    storyScenes.push({
+      id: "welcome",
+      node: (
+        <WelcomeExperience
+          recipientNickname={gift.recipientNickname || defaultGiftConfig.recipientNickname}
+          title={gift.welcomeTitle || defaultGiftConfig.welcomeTitle}
+          subtitle={gift.welcomeSubtitle || defaultGiftConfig.welcomeSubtitle}
+          message={gift.welcomeMessage || defaultGiftConfig.welcomeMessage}
+          onEnter={handleEnterWorld}
+        />
+      ),
+    });
+  }
+
+  sectionOrder.forEach((sectionId) => {
+    if (!enabledSet.has(sectionId) || sectionId === "welcome") return;
+
+    switch (sectionId) {
+      case "observations":
+        storyScenes.push({
+          id: "observations",
+          node: (
+            <ObservationsSection
+              observations={gift.customObservations || defaultGiftConfig.observations}
+            />
+          ),
+        });
+        break;
+
+      case "memories":
+        storyScenes.push({
+          id: "memories",
+          node: (
+            <MemoriesSection
+              memories={gift.customMemories || defaultGiftConfig.memories}
+            />
+          ),
+        });
+        break;
+
+      case "secretWorld":
+        storyScenes.push({
+          id: "secretWorld",
+          node: (
+            <SecretWorldSection
+              initialHint={gift.secretHint || defaultGiftConfig.secretHint}
+            />
+          ),
+        });
+        break;
+
+      case "deluluMode":
+        storyScenes.push({
+          id: "deluluMode",
+          node: <DeluluSection />,
+        });
+        break;
+
+      case "quiz":
+        storyScenes.push({
+          id: "quiz",
+          node: <QuizSection />,
+        });
+        break;
+
+      case "letters":
+        storyScenes.push({
+          id: "letters",
+          node: (
+            <LettersSection
+              letters={gift.customLetters || defaultGiftConfig.letters}
+            />
+          ),
+        });
+        break;
+
+      case "notebook":
+        storyScenes.push({
+          id: "notebook",
+          node: (
+            <NotebookSection
+              onOpenAccessModal={() => setIsAccessModalOpen(true)}
+            />
+          ),
+        });
+        break;
+
+      case "voice":
+        storyScenes.push({
+          id: "voice",
+          node: (
+            <VoiceMessageSection
+              onOpenAccessModal={() => setIsAccessModalOpen(true)}
+            />
+          ),
+        });
+        break;
+
+      case "datePlanner":
+        storyScenes.push({
+          id: "datePlanner",
+          node: (
+            <DatePlannerSection
+              onOpenAccessModal={() => setIsAccessModalOpen(true)}
+            />
+          ),
+        });
+        break;
+
+      case "openWhenLetters":
+        storyScenes.push({
+          id: "openWhenLetters",
+          node: (
+            <OpenWhenSection
+              letters={gift.customOpenWhenLetters || defaultGiftConfig.openWhenLetters}
+            />
+          ),
+        });
+        break;
+
+      case "littleReasons":
+        storyScenes.push({
+          id: "littleReasons",
+          node: (
+            <LittleReasonsSection
+              reasons={gift.customLittleReasons || defaultGiftConfig.littleReasons}
+            />
+          ),
+        });
+        break;
+
+      case "digitalGifts":
+        storyScenes.push({
+          id: "digitalGifts",
+          node: (
+            <DigitalGiftsSection
+              gifts={gift.customDigitalGifts || defaultGiftConfig.digitalGifts}
+            />
+          ),
+        });
+        break;
+
+      case "ourSong":
+        const songToUse = {
+          title: gift.featuredSong?.title || defaultGiftConfig.featuredSong?.title || "Our Song",
+          artist: gift.featuredSong?.artist || defaultGiftConfig.featuredSong?.artist || "Artist",
+          dedication: gift.featuredSong?.dedication || defaultGiftConfig.featuredSong?.dedication || "For you",
+          whyItMatters: gift.featuredSong?.whyItMatters || defaultGiftConfig.featuredSong?.whyItMatters || "Because it's ours",
+        };
+        storyScenes.push({
+          id: "ourSong",
+          node: (
+            <OurSongSection
+              featuredSong={songToUse}
+              additionalSongs={defaultGiftConfig.additionalSongs}
+            />
+          ),
+        });
+        break;
+
+      case "finalHeart":
+        storyScenes.push({
+          id: "finalHeart",
+          node: (
+            <FinalHeartSection
+              startDate={gift.dateOfficialCouple || gift.dateFirstMet || "2023-08-20"}
+              milestones={gift.customMilestones || defaultGiftConfig.customMilestones}
+              finalLetter={gift.finalLetter || defaultGiftConfig.finalLetter}
+              finalMessage={gift.finalMessage || defaultGiftConfig.finalMessage}
+              senderName={gift.senderNickname || gift.senderName || "Your Love"}
+            />
+          ),
+        });
+        break;
+    }
+  });
+
   return (
-    <main className="relative min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)]">
+    <StorySceneProvider>
+      <main className="relative min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)]">
       {/* Floating hearts ambience */}
       <FloatingHearts />
       {/* Delightful cursor heart trail */}
@@ -264,141 +444,8 @@ function GiftRecipientContent({
         </div>
       )}
 
-      {/* Chapter 1: Welcome Envelope Surprise */}
-      {enabledSet.has("welcome") && (
-        <WelcomeExperience
-          recipientNickname={gift.recipientNickname || defaultGiftConfig.recipientNickname}
-          title={gift.welcomeTitle || defaultGiftConfig.welcomeTitle}
-          subtitle={gift.welcomeSubtitle || defaultGiftConfig.welcomeSubtitle}
-          message={gift.welcomeMessage || defaultGiftConfig.welcomeMessage}
-          onEnter={handleEnterWorld}
-        />
-      )}
-
-      {/* Dynamic Ordered Sections Flow */}
-      <div className="relative z-10">
-        {sectionOrder.map((sectionId) => {
-          if (!enabledSet.has(sectionId) || sectionId === "welcome") return null;
-
-          switch (sectionId) {
-            case "observations":
-              return (
-                <ObservationsSection
-                  key="observations"
-                  observations={gift.customObservations || defaultGiftConfig.observations}
-                />
-              );
-
-            case "memories":
-              return (
-                <MemoriesSection
-                  key="memories"
-                  memories={gift.customMemories || defaultGiftConfig.memories}
-                />
-              );
-
-            case "secretWorld":
-              return (
-                <SecretWorldSection
-                  key="secretWorld"
-                  initialHint={gift.secretHint || defaultGiftConfig.secretHint}
-                />
-              );
-
-            case "deluluMode":
-              return <DeluluSection key="deluluMode" />;
-
-            case "quiz":
-              return <QuizSection key="quiz" />;
-
-            case "letters":
-              return (
-                <LettersSection
-                  key="letters"
-                  letters={gift.customLetters || defaultGiftConfig.letters}
-                />
-              );
-
-            case "notebook":
-              return (
-                <NotebookSection
-                  key="notebook"
-                  onOpenAccessModal={() => setIsAccessModalOpen(true)}
-                />
-              );
-
-            case "voice":
-              return (
-                <VoiceMessageSection
-                  key="voice"
-                  onOpenAccessModal={() => setIsAccessModalOpen(true)}
-                />
-              );
-
-            case "datePlanner":
-              return (
-                <DatePlannerSection
-                  key="datePlanner"
-                  onOpenAccessModal={() => setIsAccessModalOpen(true)}
-                />
-              );
-
-            case "openWhenLetters":
-              return (
-                <OpenWhenSection
-                  key="openWhenLetters"
-                  letters={gift.customOpenWhenLetters || defaultGiftConfig.openWhenLetters}
-                />
-              );
-
-            case "littleReasons":
-              return (
-                <LittleReasonsSection
-                  key="littleReasons"
-                  reasons={gift.customLittleReasons || defaultGiftConfig.littleReasons}
-                />
-              );
-
-            case "digitalGifts":
-              return (
-                <DigitalGiftsSection
-                  key="digitalGifts"
-                  gifts={gift.customDigitalGifts || defaultGiftConfig.digitalGifts}
-                />
-              );
-
-            case "ourSong":
-              const songToUse = {
-                title: gift.featuredSong?.title || defaultGiftConfig.featuredSong?.title || "Our Song",
-                artist: gift.featuredSong?.artist || defaultGiftConfig.featuredSong?.artist || "Artist",
-                dedication: gift.featuredSong?.dedication || defaultGiftConfig.featuredSong?.dedication || "For you",
-                whyItMatters: gift.featuredSong?.whyItMatters || defaultGiftConfig.featuredSong?.whyItMatters || "Because it's ours",
-              };
-              return (
-                <OurSongSection
-                  key="ourSong"
-                  featuredSong={songToUse}
-                  additionalSongs={defaultGiftConfig.additionalSongs}
-                />
-              );
-
-            case "finalHeart":
-              return (
-                <FinalHeartSection
-                  key="finalHeart"
-                  startDate={gift.dateOfficialCouple || gift.dateFirstMet || "2023-08-20"}
-                  milestones={gift.customMilestones || defaultGiftConfig.customMilestones}
-                  finalLetter={gift.finalLetter || defaultGiftConfig.finalLetter}
-                  finalMessage={gift.finalMessage || defaultGiftConfig.finalMessage}
-                  senderName={gift.senderNickname || gift.senderName || "Your Love"}
-                />
-              );
-
-            default:
-              return null;
-          }
-        })}
-      </div>
+      {/* Romantic Scene-By-Scene Story Container */}
+      <StorySceneContainer scenes={storyScenes} />
 
       {/* Recipient Footer */}
       <footer className="py-14 px-6 text-center border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs text-[var(--text-muted)] relative z-10">
@@ -431,6 +478,7 @@ function GiftRecipientContent({
         onClose={() => setIsAccessModalOpen(false)}
       />
     </main>
+    </StorySceneProvider>
   );
 }
 

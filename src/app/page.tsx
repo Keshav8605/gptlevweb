@@ -22,7 +22,8 @@ import { OurSongSection } from "@/components/sections/OurSongSection";
 import { FinalHeartSection } from "@/components/sections/FinalHeartSection";
 import { CreatorStudio } from "@/components/creator/CreatorStudio";
 import { ParticipantAccessModal } from "@/components/auth/ParticipantAccessModal";
-import { scrollToChapter } from "@/lib/motion";
+import { StorySceneProvider } from "@/context/StorySceneContext";
+import { StorySceneContainer, SceneDefinition } from "@/components/scenes/StorySceneContainer";
 
 export default function Home() {
   const [, setHasStartedExploring] = useState(false);
@@ -55,78 +56,85 @@ export default function Home() {
 
   const handleEnterWorld = () => {
     setHasStartedExploring(true);
-    scrollToChapter("observations");
   };
 
-  return (
-    <main className="relative min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)]">
-      {/* Delicate floating background ambience */}
-      <FloatingHearts />
-      {/* Delightful cursor heart trail */}
-      <CursorHeartTrail />
-
-      {/* Floating interactive navigation menu */}
-      <GiftNavigation
-        onOpenCreatorStudio={() => setIsCreatorStudioOpen(true)}
-        onOpenAccessModal={() => setIsAccessModalOpen(true)}
-      />
-
-      {/* Chapter 1: Personalized Welcome & Envelope Surprise */}
-      <WelcomeExperience
-        recipientNickname={defaultGiftConfig.recipientNickname}
-        title={defaultGiftConfig.welcomeTitle}
-        subtitle={defaultGiftConfig.welcomeSubtitle}
-        message={defaultGiftConfig.welcomeMessage}
-        onEnter={handleEnterWorld}
-      />
-
-      {/* Main Experience Flow */}
-      <div className="relative z-10">
-        {/* Chapter 2: Things I Noticed About You */}
-        <ObservationsSection observations={defaultGiftConfig.observations} />
-
-        {/* Chapter 3: Our Memories Scrapbook */}
-        <MemoriesSection memories={defaultGiftConfig.memories} />
-
-        {/* Chapter 4: Our Secret World (Phase 2 - server-side protected haven) */}
-        <SecretWorldSection initialHint={defaultGiftConfig.secretHint} />
-
-        {/* Chapter 5: Delulu Mode (Phase 2 - interactive relationship game) */}
-        <DeluluSection />
-
-        {/* Chapter 6: How Well Do You Know Us? (Phase 2 - Relationship Questionnaire) */}
-        <QuizSection />
-
-        {/* Chapter 7: Letters I Don't Say Enough */}
-        <LettersSection letters={defaultGiftConfig.letters} />
-
-        {/* Chapter 8: Our Little Notebook (Phase 3 - Shared Journal & Prompts) */}
-        <NotebookSection onOpenAccessModal={() => setIsAccessModalOpen(true)} />
-
-        {/* Chapter 9: Voice Message Experience (Phase 3 - 2-Way Audio Whispers) */}
-        <VoiceMessageSection onOpenAccessModal={() => setIsAccessModalOpen(true)} />
-
-        {/* Chapter 10: Plan Our Next Little Adventure ♡ (Phase 4 - Collaborative Date Planner) */}
-        <DatePlannerSection onOpenAccessModal={() => setIsAccessModalOpen(true)} />
-
-        {/* Chapter 11: Open When Letters */}
-        <OpenWhenSection letters={defaultGiftConfig.openWhenLetters} />
-
-        {/* Chapter 11: Little Reasons Why I Love You (Phase 2) */}
-        <LittleReasonsSection reasons={defaultGiftConfig.littleReasons} />
-
-        {/* Chapter 12: Little Gifts I Owe You (Phase 2 - redeemable digital vouchers) */}
-        <DigitalGiftsSection gifts={defaultGiftConfig.digitalGifts} />
-
-        {/* Chapter 13: Our Song Dedicated Melody */}
-        {defaultGiftConfig.featuredSong && (
-          <OurSongSection
-            featuredSong={defaultGiftConfig.featuredSong}
-            additionalSongs={defaultGiftConfig.additionalSongs}
-          />
-        )}
-
-        {/* Chapter 14: Final Romantic Heart & Relationship Counter */}
+  const storyScenes: SceneDefinition[] = [
+    {
+      id: "welcome",
+      node: (
+        <WelcomeExperience
+          recipientNickname={defaultGiftConfig.recipientNickname}
+          title={defaultGiftConfig.welcomeTitle}
+          subtitle={defaultGiftConfig.welcomeSubtitle}
+          message={defaultGiftConfig.welcomeMessage}
+          onEnter={handleEnterWorld}
+        />
+      ),
+    },
+    {
+      id: "observations",
+      node: <ObservationsSection observations={defaultGiftConfig.observations} />,
+    },
+    {
+      id: "memories",
+      node: <MemoriesSection memories={defaultGiftConfig.memories} />,
+    },
+    {
+      id: "secretWorld",
+      node: <SecretWorldSection initialHint={defaultGiftConfig.secretHint} />,
+    },
+    {
+      id: "deluluMode",
+      node: <DeluluSection />,
+    },
+    {
+      id: "quiz",
+      node: <QuizSection />,
+    },
+    {
+      id: "letters",
+      node: <LettersSection letters={defaultGiftConfig.letters} />,
+    },
+    {
+      id: "notebook",
+      node: <NotebookSection onOpenAccessModal={() => setIsAccessModalOpen(true)} />,
+    },
+    {
+      id: "voice",
+      node: <VoiceMessageSection onOpenAccessModal={() => setIsAccessModalOpen(true)} />,
+    },
+    {
+      id: "datePlanner",
+      node: <DatePlannerSection onOpenAccessModal={() => setIsAccessModalOpen(true)} />,
+    },
+    {
+      id: "openWhenLetters",
+      node: <OpenWhenSection letters={defaultGiftConfig.openWhenLetters} />,
+    },
+    {
+      id: "littleReasons",
+      node: <LittleReasonsSection reasons={defaultGiftConfig.littleReasons} />,
+    },
+    {
+      id: "digitalGifts",
+      node: <DigitalGiftsSection gifts={defaultGiftConfig.digitalGifts} />,
+    },
+    ...(defaultGiftConfig.featuredSong
+      ? [
+          {
+            id: "ourSong",
+            node: (
+              <OurSongSection
+                featuredSong={defaultGiftConfig.featuredSong}
+                additionalSongs={defaultGiftConfig.additionalSongs}
+              />
+            ),
+          },
+        ]
+      : []),
+    {
+      id: "finalHeart",
+      node: (
         <FinalHeartSection
           startDate={defaultGiftConfig.dateOfficialCouple || defaultGiftConfig.dateFirstMet}
           milestones={defaultGiftConfig.customMilestones}
@@ -134,7 +142,26 @@ export default function Home() {
           finalMessage={defaultGiftConfig.finalMessage}
           senderName={defaultGiftConfig.senderNickname || defaultGiftConfig.senderName}
         />
-      </div>
+      ),
+    },
+  ];
+
+  return (
+    <StorySceneProvider>
+      <main className="relative min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)]">
+        {/* Delicate floating background ambience */}
+        <FloatingHearts />
+        {/* Delightful cursor heart trail */}
+        <CursorHeartTrail />
+
+        {/* Floating interactive navigation menu */}
+        <GiftNavigation
+          onOpenCreatorStudio={() => setIsCreatorStudioOpen(true)}
+          onOpenAccessModal={() => setIsAccessModalOpen(true)}
+        />
+
+        {/* Romantic Scene-By-Scene Story Container */}
+        <StorySceneContainer scenes={storyScenes} />
 
       {/* Editorial Footer */}
       <footer className="py-14 px-6 text-center border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs text-[var(--text-muted)] relative z-10">
@@ -179,5 +206,6 @@ export default function Home() {
         onClose={() => setIsAccessModalOpen(false)}
       />
     </main>
+    </StorySceneProvider>
   );
 }

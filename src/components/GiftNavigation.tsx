@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 import { scrollToChapter } from "@/lib/motion";
+import { useStoryScene } from "@/context/StorySceneContext";
 
 export interface NavItem {
   id: string;
@@ -45,6 +46,14 @@ export function GiftNavigation({
   const [participantRole, setParticipantRole] = useState<string>("recipient");
   const [participantName, setParticipantName] = useState<string>("Baby");
 
+  let sceneContext: ReturnType<typeof useStoryScene> | null = null;
+  try {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    sceneContext = useStoryScene();
+  } catch {
+    sceneContext = null;
+  }
+
   useEffect(() => {
     const updateRole = () => {
       const role = localStorage.getItem("gift_participant_role") || "recipient";
@@ -57,9 +66,13 @@ export function GiftNavigation({
     return () => window.removeEventListener("storage", updateRole);
   }, []);
 
-  const scrollToSection = (id: string) => {
-    scrollToChapter(id);
+  const handleNavigate = (id: string) => {
     setIsOpen(false);
+    if (sceneContext) {
+      sceneContext.goToChapter(id);
+      return;
+    }
+    scrollToChapter(id);
   };
 
   return (
@@ -177,23 +190,37 @@ export function GiftNavigation({
                 </div>
 
                 <div className="space-y-1">
-                  {items.map((item, i) => (
-                    <motion.button
-                      key={item.id}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.02 }}
-                      onClick={() => scrollToSection(item.id)}
-                      className="w-full text-left px-3.5 py-2 rounded-2xl flex items-center gap-3 transition-all duration-200 cursor-pointer group hover:bg-[var(--pale-rose)]"
-                    >
-                      <span className="text-base group-hover:scale-115 transition-transform duration-200">
-                        {item.emoji}
-                      </span>
-                      <span className="text-xs sm:text-sm font-medium text-[var(--text-primary)] group-hover:text-[var(--pink-deep)]">
-                        {item.label}
-                      </span>
-                    </motion.button>
-                  ))}
+                  {items.map((item, i) => {
+                    const isActive = sceneContext?.activeChapterId === item.id;
+                    return (
+                      <motion.button
+                        key={item.id}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.02 }}
+                        onClick={() => handleNavigate(item.id)}
+                        className={`w-full text-left px-3.5 py-2 rounded-2xl flex items-center justify-between transition-all duration-200 cursor-pointer group ${
+                          isActive
+                            ? "bg-[var(--pale-rose)] text-[var(--pink-strong)] font-bold shadow-2xs"
+                            : "hover:bg-[var(--pale-rose)]/50 text-[var(--text-primary)]"
+                        }`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className="text-base group-hover:scale-115 transition-transform duration-200">
+                            {item.emoji}
+                          </span>
+                          <span className="text-xs sm:text-sm font-medium">
+                            {item.label}
+                          </span>
+                        </div>
+                        {isActive && (
+                          <span className="text-xs text-[var(--pink-strong)] font-bold">
+                            ♡ Active
+                          </span>
+                        )}
+                      </motion.button>
+                    );
+                  })}
                 </div>
               </div>
 
