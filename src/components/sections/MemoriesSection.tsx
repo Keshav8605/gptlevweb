@@ -16,7 +16,7 @@ const defaultPolaroids = [
   {
     id: "pol-1",
     src: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80",
-    caption: "A moment I'd keep forever",
+    caption: "A moment I'd choose a thousand times ♡",
     rotation: -3,
     tint: "from-[#FCE7EF] to-[#EDE2FA]",
     emoji: "📸",
@@ -24,7 +24,7 @@ const defaultPolaroids = [
   {
     id: "pol-2",
     src: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=600&q=80",
-    caption: "Little things, big feelings",
+    caption: "Little things, big feelings ♡",
     rotation: 2.5,
     tint: "from-[#FFE0EA] to-[#FFCADB]",
     emoji: "🌸",
@@ -32,7 +32,7 @@ const defaultPolaroids = [
   {
     id: "pol-3",
     src: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=600&q=80",
-    caption: "Anywhere is lovely with you",
+    caption: "Right here is where my heart belongs ♡",
     rotation: -2,
     tint: "from-[#EDE2FA] to-[#F7F0FF]",
     emoji: "🌅",
@@ -40,7 +40,7 @@ const defaultPolaroids = [
   {
     id: "pol-4",
     src: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80",
-    caption: "One for our imaginary scrapbook",
+    caption: "One for our imaginary scrapbook ✨",
     rotation: 2,
     tint: "from-[#FFF9F3] to-[#FFE0EA]",
     emoji: "🏖️",
@@ -48,7 +48,7 @@ const defaultPolaroids = [
   {
     id: "pol-5",
     src: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=600&q=80",
-    caption: "The best kind of ordinary",
+    caption: "The sweetest part of my days ✨",
     rotation: -2.5,
     tint: "from-[#FFCADB] to-[#EDE2FA]",
     emoji: "☕",
@@ -56,7 +56,7 @@ const defaultPolaroids = [
   {
     id: "pol-6",
     src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
-    caption: "My favourite view",
+    caption: "The sweetest view in the whole world ✨",
     rotation: 3,
     tint: "from-[#FFE0EA] to-[#FF5F96]/30",
     emoji: "🌿",

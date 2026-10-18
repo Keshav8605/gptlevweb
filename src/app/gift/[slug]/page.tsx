@@ -271,6 +271,7 @@ function GiftRecipientContent({
           title={gift.welcomeTitle || defaultGiftConfig.welcomeTitle}
           subtitle={gift.welcomeSubtitle || defaultGiftConfig.welcomeSubtitle}
           message={gift.welcomeMessage || defaultGiftConfig.welcomeMessage}
+          polaroids={gift.welcomePolaroids || defaultGiftConfig.welcomePolaroids}
           onEnter={handleEnterWorld}
         />
       )}

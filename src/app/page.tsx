@@ -77,6 +77,7 @@ export default function Home() {
         title={defaultGiftConfig.welcomeTitle}
         subtitle={defaultGiftConfig.welcomeSubtitle}
         message={defaultGiftConfig.welcomeMessage}
+        polaroids={defaultGiftConfig.welcomePolaroids}
         onEnter={handleEnterWorld}
       />
 

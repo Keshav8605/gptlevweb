@@ -1,3 +1,9 @@
+export interface HeroPolaroidConfig {
+  id?: string;
+  src?: string;
+  caption?: string;
+}
+
 // Gift data types and configuration
 export interface GiftConfig {
   // People
@@ -10,6 +16,7 @@ export interface GiftConfig {
   welcomeTitle: string;
   welcomeSubtitle: string;
   welcomeMessage: string;
+  welcomePolaroids?: HeroPolaroidConfig[];
   
   // Relationship dates
   dateFirstMet?: string;
@@ -190,6 +197,28 @@ export const defaultGiftConfig: GiftConfig = {
   welcomeTitle: "You & Me",
   welcomeSubtitle: "A little world, just for us ✨",
   welcomeMessage: "Because you deserve to know how special you are to me. Every pixel on this page holds a piece of my heart. Take your time exploring — this is all for you.",
+  welcomePolaroids: [
+    {
+      id: "p1",
+      src: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80",
+      caption: "A moment I'd choose a thousand times ♡",
+    },
+    {
+      id: "p2",
+      src: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=600&q=80",
+      caption: "The sweetest view in the whole world ✨",
+    },
+    {
+      id: "p3",
+      src: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80",
+      caption: "Right here is where my heart belongs ♡",
+    },
+    {
+      id: "p4",
+      src: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=600&q=80",
+      caption: "The best part of every single day ✨",
+    },
+  ],
   
   dateFirstMet: "2023-06-15",
   dateOfficialCouple: "2023-08-20",

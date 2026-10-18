@@ -264,6 +264,7 @@ export interface GiftRecord {
   welcomeTitle: string;
   welcomeSubtitle: string;
   welcomeMessage: string;
+  welcomePolaroids?: { id?: string; src?: string; caption?: string }[];
   enabledSections: string[];
   sectionOrder: string[];
   customMilestones?: { id: string; label: string; date: string }[];

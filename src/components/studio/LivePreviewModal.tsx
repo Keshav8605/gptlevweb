@@ -114,6 +114,7 @@ export function LivePreviewModal({ isOpen, onClose, gift }: LivePreviewModalProp
                 title={gift.welcomeTitle}
                 subtitle={gift.welcomeSubtitle}
                 message={gift.welcomeMessage}
+                polaroids={gift.welcomePolaroids}
                 onEnter={() => {}}
               />
             )}

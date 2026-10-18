@@ -1,8 +1,14 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { RomanticCharacter } from "../RomanticCharacter";
+
+export interface HeroPolaroid {
+  id?: string;
+  src?: string;
+  caption?: string;
+}
 
 interface WelcomeExperienceProps {
   recipientNickname: string;
@@ -11,6 +17,7 @@ interface WelcomeExperienceProps {
   message?: string;
   startDate?: string;
   onEnter: () => void;
+  polaroids?: HeroPolaroid[];
 }
 
 export function WelcomeExperience({
@@ -19,15 +26,25 @@ export function WelcomeExperience({
   subtitle,
   message,
   onEnter,
+  polaroids,
 }: WelcomeExperienceProps) {
   const [photoLoaded, setPhotoLoaded] = useState<Record<string, boolean>>({});
+  const [clickedHeart, setClickedHeart] = useState<string | null>(null);
 
-  // 4 Curated Romantic Hero Polaroids (matching Reference 2)
-  const heroPolaroids = [
+  const handleCardClick = (id: string) => {
+    setClickedHeart(id);
+    setTimeout(() => {
+      setClickedHeart((curr) => (curr === id ? null : curr));
+    }, 1200);
+  };
+
+  // 4 Universal Romantic Hero Polaroids
+  // Crafted so ANY photo — couple photo, solo portrait of partner/sender, or scenic memory — looks deeply lovable, connecting, and impressive.
+  const defaultPolaroidsData = [
     {
       id: "p1",
       src: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80",
-      caption: "A moment I'd keep forever",
+      caption: "A moment I'd choose a thousand times ♡",
       rotation: -5,
       delay: 0,
       positionClass: "hidden lg:block absolute top-6 lg:top-8 left-4 xl:left-12",
@@ -35,7 +52,7 @@ export function WelcomeExperience({
     {
       id: "p2",
       src: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=600&q=80",
-      caption: "Our favourite view",
+      caption: "The sweetest view in the whole world ✨",
       rotation: 4.5,
       delay: 0.5,
       positionClass: "hidden lg:block absolute top-8 lg:top-10 right-4 xl:right-12",
@@ -43,7 +60,7 @@ export function WelcomeExperience({
     {
       id: "p3",
       src: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80",
-      caption: "Anywhere is lovely with you",
+      caption: "Right here is where my heart belongs ♡",
       rotation: 4,
       delay: 1,
       positionClass: "hidden md:block absolute top-[44%] lg:top-[42%] left-4 xl:left-12",
@@ -51,12 +68,21 @@ export function WelcomeExperience({
     {
       id: "p4",
       src: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=600&q=80",
-      caption: "Told mostly in bad jokes",
+      caption: "The best part of every single day ✨",
       rotation: -3.5,
       delay: 1.5,
       positionClass: "hidden md:block absolute top-[46%] lg:top-[44%] right-4 xl:right-12",
     },
   ];
+
+  const heroPolaroids = defaultPolaroidsData.map((item, idx) => {
+    const custom = polaroids?.[idx];
+    return {
+      ...item,
+      src: custom?.src?.trim() || item.src,
+      caption: custom?.caption?.trim() || item.caption,
+    };
+  });
 
   return (
     <section
@@ -88,7 +114,8 @@ export function WelcomeExperience({
         animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[0].rotation }}
         transition={{ duration: 0.9, delay: 0.3 }}
         whileHover={{ scale: 1.06, rotate: -2, zIndex: 30 }}
-        className={`${heroPolaroids[0].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl`}
+        onClick={() => handleCardClick(heroPolaroids[0].id)}
+        className={`${heroPolaroids[0].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl select-none`}
       >
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--soft-pink)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -101,6 +128,19 @@ export function WelcomeExperience({
           {!photoLoaded.p1 && (
             <div className="absolute inset-0 flex items-center justify-center text-3xl">📸</div>
           )}
+          <AnimatePresence>
+            {clickedHeart === heroPolaroids[0].id && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.4, y: 10 }}
+                animate={{ opacity: 1, scale: 1.3, y: -16 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.6 }}
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+              >
+                <span className="text-4xl drop-shadow-lg">💖</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         <p className="mt-3 font-handwritten text-center text-base xl:text-lg text-[var(--romantic-plum)] font-semibold">
           {heroPolaroids[0].caption}
@@ -113,7 +153,8 @@ export function WelcomeExperience({
         animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[1].rotation }}
         transition={{ duration: 0.9, delay: 0.4 }}
         whileHover={{ scale: 1.06, rotate: 1, zIndex: 30 }}
-        className={`${heroPolaroids[1].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl`}
+        onClick={() => handleCardClick(heroPolaroids[1].id)}
+        className={`${heroPolaroids[1].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl select-none`}
       >
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--lavender)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -126,6 +167,19 @@ export function WelcomeExperience({
           {!photoLoaded.p2 && (
             <div className="absolute inset-0 flex items-center justify-center text-3xl">🌅</div>
           )}
+          <AnimatePresence>
+            {clickedHeart === heroPolaroids[1].id && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.4, y: 10 }}
+                animate={{ opacity: 1, scale: 1.3, y: -16 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.6 }}
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+              >
+                <span className="text-4xl drop-shadow-lg">💖</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         <p className="mt-3 font-handwritten text-center text-base xl:text-lg text-[var(--romantic-plum)] font-semibold">
           {heroPolaroids[1].caption}
@@ -138,7 +192,8 @@ export function WelcomeExperience({
         animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[2].rotation }}
         transition={{ duration: 0.9, delay: 0.5 }}
         whileHover={{ scale: 1.06, rotate: 0, zIndex: 30 }}
-        className={`${heroPolaroids[2].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl`}
+        onClick={() => handleCardClick(heroPolaroids[2].id)}
+        className={`${heroPolaroids[2].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl select-none`}
       >
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--soft-pink)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -151,6 +206,19 @@ export function WelcomeExperience({
           {!photoLoaded.p3 && (
             <div className="absolute inset-0 flex items-center justify-center text-3xl">✨</div>
           )}
+          <AnimatePresence>
+            {clickedHeart === heroPolaroids[2].id && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.4, y: 10 }}
+                animate={{ opacity: 1, scale: 1.3, y: -16 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.6 }}
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+              >
+                <span className="text-4xl drop-shadow-lg">💖</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         <p className="mt-3 font-handwritten text-center text-base xl:text-lg text-[var(--romantic-plum)] font-semibold">
           {heroPolaroids[2].caption}
@@ -163,7 +231,8 @@ export function WelcomeExperience({
         animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[3].rotation }}
         transition={{ duration: 0.9, delay: 0.6 }}
         whileHover={{ scale: 1.06, rotate: 0, zIndex: 30 }}
-        className={`${heroPolaroids[3].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl`}
+        onClick={() => handleCardClick(heroPolaroids[3].id)}
+        className={`${heroPolaroids[3].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl select-none`}
       >
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--pale-rose)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -176,6 +245,19 @@ export function WelcomeExperience({
           {!photoLoaded.p4 && (
             <div className="absolute inset-0 flex items-center justify-center text-3xl">💛</div>
           )}
+          <AnimatePresence>
+            {clickedHeart === heroPolaroids[3].id && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.4, y: 10 }}
+                animate={{ opacity: 1, scale: 1.3, y: -16 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.6 }}
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+              >
+                <span className="text-4xl drop-shadow-lg">💖</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         <p className="mt-3 font-handwritten text-center text-base xl:text-lg text-[var(--romantic-plum)] font-semibold">
           {heroPolaroids[3].caption}
@@ -251,7 +333,7 @@ export function WelcomeExperience({
           transition={{ duration: 0.7, delay: 0.7 }}
           className="mt-3 text-sm sm:text-base md:text-lg text-[var(--text-secondary)] max-w-lg leading-relaxed font-sans"
         >
-          {subtitle || "an entirely accidental love story told mostly in polaroids and bad jokes 🥹"}
+          {subtitle || "A little world made with all my heart, just for you ✨"}
         </motion.p>
 
         {/* Optional heartfelt personal message snippet if provided */}
