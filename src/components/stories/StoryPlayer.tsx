@@ -12,6 +12,87 @@ interface StoryPlayerProps {
   onSceneChange?: (sceneIndex: number) => void;
 }
 
+interface PlayerTheme {
+  badgeClass: string;
+  badgeEmoji: string;
+  containerClass: string;
+  fallbackGradient: string;
+  fallbackEmoji: string;
+  storyTitleClass: string;
+  dotActiveColor: string;
+  dotPassedColor: string;
+  actionButtonClass: string;
+}
+
+const PLAYER_THEMES: Record<Story["id"], PlayerTheme> = {
+  "mafia-romance": {
+    badgeClass: "bg-rose-950/70 border-rose-600/40 text-rose-200",
+    badgeEmoji: "🥀",
+    containerClass: "border-rose-900/40 bg-[#12070e]/90 shadow-[0_20px_50px_rgba(190,18,60,0.18)]",
+    fallbackGradient: "radial-gradient(circle at 50% 50%, #300813 0%, #0d0407 100%)",
+    fallbackEmoji: "🥀",
+    storyTitleClass: "text-rose-400",
+    dotActiveColor: "#f43f5e",
+    dotPassedColor: "rgba(244, 63, 94, 0.4)",
+    actionButtonClass: "bg-gradient-to-r from-rose-700 to-rose-500 hover:from-rose-600 hover:to-rose-400 shadow-rose-950/60",
+  },
+  "enemies-to-lovers": {
+    badgeClass: "bg-sky-950/70 border-sky-600/40 text-sky-200",
+    badgeEmoji: "✨",
+    containerClass: "border-sky-900/40 bg-[#07131d]/90 shadow-[0_20px_50px_rgba(14,165,233,0.18)]",
+    fallbackGradient: "radial-gradient(circle at 50% 50%, #08283a 0%, #050d14 100%)",
+    fallbackEmoji: "🌧️",
+    storyTitleClass: "text-sky-400",
+    dotActiveColor: "#38bdf8",
+    dotPassedColor: "rgba(56, 189, 248, 0.4)",
+    actionButtonClass: "bg-gradient-to-r from-sky-700 to-sky-500 hover:from-sky-600 hover:to-sky-400 shadow-sky-950/60",
+  },
+  "fantasy-romance": {
+    badgeClass: "bg-purple-950/70 border-purple-600/40 text-purple-200",
+    badgeEmoji: "🔮",
+    containerClass: "border-purple-900/40 bg-[#10071a]/90 shadow-[0_20px_50px_rgba(139,92,246,0.20)]",
+    fallbackGradient: "radial-gradient(circle at 50% 50%, #2e1065 0%, #090314 100%)",
+    fallbackEmoji: "👑",
+    storyTitleClass: "text-purple-400",
+    dotActiveColor: "#a855f7",
+    dotPassedColor: "rgba(168, 85, 247, 0.4)",
+    actionButtonClass: "bg-gradient-to-r from-purple-700 to-purple-500 hover:from-purple-600 hover:to-purple-400 shadow-purple-950/60",
+  },
+  "campus-romance": {
+    badgeClass: "bg-amber-950/70 border-amber-600/40 text-amber-200",
+    badgeEmoji: "☕",
+    containerClass: "border-amber-900/40 bg-[#160c04]/90 shadow-[0_20px_50px_rgba(217,119,6,0.20)]",
+    fallbackGradient: "radial-gradient(circle at 50% 50%, #451a03 0%, #0f0702 100%)",
+    fallbackEmoji: "🍂",
+    storyTitleClass: "text-amber-400",
+    dotActiveColor: "#f59e0b",
+    dotPassedColor: "rgba(245, 158, 11, 0.4)",
+    actionButtonClass: "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 shadow-amber-950/60",
+  },
+  "celebrity-romance": {
+    badgeClass: "bg-fuchsia-950/70 border-fuchsia-600/40 text-fuchsia-200",
+    badgeEmoji: "🎤",
+    containerClass: "border-fuchsia-900/40 bg-[#160517]/90 shadow-[0_20px_50px_rgba(192,38,211,0.20)]",
+    fallbackGradient: "radial-gradient(circle at 50% 50%, #4a044e 0%, #0d010e 100%)",
+    fallbackEmoji: "✨",
+    storyTitleClass: "text-fuchsia-400",
+    dotActiveColor: "#e879f9",
+    dotPassedColor: "rgba(232, 121, 249, 0.4)",
+    actionButtonClass: "bg-gradient-to-r from-fuchsia-700 to-fuchsia-500 hover:from-fuchsia-600 hover:to-fuchsia-400 shadow-fuchsia-950/60",
+  },
+  "supernatural-mystery": {
+    badgeClass: "bg-cyan-950/70 border-cyan-600/40 text-cyan-200",
+    badgeEmoji: "🗝️",
+    containerClass: "border-cyan-900/40 bg-[#041318]/90 shadow-[0_20px_50px_rgba(6,182,212,0.20)]",
+    fallbackGradient: "radial-gradient(circle at 50% 50%, #083344 0%, #020b0f 100%)",
+    fallbackEmoji: "🕰️",
+    storyTitleClass: "text-cyan-400",
+    dotActiveColor: "#22d3ee",
+    dotPassedColor: "rgba(34, 211, 238, 0.4)",
+    actionButtonClass: "bg-gradient-to-r from-cyan-700 to-cyan-500 hover:from-cyan-600 hover:to-cyan-400 shadow-cyan-950/60",
+  },
+};
+
 export function StoryPlayer({
   story,
   initialSceneIndex = 0,
@@ -21,9 +102,9 @@ export function StoryPlayer({
   const [currentSceneIndex, setCurrentSceneIndex] = useState(initialSceneIndex);
   const [imageError, setImageError] = useState(false);
 
+  const theme = PLAYER_THEMES[story.id] || PLAYER_THEMES["mafia-romance"];
   const totalScenes = story.scenes.length;
   const currentScene = story.scenes[currentSceneIndex] || story.scenes[0];
-  const isMafia = story.id === "mafia-romance";
   const isFirstScene = currentSceneIndex === 0;
   const isLastScene = currentSceneIndex === totalScenes - 1;
 
@@ -78,13 +159,9 @@ export function StoryPlayer({
 
         <div className="flex items-center gap-3">
           <span
-            className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider backdrop-blur-md ${
-              isMafia
-                ? "bg-rose-950/70 border border-rose-600/40 text-rose-200"
-                : "bg-sky-950/70 border border-sky-600/40 text-sky-200"
-            }`}
+            className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider backdrop-blur-md border ${theme.badgeClass}`}
           >
-            {isMafia ? "🥀" : "✨"} {story.genre}
+            {theme.badgeEmoji} {story.genre}
           </span>
           <span className="text-xs sm:text-sm font-semibold tracking-wide text-zinc-300 px-3 py-1 rounded-full bg-white/5 border border-white/10">
             Scene {currentSceneIndex + 1} of {totalScenes}
@@ -94,11 +171,7 @@ export function StoryPlayer({
 
       {/* Main Scene Presentation Container */}
       <div
-        className={`rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 border ${
-          isMafia
-            ? "border-rose-900/40 bg-[#12070e]/90 shadow-[0_20px_50px_rgba(190,18,60,0.18)]"
-            : "border-sky-900/40 bg-[#07131d]/90 shadow-[0_20px_50px_rgba(14,165,233,0.18)]"
-        }`}
+        className={`rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 border ${theme.containerClass}`}
       >
         <AnimatePresence mode="wait">
           <motion.div
@@ -126,12 +199,10 @@ export function StoryPlayer({
                 <div
                   className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center"
                   style={{
-                    background: isMafia
-                      ? "radial-gradient(circle at 50% 50%, #300813 0%, #0d0407 100%)"
-                      : "radial-gradient(circle at 50% 50%, #08283a 0%, #050d14 100%)",
+                    background: theme.fallbackGradient,
                   }}
                 >
-                  <span className="text-4xl sm:text-5xl mb-2">{isMafia ? "🥀" : "🌧️"}</span>
+                  <span className="text-4xl sm:text-5xl mb-2">{theme.fallbackEmoji}</span>
                   <p className="font-serif italic text-base sm:text-lg text-rose-100/90">
                     {currentScene.title}
                   </p>
@@ -154,9 +225,7 @@ export function StoryPlayer({
               {/* Scene Title */}
               <div>
                 <span
-                  className={`text-xs font-semibold uppercase tracking-widest ${
-                    isMafia ? "text-rose-400" : "text-sky-400"
-                  }`}
+                  className={`text-xs font-semibold uppercase tracking-widest ${theme.storyTitleClass}`}
                 >
                   {story.title}
                 </span>
@@ -194,13 +263,9 @@ export function StoryPlayer({
                       width: idx === currentSceneIndex ? "2rem" : "0.5rem",
                       background:
                         idx === currentSceneIndex
-                          ? isMafia
-                            ? "#f43f5e"
-                            : "#38bdf8"
+                          ? theme.dotActiveColor
                           : idx < currentSceneIndex
-                          ? isMafia
-                            ? "rgba(244, 63, 94, 0.4)"
-                            : "rgba(56, 189, 248, 0.4)"
+                          ? theme.dotPassedColor
                           : "rgba(255, 255, 255, 0.15)",
                     }}
                     aria-label={`Jump to scene ${idx + 1}`}
@@ -229,11 +294,7 @@ export function StoryPlayer({
                 {isLastScene ? (
                   <button
                     onClick={onBackToStories}
-                    className={`px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wide text-white shadow-lg cursor-pointer transition-all flex items-center gap-2 ${
-                      isMafia
-                        ? "bg-gradient-to-r from-rose-700 to-rose-500 hover:from-rose-600 hover:to-rose-400 shadow-rose-950/60"
-                        : "bg-gradient-to-r from-sky-700 to-sky-500 hover:from-sky-600 hover:to-sky-400 shadow-sky-950/60"
-                    }`}
+                    className={`px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wide text-white shadow-lg cursor-pointer transition-all flex items-center gap-2 ${theme.actionButtonClass}`}
                     id="btn-scene-complete"
                   >
                     <span>Story Complete ♡ Back to Stories</span>
@@ -242,11 +303,7 @@ export function StoryPlayer({
                 ) : (
                   <button
                     onClick={handleNext}
-                    className={`px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wide text-white shadow-lg cursor-pointer transition-all flex items-center gap-2 ${
-                      isMafia
-                        ? "bg-gradient-to-r from-rose-700 to-rose-500 hover:from-rose-600 hover:to-rose-400 shadow-rose-950/60"
-                        : "bg-gradient-to-r from-sky-700 to-sky-500 hover:from-sky-600 hover:to-sky-400 shadow-sky-950/60"
-                    }`}
+                    className={`px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wide text-white shadow-lg cursor-pointer transition-all flex items-center gap-2 ${theme.actionButtonClass}`}
                     id="btn-scene-next"
                   >
                     <span>Next Scene</span>

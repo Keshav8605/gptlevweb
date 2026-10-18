@@ -5,7 +5,7 @@ import { StoryUniverseView } from "@/components/stories/StoryUniverseView";
 export const metadata: Metadata = {
   title: "Story Universe — Romantic Stories | YOU & ME",
   description:
-    "Immerse yourself in two complete romantic universes: The City's Most Feared Man Has One Weakness and I Hate Everyone. Unfortunately, I Notice You.",
+    "Immerse yourself in six complete romantic universes across diverse genres: Mafia Romance, Enemies to Lovers, Fantasy Romance, Campus Romance, Celebrity Romance, and Supernatural Mystery.",
 };
 
 export default function StoryUniversePage() {

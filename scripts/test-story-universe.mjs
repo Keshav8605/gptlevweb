@@ -4,7 +4,7 @@ import { STORIES } from "../src/lib/stories-data.ts";
 const BASE_URL = process.env.TEST_URL || "http://localhost:3000";
 
 console.log("==========================================================");
-console.log("  STORY UNIVERSE & DELULU REFRESH VERIFICATION SUITE");
+console.log("  STORY UNIVERSE 6-STORY VERIFICATION SUITE");
 console.log(`  Target: ${BASE_URL}`);
 console.log("==========================================================\n");
 
@@ -101,84 +101,85 @@ async function run() {
     );
   });
 
-  await itAsync("Story Universe contains Story 1: 'The City&#x27;s Most Feared Man Has One Weakness.'", async () => {
-    const res = await fetch(`${BASE_URL}/story-universe`);
-    const html = await res.text();
-    assert.ok(
-      html.includes("The City&#x27;s Most Feared Man Has One Weakness") ||
-      html.includes("The City's Most Feared Man Has One Weakness"),
-      "Expected Story 1 title"
-    );
-  });
+  const expectedStories = [
+    { id: "mafia-romance", titleMatch: "The City" },
+    { id: "enemies-to-lovers", titleMatch: "I Hate Everyone" },
+    { id: "fantasy-romance", titleMatch: "The Prince Who Could Hear My Heart" },
+    { id: "campus-romance", titleMatch: "My Roommate Is My Almost" },
+    { id: "celebrity-romance", titleMatch: "Falling for the Boy on Every Billboard" },
+    { id: "supernatural-mystery", titleMatch: "The Ghost Who Fell in Love With Me" },
+  ];
 
-  await itAsync("Story Universe contains Story 2: 'I Hate Everyone. Unfortunately, I Notice You.'", async () => {
-    const res = await fetch(`${BASE_URL}/story-universe`);
-    const html = await res.text();
-    assert.ok(
-      html.includes("I Hate Everyone. Unfortunately, I Notice You."),
-      "Expected Story 2 title"
-    );
-  });
+  for (const exp of expectedStories) {
+    await itAsync(`Story Universe gallery displays story: ${exp.id}`, async () => {
+      const res = await fetch(`${BASE_URL}/story-universe`);
+      const html = await res.text();
+      assert.ok(
+        html.includes(exp.titleMatch) || html.includes(encodeURIComponent(exp.id)) || html.includes(`btn-open-${exp.id}`),
+        `Expected gallery to display ${exp.id}`
+      );
+    });
+
+    await itAsync(`Story reading view loads for: ${exp.id} at Scene 1`, async () => {
+      const res = await fetch(`${BASE_URL}/story-universe?story=${exp.id}&scene=1`);
+      assert.strictEqual(res.status, 200);
+      const html = await res.text();
+      const cleanHtml = html.replace(/<!-- -->/g, "");
+      assert.ok(cleanHtml.includes("Scene 1 of 8"), `Expected 'Scene 1 of 8' in ${exp.id}`);
+    });
+  }
 
   console.log("\n► [Suite C] Static Story Data Integrity & Word Counts");
 
-  it("Story collection contains exactly two stories", () => {
-    assert.strictEqual(STORIES.length, 2);
+  it("Story collection contains exactly six stories", () => {
+    assert.strictEqual(STORIES.length, 6, `Expected exactly 6 stories, found ${STORIES.length}`);
   });
 
-  it("Story 1 is Mafia Romance with 8 scenes", () => {
-    const s1 = STORIES.find((s) => s.id === "mafia-romance");
-    assert.ok(s1, "Mafia Romance story not found");
-    assert.strictEqual(s1.genre, "Mafia Romance");
-    assert.strictEqual(s1.scenes.length, 8);
-  });
+  for (const s of STORIES) {
+    it(`Story '${s.id}' (${s.genre}) has exactly 8 scenes`, () => {
+      assert.strictEqual(s.scenes.length, 8, `Story ${s.id} does not have 8 scenes`);
+    });
 
-  it("Story 1 total word count is within target 400–550 words", () => {
-    const s1 = STORIES.find((s) => s.id === "mafia-romance");
-    const totalWords = s1.scenes.reduce((acc, scene) => acc + scene.text.trim().split(/\s+/).length, 0);
-    console.log(`    (Story 1 word count: ${totalWords} words)`);
-    assert.ok(totalWords >= 400 && totalWords <= 550, `Word count ${totalWords} out of bounds`);
-  });
-
-  it("Story 2 is Enemies to Lovers with 8 scenes", () => {
-    const s2 = STORIES.find((s) => s.id === "enemies-to-lovers");
-    assert.ok(s2, "Enemies to Lovers story not found");
-    assert.strictEqual(s2.genre, "Enemies to Lovers");
-    assert.strictEqual(s2.scenes.length, 8);
-  });
-
-  it("Story 2 total word count is within target 400–550 words", () => {
-    const s2 = STORIES.find((s) => s.id === "enemies-to-lovers");
-    const totalWords = s2.scenes.reduce((acc, scene) => acc + scene.text.trim().split(/\s+/).length, 0);
-    console.log(`    (Story 2 word count: ${totalWords} words)`);
-    assert.ok(totalWords >= 400 && totalWords <= 550, `Word count ${totalWords} out of bounds`);
-  });
+    it(`Story '${s.id}' total word count is within target 400–550 words`, () => {
+      const totalWords = s.scenes.reduce(
+        (acc, scene) => acc + scene.text.trim().split(/\s+/).length,
+        0
+      );
+      console.log(`    ('${s.title}' word count: ${totalWords} words)`);
+      assert.ok(
+        totalWords >= 400 && totalWords <= 550,
+        `Word count ${totalWords} for '${s.id}' out of bounds (expected 400-550)`
+      );
+    });
+  }
 
   it("Stories do not contain placeholder or undefined tokens", () => {
     for (const s of STORIES) {
-      assert.ok(!s.title.includes("undefined"), "Title has undefined");
-      assert.ok(!s.synopsis.includes("undefined"), "Synopsis has undefined");
+      assert.ok(!s.title.includes("undefined"), `Title of ${s.id} has undefined`);
+      assert.ok(!s.synopsis.includes("undefined"), `Synopsis of ${s.id} has undefined`);
       for (const scene of s.scenes) {
-        assert.ok(!scene.text.includes("undefined"), `Scene ${scene.id} has undefined`);
-        assert.ok(!scene.text.includes("[Name]"), `Scene ${scene.id} has [Name] placeholder`);
+        assert.ok(!scene.text.includes("undefined"), `Scene ${scene.id} text has undefined`);
+        assert.ok(!scene.text.includes("[Name]"), `Scene ${scene.id} text has [Name] placeholder`);
         assert.ok(!scene.title.includes("undefined"), `Scene ${scene.id} title has undefined`);
+        assert.ok(scene.text.length > 50, `Scene ${scene.id} text is too short`);
       }
     }
   });
 
-  it("Every scene across both stories has a 100% unique illustration (16 distinct scene images)", () => {
+  it("Every scene across all six stories has a 100% unique illustration (48 distinct scene images)", () => {
     const allSceneImages = STORIES.flatMap((s) => s.scenes.map((sc) => sc.image));
-    assert.strictEqual(allSceneImages.length, 16, "Expected 16 total scene images");
+    assert.strictEqual(allSceneImages.length, 48, `Expected 48 total scene images, found ${allSceneImages.length}`);
 
     const uniqueSceneImages = new Set(allSceneImages);
     assert.strictEqual(
       uniqueSceneImages.size,
-      16,
-      `Expected 16 unique scene images, but got ${uniqueSceneImages.size}`
+      48,
+      `Expected 48 unique scene images, but got ${uniqueSceneImages.size}`
     );
 
-    // Verify neither cover is reused in any scene
+    // Verify covers are not reused as scene images
     const covers = STORIES.map((s) => s.coverImage);
+    assert.strictEqual(new Set(covers).size, 6, "Expected 6 unique covers");
     for (const cover of covers) {
       assert.ok(
         !uniqueSceneImages.has(cover),
@@ -195,15 +196,12 @@ async function run() {
 
   console.log("\n► [Suite D] Local Static Asset Availability");
 
-  await itAsync("Cover image for Mafia Romance is accessible (HTTP 200)", async () => {
-    const res = await fetch(`${BASE_URL}/images/stories/mafia-romance-cover.jpg`);
-    assert.strictEqual(res.status, 200);
-  });
-
-  await itAsync("Cover image for Enemies to Lovers is accessible (HTTP 200)", async () => {
-    const res = await fetch(`${BASE_URL}/images/stories/enemies-lovers-cover.jpg`);
-    assert.strictEqual(res.status, 200);
-  });
+  for (const s of STORIES) {
+    await itAsync(`Cover image for '${s.id}' is accessible (HTTP 200)`, async () => {
+      const res = await fetch(`${BASE_URL}${s.coverImage}`);
+      assert.strictEqual(res.status, 200, `Cover ${s.coverImage} returned status ${res.status}`);
+    });
+  }
 
   await itAsync("Gallery backdrop image is accessible (HTTP 200)", async () => {
     const res = await fetch(`${BASE_URL}/images/stories/gallery-backdrop.jpg`);
@@ -212,9 +210,9 @@ async function run() {
 
   for (const s of STORIES) {
     for (const scene of s.scenes) {
-      await itAsync(`Scene image for ${scene.id} is accessible (HTTP 200)`, async () => {
+      await itAsync(`Scene image for ${s.id} - ${scene.id} is accessible (HTTP 200)`, async () => {
         const res = await fetch(`${BASE_URL}${scene.image}`);
-        assert.strictEqual(res.status, 200, `Asset ${scene.image} failed to load`);
+        assert.strictEqual(res.status, 200, `Asset ${scene.image} failed to load (HTTP ${res.status})`);
       });
     }
   }

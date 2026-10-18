@@ -32,9 +32,7 @@ export function StoryUniverseView() {
 
   // Derive active story and scene directly from URL search params
   const activeStoryId: Story["id"] | null =
-    storyParam === "mafia-romance" || storyParam === "enemies-to-lovers"
-      ? storyParam
-      : null;
+    STORIES.some((s) => s.id === storyParam) ? (storyParam as Story["id"]) : null;
 
   const parsedScene = sceneParam ? parseInt(sceneParam, 10) : 1;
   const activeSceneIndex =
@@ -152,7 +150,7 @@ export function StoryUniverseView() {
                   </h1>
 
                   <p className="font-serif italic text-sm sm:text-base text-rose-200/80 leading-relaxed max-w-xl mx-auto">
-                    Two romantic worlds waiting to unfold. Choose your story, step beyond the ordinary, and immerse yourself in the journey.
+                    Six romantic worlds waiting to unfold. Choose your story, step beyond the ordinary, and immerse yourself in the journey.
                   </p>
                 </div>
 
