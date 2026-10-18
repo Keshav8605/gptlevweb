@@ -184,6 +184,22 @@ function LetterCard({
                 </motion.div>
               )}
 
+              {/* Fold letter back action */}
+              <div className="mt-8 flex justify-center">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggle();
+                  }}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--pale-rose)]/70 hover:bg-[var(--pale-rose)] border border-[var(--border-subtle)] text-[var(--pink-strong)] hover:text-[var(--pink-deep)] font-rounded text-xs sm:text-sm font-semibold transition-all duration-200 shadow-2xs hover:shadow-xs hover:scale-102 active:scale-98 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
+                  aria-label="Fold letter back into envelope"
+                >
+                  <span>Fold letter back into envelope</span>
+                  <span className="text-sm">💌</span>
+                </button>
+              </div>
+
               {/* Shared Persistent Reactions & Comments */}
               <div className="mt-8 pt-4 border-t border-[var(--border-subtle)]">
                 <SharedInteractions

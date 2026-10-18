@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { SharedInteractions } from "../interactions/SharedInteractions";
 import { RomanticCharacter } from "../RomanticCharacter";
@@ -64,7 +64,7 @@ const defaultPolaroids = [
 ];
 
 export function MemoriesSection({ memories }: MemoriesSectionProps) {
-  const [selectedMemory, setSelectedMemory] = useState<Memory | null>(null);
+  const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
 
   // Combine user memories with default layout
   const displayItems = memories && memories.length > 0
@@ -90,6 +90,34 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
         date: undefined as string | undefined,
         location: undefined as string | undefined,
       }));
+
+  const selectedMemory = selectedIndex !== null ? displayItems[selectedIndex] : null;
+
+  const handlePrevMemory = () => {
+    setSelectedIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : prev));
+  };
+
+  const handleNextMemory = () => {
+    setSelectedIndex((prev) => (prev !== null && prev < displayItems.length - 1 ? prev + 1 : prev));
+  };
+
+  // Keyboard navigation for scrapbook modal
+  useEffect(() => {
+    if (selectedIndex === null) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") {
+        setSelectedIndex((prev) => (prev !== null && prev > 0 ? prev - 1 : prev));
+      } else if (e.key === "ArrowRight") {
+        setSelectedIndex((prev) => (prev !== null && prev < displayItems.length - 1 ? prev + 1 : prev));
+      } else if (e.key === "Escape") {
+        setSelectedIndex(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedIndex, displayItems.length]);
 
   return (
     <SectionWrapper
@@ -124,7 +152,7 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
               viewport={{ once: true, margin: "-40px" }}
               transition={{ duration: 0.6, delay: idx * 0.1 }}
               whileHover={{ scale: 1.05, rotate: 0, zIndex: 20 }}
-              onClick={() => setSelectedMemory(item as Memory)}
+              onClick={() => setSelectedIndex(idx)}
               className="group cursor-pointer select-none"
               style={{
                 transform: `rotate(${item.rotation}deg)`,
@@ -197,13 +225,13 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
 
       {/* Memory Lightbox Modal */}
       <AnimatePresence>
-        {selectedMemory && (
+        {selectedMemory && selectedIndex !== null && (
           <>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setSelectedMemory(null)}
+              onClick={() => setSelectedIndex(null)}
               className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
             />
             <motion.div
@@ -212,54 +240,99 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
               exit={{ opacity: 0, scale: 0.9, y: 30 }}
               className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-xl w-full z-50 bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-[var(--border-subtle)] max-h-[90vh] overflow-y-auto"
             >
-              <div className="flex items-center justify-between mb-4">
+              {/* Top Bar: Emoji, Position Indicator, Close Button */}
+              <div className="flex items-center justify-between mb-3">
                 <span className="text-2xl">{selectedMemory.emoji || "📸"}</span>
+
+                {/* Position Indicator */}
+                <span className="text-xs font-rounded font-bold text-[var(--pink-strong)] bg-[var(--pale-rose)]/80 px-3.5 py-1 rounded-full border border-[var(--border-subtle)] shadow-2xs">
+                  {selectedIndex + 1} of {displayItems.length} memories
+                </span>
+
                 <button
-                  onClick={() => setSelectedMemory(null)}
-                  className="w-8 h-8 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-blush)] transition-colors"
+                  onClick={() => setSelectedIndex(null)}
+                  className="w-8 h-8 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-blush)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
+                  aria-label="Close memory lightbox"
                 >
                   ✕
                 </button>
               </div>
 
-              <h3 className="font-rounded text-2xl font-bold text-[var(--romantic-plum)] mb-2">
-                {selectedMemory.title}
-              </h3>
+              {/* Previous / Next Memory Navigation Buttons */}
+              <div className="flex items-center justify-between gap-3 mb-4 pt-1">
+                <button
+                  type="button"
+                  onClick={handlePrevMemory}
+                  disabled={selectedIndex === 0}
+                  className="px-3.5 py-1.5 rounded-full border border-[var(--border-subtle)] bg-white text-xs font-rounded font-semibold text-[var(--pink-strong)] hover:bg-[var(--pale-rose)] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-all flex items-center gap-1.5 shadow-2xs hover:scale-102 active:scale-98 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
+                  aria-label="Previous memory"
+                >
+                  <span>←</span>
+                  <span>Previous</span>
+                </button>
 
-              {selectedMemory.date && (
-                <p className="text-xs text-[var(--text-muted)] mb-4">
-                  {new Date(selectedMemory.date).toLocaleDateString("en-US", {
-                    month: "long",
-                    day: "numeric",
-                    year: "numeric",
-                  })}
-                  {selectedMemory.location && ` • 📍 ${selectedMemory.location}`}
+                <span className="text-[11px] text-[var(--text-muted)] font-rounded font-medium hidden sm:inline">
+                  Use ← → keys to browse
+                </span>
+
+                <button
+                  type="button"
+                  onClick={handleNextMemory}
+                  disabled={selectedIndex === displayItems.length - 1}
+                  className="px-3.5 py-1.5 rounded-full border border-[var(--border-subtle)] bg-white text-xs font-rounded font-semibold text-[var(--pink-strong)] hover:bg-[var(--pale-rose)] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-all flex items-center gap-1.5 shadow-2xs hover:scale-102 active:scale-98 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
+                  aria-label="Next memory"
+                >
+                  <span>Next</span>
+                  <span>→</span>
+                </button>
+              </div>
+
+              <motion.div
+                key={selectedMemory.id}
+                initial={{ opacity: 0, x: 10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.25 }}
+              >
+                <h3 className="font-rounded text-2xl font-bold text-[var(--romantic-plum)] mb-2">
+                  {selectedMemory.title}
+                </h3>
+
+                {selectedMemory.date && (
+                  <p className="text-xs text-[var(--text-muted)] mb-4 font-rounded">
+                    {new Date(selectedMemory.date).toLocaleDateString("en-US", {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                    })}
+                    {selectedMemory.location && ` • 📍 ${selectedMemory.location}`}
+                  </p>
+                )}
+
+                {/* Photo Preview in Modal */}
+                {Boolean((selectedMemory as { photoUrl?: string }).photoUrl || ("photos" in selectedMemory && Array.isArray((selectedMemory as { photos?: string[] }).photos) && (selectedMemory as { photos?: string[] }).photos!.length > 0)) && (
+                  <div className="rounded-2xl overflow-hidden aspect-[4/3] border border-[var(--border-subtle)] mb-5 shadow-xs bg-[var(--soft-pink)]">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={(selectedMemory as { photoUrl?: string }).photoUrl || (selectedMemory as { photos?: string[] }).photos![0]}
+                      alt={selectedMemory.title}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                )}
+
+                <p className="text-base sm:text-lg font-serif italic text-[var(--text-primary)] leading-relaxed mb-6">
+                  {selectedMemory.description}
                 </p>
-              )}
 
-              {/* Photo Preview in Modal */}
-              {selectedMemory.photos && selectedMemory.photos.length > 0 && (
-                <div className="rounded-2xl overflow-hidden aspect-[4/3] border border-[var(--border-subtle)] mb-5 shadow-xs">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={selectedMemory.photos[0]}
-                    alt={selectedMemory.title}
-                    className="w-full h-full object-cover"
+                {/* Shared Persistent Reactions & Comments (keyed by memory ID for correct association) */}
+                <div className="pt-2 border-t border-[var(--border-subtle)]">
+                  <SharedInteractions
+                    key={selectedMemory.id}
+                    targetType="memory"
+                    targetId={selectedMemory.id}
                   />
                 </div>
-              )}
-
-              <p className="text-base sm:text-lg font-serif italic text-[var(--text-primary)] leading-relaxed mb-6">
-                {selectedMemory.description}
-              </p>
-
-              {/* Shared Persistent Reactions & Comments */}
-              <div className="pt-2 border-t border-[var(--border-subtle)]">
-                <SharedInteractions
-                  targetType="memory"
-                  targetId={selectedMemory.id}
-                />
-              </div>
+              </motion.div>
 
               <div className="text-center pt-4">
                 <p className="font-handwritten text-xl text-[var(--pink-strong)]">

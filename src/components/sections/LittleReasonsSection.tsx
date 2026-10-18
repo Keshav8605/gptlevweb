@@ -203,13 +203,26 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
             🎲 Surprise Me
           </button>
 
-          <button
-            onClick={handleNext}
-            disabled={currentIndex === activeReasons.length - 1}
-            className="px-6 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-semibold bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white hover:opacity-95 disabled:opacity-30 cursor-pointer transition-all shadow-xs hover:scale-105"
-          >
-            Next Reason →
-          </button>
+          {currentIndex === activeReasons.length - 1 ? (
+            <button
+              onClick={() => {
+                setDirection(1);
+                setCurrentIndex(0);
+              }}
+              className="px-6 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-semibold bg-gradient-to-r from-[var(--pink-strong)] to-[var(--pink-primary)] text-white hover:opacity-95 cursor-pointer transition-all shadow-xs hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
+              aria-label="Read from Reason 1"
+            >
+              Read from Reason 1 ↺
+            </button>
+          ) : (
+            <button
+              onClick={handleNext}
+              className="px-6 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-semibold bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white hover:opacity-95 cursor-pointer transition-all shadow-xs hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
+              aria-label="Next Reason"
+            >
+              Next Reason →
+            </button>
+          )}
         </div>
 
         {/* Progress Line */}

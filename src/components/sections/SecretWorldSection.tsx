@@ -59,6 +59,26 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
     return () => clearInterval(interval);
   }, [lockoutSeconds]);
 
+  // Full-size photo lightbox Escape key & body scroll lock
+  useEffect(() => {
+    if (!activePhoto) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setActivePhoto(null);
+      }
+    };
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [activePhoto]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading || lockoutSeconds > 0) return;
@@ -304,13 +324,22 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                     {revealedData.photos.map((src, i) => (
                       <div
                         key={i}
+                        role="button"
+                        tabIndex={0}
                         onClick={() => setActivePhoto(src)}
-                        className="rounded-2xl overflow-hidden aspect-[4/3] border border-[var(--border-subtle)] shadow-sm hover:shadow-md transition-all cursor-pointer group"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setActivePhoto(src);
+                          }
+                        }}
+                        aria-label={`View secret photo ${i + 1} in full size`}
+                        className="rounded-2xl overflow-hidden aspect-[4/3] border border-[var(--border-subtle)] shadow-sm hover:shadow-md transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={src}
-                          alt="Secret memory"
+                          alt={`Secret memory moment ${i + 1}`}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       </div>
@@ -323,7 +352,7 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
               <div className="text-center pt-2 border-t border-[var(--border-subtle)]">
                 <button
                   onClick={handleLockAgain}
-                  className="text-xs text-[var(--text-muted)] hover:text-[var(--pink-strong)] transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                  className="text-xs text-[var(--text-muted)] hover:text-[var(--pink-strong)] transition-colors cursor-pointer inline-flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
                 >
                   <span>🔒</span>
                   <span>Lock this haven again</span>
@@ -343,27 +372,40 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setActivePhoto(null)}
-              className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+              className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md"
             />
-            <div className="fixed inset-4 sm:inset-10 z-50 flex items-center justify-center pointer-events-none">
+            <div
+              className="fixed inset-4 sm:inset-10 z-50 flex items-center justify-center"
+              onClick={() => setActivePhoto(null)}
+            >
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="max-w-2xl max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl pointer-events-auto relative bg-white p-2"
+                initial={{ opacity: 0, scale: 0.92, y: 15 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.92, y: 15 }}
+                transition={{ duration: 0.25 }}
+                onClick={(e) => e.stopPropagation()}
+                className="max-w-3xl max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl relative bg-white p-2.5 sm:p-3 border border-white/20"
               >
                 <button
                   onClick={() => setActivePhoto(null)}
-                  className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/60 text-white flex items-center justify-center cursor-pointer hover:bg-black/80"
+                  className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/60 text-white flex items-center justify-center cursor-pointer hover:bg-black/80 transition-colors shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
+                  aria-label="Close full-size photo"
                 >
                   ✕
                 </button>
+
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={activePhoto}
-                  alt="Enlarged secret photo"
-                  className="max-h-[80vh] w-auto rounded-2xl object-contain mx-auto"
+                  alt="Secret memory in full resolution"
+                  className="max-h-[78vh] w-auto rounded-2xl object-contain mx-auto"
                 />
+
+                <div className="text-center pt-2 pb-1">
+                  <p className="font-handwritten text-lg text-[var(--pink-strong)]">
+                    Our Secret Haven ♡
+                  </p>
+                </div>
               </motion.div>
             </div>
           </>

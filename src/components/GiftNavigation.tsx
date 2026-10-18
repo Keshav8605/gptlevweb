@@ -44,6 +44,7 @@ export function GiftNavigation({
   const [isOpen, setIsOpen] = useState(false);
   const [participantRole, setParticipantRole] = useState<string>("recipient");
   const [participantName, setParticipantName] = useState<string>("Baby");
+  const [activeSectionId, setActiveSectionId] = useState<string>("welcome");
 
   useEffect(() => {
     const updateRole = () => {
@@ -57,8 +58,67 @@ export function GiftNavigation({
     return () => window.removeEventListener("storage", updateRole);
   }, []);
 
+  // Frontend-only active chapter scroll tracking with IntersectionObserver
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const handleScrollBoundary = () => {
+      const scrollPos = window.scrollY;
+      const scrollHeight = document.documentElement.scrollHeight;
+      const clientHeight = window.innerHeight;
+
+      if (scrollPos < 160) {
+        setActiveSectionId("welcome");
+      } else if (scrollPos + clientHeight >= scrollHeight - 140) {
+        setActiveSectionId("finalHeart");
+      }
+    };
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visibleEntries = entries.filter((e) => e.isIntersecting);
+        if (visibleEntries.length > 0) {
+          visibleEntries.sort(
+            (a, b) => Math.abs(a.boundingClientRect.top) - Math.abs(b.boundingClientRect.top)
+          );
+          setActiveSectionId(visibleEntries[0].target.id);
+        }
+      },
+      {
+        rootMargin: "-15% 0px -50% 0px",
+        threshold: [0, 0.2, 0.5],
+      }
+    );
+
+    items.forEach((item) => {
+      const el = document.getElementById(item.id);
+      if (el) observer.observe(el);
+    });
+
+    window.addEventListener("scroll", handleScrollBoundary, { passive: true });
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", handleScrollBoundary);
+    };
+  }, [items]);
+
+  // When drawer opens, smoothly bring the active item into view inside the drawer panel
+  useEffect(() => {
+    if (isOpen && activeSectionId) {
+      const timer = setTimeout(() => {
+        const activeEl = document.getElementById(`nav-item-${activeSectionId}`);
+        if (activeEl) {
+          activeEl.scrollIntoView({ block: "nearest", behavior: "smooth" });
+        }
+      }, 180);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, activeSectionId]);
+
   const scrollToSection = (id: string) => {
     scrollToChapter(id);
+    setActiveSectionId(id);
     setIsOpen(false);
   };
 
@@ -177,23 +237,40 @@ export function GiftNavigation({
                 </div>
 
                 <div className="space-y-1">
-                  {items.map((item, i) => (
-                    <motion.button
-                      key={item.id}
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: i * 0.02 }}
-                      onClick={() => scrollToSection(item.id)}
-                      className="w-full text-left px-3.5 py-2 rounded-2xl flex items-center gap-3 transition-all duration-200 cursor-pointer group hover:bg-[var(--pale-rose)]"
-                    >
-                      <span className="text-base group-hover:scale-115 transition-transform duration-200">
-                        {item.emoji}
-                      </span>
-                      <span className="text-xs sm:text-sm font-medium text-[var(--text-primary)] group-hover:text-[var(--pink-deep)]">
-                        {item.label}
-                      </span>
-                    </motion.button>
-                  ))}
+                  {items.map((item, i) => {
+                    const isActive = activeSectionId === item.id;
+                    return (
+                      <motion.button
+                        key={item.id}
+                        id={`nav-item-${item.id}`}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: i * 0.02 }}
+                        onClick={() => scrollToSection(item.id)}
+                        className={`w-full text-left px-3.5 py-2.5 rounded-2xl flex items-center justify-between transition-all duration-200 cursor-pointer group ${
+                          isActive
+                            ? "bg-gradient-to-r from-[var(--pale-rose)] to-white border border-[var(--pink-primary)]/40 shadow-xs text-[var(--pink-strong)] font-semibold"
+                            : "hover:bg-[var(--pale-rose)] text-[var(--text-primary)]"
+                        }`}
+                        aria-current={isActive ? "true" : undefined}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className={`text-base transition-transform duration-200 ${isActive ? "scale-115" : "group-hover:scale-115"}`}>
+                            {item.emoji}
+                          </span>
+                          <span className={`text-xs sm:text-sm font-medium ${isActive ? "text-[var(--pink-strong)] font-bold" : "group-hover:text-[var(--pink-deep)]"}`}>
+                            {item.label}
+                          </span>
+                        </div>
+                        {isActive && (
+                          <span className="text-[10px] uppercase tracking-wider text-[var(--pink-strong)] flex items-center gap-1.5 font-rounded font-bold bg-white/80 px-2 py-0.5 rounded-full border border-[var(--pink-primary)]/20 shadow-2xs">
+                            <span className="w-1.5 h-1.5 rounded-full bg-[var(--pink-strong)] animate-pulse" />
+                            <span>Here</span>
+                          </span>
+                        )}
+                      </motion.button>
+                    );
+                  })}
                 </div>
               </div>
 
