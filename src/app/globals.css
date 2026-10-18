@@ -235,28 +235,28 @@ button:not(.font-display):not(.font-serif):not(.font-handwritten) {
 .font-script { font-family: var(--font-script) !important; }
 .font-handwritten { font-family: var(--font-handwritten) !important; }
 
-/* Cute Love Chunky White Stroke Styles for Headings (inspired by reference image) */
+/* Cute Love Soft White Stroke Styles for Headings (reduced to half width) */
 .cute-love-stroke,
 .cute-love-sticker,
 .cute-love-outline,
 h2.font-rounded {
-  -webkit-text-stroke: 7.5px #ffffff;
+  -webkit-text-stroke: 3.5px #ffffff;
   paint-order: stroke fill;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.008em;
   text-shadow:
-    -3px -3px 0 #ffffff,
-     3px -3px 0 #ffffff,
-    -3px  3px 0 #ffffff,
-     3px  3px 0 #ffffff,
-    -4px  0   0 #ffffff,
-     4px  0   0 #ffffff,
-     0   -4px 0 #ffffff,
-     0    4px 0 #ffffff,
-    -5px -5px 0 #ffffff,
-     5px -5px 0 #ffffff,
-    -5px  5px 0 #ffffff,
-     5px  5px 0 #ffffff,
-     0    5px 16px rgba(255, 95, 150, 0.28);
+    -1.5px -1.5px 0 #ffffff,
+     1.5px -1.5px 0 #ffffff,
+    -1.5px  1.5px 0 #ffffff,
+     1.5px  1.5px 0 #ffffff,
+    -2px  0   0 #ffffff,
+     2px  0   0 #ffffff,
+     0   -2px 0 #ffffff,
+     0    2px 0 #ffffff,
+    -2.5px -2.5px 0 #ffffff,
+     2.5px -2.5px 0 #ffffff,
+    -2.5px  2.5px 0 #ffffff,
+     2.5px  2.5px 0 #ffffff,
+     0    4px 12px rgba(255, 95, 150, 0.22);
 }
 
 .cute-love-stroke span.inline-block,

@@ -25,15 +25,15 @@ export function StoryTransitionOverlay() {
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        transition={{ duration: 0.3 }}
+        transition={{ duration: 0.5, ease: "easeInOut" }}
         className="fixed inset-0 z-50 pointer-events-auto flex items-center justify-center overflow-hidden"
       >
         {/* Soft atmospheric backdrop glow */}
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: transitionPhase === "bridge" ? 1 : 0.85 }}
+          animate={{ opacity: transitionPhase === "bridge" ? 1 : 0.88 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.35 }}
+          transition={{ duration: 0.5 }}
           className="absolute inset-0 bg-gradient-to-b from-[#FFF5F9]/95 via-[#FFF0F5]/98 to-[#EDE2FA]/95 backdrop-blur-md"
         />
 

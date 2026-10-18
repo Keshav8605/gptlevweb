@@ -126,11 +126,11 @@ export function StoryTransitionProvider({ children }: { children: React.ReactNod
         return;
       }
 
-      // Phase 1: Outgoing scene begins graceful exit (250ms)
+      // Phase 1: Outgoing scene begins graceful exit (450ms)
       setTimeout(() => {
         setTransitionPhase("bridge");
 
-        // Phase 2: Bridge element connects scenes, route changes (400ms)
+        // Phase 2: Bridge element connects scenes, hold for romantic enjoyment, route changes (1100ms)
         setTimeout(() => {
           router.push(targetPath);
           // Scroll page to top for clean entrance
@@ -138,7 +138,7 @@ export function StoryTransitionProvider({ children }: { children: React.ReactNod
             window.scrollTo({ top: 0, behavior: "instant" });
           }
 
-          // Phase 3: Incoming scene revealed (350ms)
+          // Phase 3: Incoming scene revealed with smooth dissolution (700ms)
           setTransitionPhase("incoming");
 
           setTimeout(() => {
@@ -148,18 +148,20 @@ export function StoryTransitionProvider({ children }: { children: React.ReactNod
             setOutgoingChapter(null);
             setIncomingChapter(null);
             isTransitioningRef.current = false;
-          }, 450);
-        }, 400);
-      }, 250);
+          }, 700);
+        }, 1100);
+      }, 450);
     },
     [currentChapter, pathname, resolveTransitionType, router]
   );
 
-  // Sync state if pathname changed through browser back/forward buttons
+  // Sync state if pathname changed through browser back/forward buttons (external popstate only)
   useEffect(() => {
-    isTransitioningRef.current = false;
-    setIsTransitioning(false);
-    setTransitionPhase("idle");
+    if (!isTransitioningRef.current) {
+      setIsTransitioning(false);
+      setTransitionPhase("idle");
+      setActiveTransition(null);
+    }
   }, [pathname]);
 
   return (
