@@ -44,7 +44,7 @@ export function WelcomeExperience({
     {
       id: "p1",
       src: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80",
-      caption: "A moment I'd choose a thousand times ♡",
+      caption: "A moment I'd choose all over again.",
       rotation: -5,
       delay: 0,
       positionClass: "hidden lg:block absolute top-6 lg:top-8 left-4 xl:left-12",
@@ -52,7 +52,7 @@ export function WelcomeExperience({
     {
       id: "p2",
       src: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=600&q=80",
-      caption: "The sweetest view in the whole world ✨",
+      caption: "Somehow, my heart always finds its way back to you.",
       rotation: 4.5,
       delay: 0.5,
       positionClass: "hidden lg:block absolute top-8 lg:top-10 right-4 xl:right-12",
@@ -60,7 +60,7 @@ export function WelcomeExperience({
     {
       id: "p3",
       src: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80",
-      caption: "Right here is where my heart belongs ♡",
+      caption: "The world feels softer when I share it with you.",
       rotation: 4,
       delay: 1,
       positionClass: "hidden md:block absolute top-[44%] lg:top-[42%] left-4 xl:left-12",
@@ -68,7 +68,7 @@ export function WelcomeExperience({
     {
       id: "p4",
       src: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=600&q=80",
-      caption: "The best part of every single day ✨",
+      caption: "My favorite person, in a thousand little ways.",
       rotation: -3.5,
       delay: 1.5,
       positionClass: "hidden md:block absolute top-[46%] lg:top-[44%] right-4 xl:right-12",
@@ -291,12 +291,12 @@ export function WelcomeExperience({
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 border border-[var(--border-subtle)] shadow-2xs mb-4"
         >
           <span className="text-[11px] font-bold tracking-widest uppercase font-rounded text-[var(--pink-strong)]">
-            CHAPTER ∞ · AN ONGOING STORY
+            A LITTLE WORLD, JUST FOR YOU
           </span>
           <span className="text-xs">✨</span>
         </motion.div>
 
-        {/* Main Title: "You & Me" in Chunky Rounded Display Font (Inspired by Reference) */}
+        {/* Main Title: "You & Me" in Chunky Rounded Display Font */}
         <motion.h1
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -316,65 +316,68 @@ export function WelcomeExperience({
           )}
         </motion.h1>
 
-        {/* Personalized dedication for recipient */}
+        {/* Handwritten line */}
         <motion.p
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.6 }}
-          className="mt-3 font-handwritten text-xl sm:text-2xl text-[var(--pink-strong)]"
+          transition={{ duration: 0.7, delay: 0.5 }}
+          className="mt-2 font-handwritten text-xl sm:text-2xl md:text-3xl text-[var(--pink-strong)]"
         >
-          For my sweetest {recipientNickname} ♡
+          If I could put everything I feel into one place, it would look a little like this.
         </motion.p>
 
-        {/* Subtitle / Romantic Tagline */}
+        {/* Recipient dedication */}
         <motion.p
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.6 }}
+          className="mt-2 font-handwritten text-lg sm:text-xl text-[var(--romantic-plum)]"
+        >
+          For my sweetest {recipientNickname || "Baby"} ♡
+        </motion.p>
+
+        {/* Supporting text */}
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.7 }}
           className="mt-3 text-sm sm:text-base md:text-lg text-[var(--text-secondary)] max-w-lg leading-relaxed font-sans"
         >
-          {subtitle || "A little world made with all my heart, just for you ✨"}
+          {subtitle || "A little world made from my favorite person, our little moments, and all the things I sometimes struggle to put into words."}
         </motion.p>
 
-        {/* Optional heartfelt personal message snippet if provided */}
-        {message && message !== subtitle && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.85 }}
-            className="mt-3 text-xs sm:text-sm text-[var(--text-muted)] italic max-w-md"
-          >
-            &ldquo;{message}&rdquo;
-          </motion.p>
-        )}
+        {/* Quote */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+          className="mt-3 text-xs sm:text-sm text-[var(--text-muted)] italic max-w-md"
+        >
+          &ldquo;{message || "Of all the stories life could give me, you're the one I'd choose to keep living."}&rdquo;
+        </motion.p>
 
-        {/* Primary Action Button: "Let's continue ♡" */}
+        {/* Primary Action Button: "Come inside, my love ♡" */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.9 }}
-          className="mt-8 flex flex-col items-center gap-4"
+          className="mt-8 flex flex-col items-center gap-3"
         >
           <button
             onClick={onEnter}
             className="group relative px-9 py-3.5 rounded-full text-white font-rounded font-semibold text-base sm:text-lg bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] shadow-lg shadow-pink-300/40 hover:shadow-xl hover:shadow-pink-400/50 hover:scale-105 active:scale-95 cursor-pointer transition-all duration-300 flex items-center gap-2"
           >
-            <span>Let&apos;s continue</span>
+            <span>Come inside, my love</span>
             <span className="text-xl group-hover:scale-125 transition-transform duration-300">♡</span>
           </button>
 
-          {/* Scroll Cue (Inspired by Reference 2) */}
-          <div className="flex flex-col items-center gap-1.5 pt-3">
-            <span className="text-[10px] font-bold tracking-widest uppercase font-rounded text-[var(--pink-strong)]">
-              SCROLL FOR THE FULL STORY ↓
-            </span>
-            <button
-              onClick={onEnter}
-              className="px-3 py-1 rounded-full bg-[var(--pale-rose)]/70 text-[var(--pink-deep)] text-[10px] font-semibold animate-bounce cursor-pointer hover:bg-[var(--pale-rose)]"
-            >
-              keep going
-            </button>
-          </div>
+          {/* Single subtle scroll hint */}
+          <button
+            onClick={onEnter}
+            className="group inline-flex items-center gap-1.5 pt-2 text-xs font-rounded font-semibold text-[var(--pink-strong)] hover:text-[var(--pink-deep)] transition-colors cursor-pointer"
+          >
+            <span>There&apos;s more waiting for you ↓</span>
+          </button>
         </motion.div>
       </div>
     </section>

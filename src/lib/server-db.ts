@@ -379,8 +379,8 @@ export const defaultDateIdeas: DateIdea[] = [
   },
   {
     id: "idea_blanket_fort",
-    title: "Living Room Blanket Fort & Film Marathon",
-    description: "Construct a palace out of every soft blanket and fairy light in the apartment. Squeeze inside with warm stove-popped caramel popcorn and binge our favorite films.",
+    title: "A cozy movie night",
+    description: "Our favorite snacks, one blanket, and a movie we may or may not finish because we keep talking.",
     coverPhoto: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80",
     category: "cozy_home",
     costRange: "free",
@@ -400,8 +400,8 @@ export const defaultDateIdeas: DateIdea[] = [
   },
   {
     id: "idea_scenic_drive",
-    title: "Scenic Long Drive with Our Roadtrip Playlist",
-    description: "No strict destination in mind. We roll the windows down, blast the songs we both know every single lyric to, and stop whenever an interesting roadside fruit stand or lookout appears.",
+    title: "A sunset drive with our favorite songs",
+    description: "No strict destination. Just the windows down, a shared playlist, and a little more time together.",
     coverPhoto: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80",
     category: "spontaneous_adventures",
     costRange: "low",
@@ -442,8 +442,8 @@ export const defaultDateIdeas: DateIdea[] = [
   },
   {
     id: "idea_pottery_painting",
-    title: "Pottery Sculpting or Canvas Painting",
-    description: "Sit side-by-side behind the potter's wheel or in front of twin easels. We'll sculpt or paint something inspired by each other—no artistic skills required, just pure fun and giggles.",
+    title: "A little creative date",
+    description: "Let's make something together. It doesn't have to be perfect; it just has to be ours.",
     coverPhoto: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=80",
     category: "creative_activities",
     costRange: "medium",
@@ -647,8 +647,8 @@ function getPastDateString(daysAgo: number): string {
 export const defaultDateProposals: DateProposal[] = [
   {
     id: "prop_demo_confirmed",
-    title: "Sunset Picnic & Stargazing Adventure",
-    description: "An evening dedicated to sweet treats, glowing twilight, and constellations.",
+    title: "Sunset Picnic & Stargazing",
+    description: "Let's watch the sky change colors, share something delicious, and stay until the first stars appear.",
     isSurprise: false,
     surpriseRevealed: true,
     itinerary: [
@@ -1006,7 +1006,7 @@ const defaultDb: RelationshipDatabase = {
       id: "jn_demo_1",
       title: "The day you smiled at me like that",
       content:
-        "I was thinking about the moment we were sitting in that little corner café, and you started laughing so hard your eyes crinkled. I remember whispering to myself: this is where I want to stay forever.",
+        "I was thinking about the moment we were sitting in that little corner café, and you started laughing so hard your eyes crinkled. I remember wishing I could pause the whole afternoon, just to stay in that moment a little longer.",
       prompt: "A memory I never want to forget",
       moodEmoji: "☕",
       author: "creator",

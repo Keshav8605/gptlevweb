@@ -123,13 +123,15 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
   return (
     <SectionWrapper
       id="ourSong"
+      eyebrowLabel="A SONG THAT SOUNDS LIKE US"
       title="Our Song"
-      subtitle="The melodies that immediately bring every memory of you rushing back"
+      subtitle="Some songs play in the background. This one brings you right back to me."
       emoji="🎵"
       bgVariant="blush"
-      chapterNumber={13}
+      chapterNumber={14}
       nextSectionId="finalHeart"
-      nextSectionLabel="Our Heart Collage"
+      nextSectionLabel="Reveal our love story ♡"
+      nextSectionSubtitle="Every little moment, every tiny reason, every feeling in this world leads back to one thing: us."
       nextSectionEmoji="❤️"
     >
       <div className="max-w-2xl mx-auto">
@@ -173,7 +175,7 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
             <button
               onClick={handleTogglePlay}
               className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm text-[var(--pink-strong)] flex items-center justify-center shadow-md hover:scale-110 transition-transform cursor-pointer"
-              title={isPlaying ? "Pause soundtrack" : "Play soundtrack"}
+              title={isPlaying ? "Pause our song" : "Play our song"}
             >
               {isPlaying ? (
                 <span className="text-sm font-bold">❚❚</span>
@@ -194,10 +196,10 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
           {/* Dedication */}
           <div className="rounded-2xl p-6 mb-6 bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-left">
             <p className="font-script text-xl mb-2 text-[var(--pink-strong)]">
-              My dedication to you
+              A little dedication to you
             </p>
             <p className="text-sm md:text-base leading-relaxed text-[var(--text-secondary)]">
-              {featuredSong.dedication}
+              {featuredSong.dedication || "Every time I hear this, I think of you. Of the moments we've shared, the ones still waiting for us, and all the feelings that are somehow easier to hear in a song."}
             </p>
           </div>
 
@@ -212,17 +214,25 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               onClick={handleTogglePlay}
-              className="px-6 py-2.5 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] text-xs font-semibold hover:bg-[var(--bg-blush)] transition-colors cursor-pointer inline-flex items-center gap-2"
+              className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs font-semibold shadow-xs hover:shadow-md transition-all cursor-pointer inline-flex items-center gap-2"
             >
-              <span>{isPlaying ? "Pause Ambient Music" : "Play Ambient Melody"}</span>
-              <span>{isPlaying ? "⏸" : "✨"}</span>
+              <span>{isPlaying ? "Pause our song" : "Play our song"}</span>
+              <span>{isPlaying ? "⏸" : "▶"}</span>
+            </button>
+
+            <button
+              onClick={handleTogglePlay}
+              className="px-5 py-2.5 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] text-xs font-medium hover:bg-[var(--bg-blush)] transition-colors cursor-pointer inline-flex items-center gap-2"
+            >
+              <span>{isPlaying ? "Pause instrumental" : "Play a soft instrumental"}</span>
+              <span>✨</span>
             </button>
 
             <button
               onClick={() => setShowSuggestModal(true)}
-              className="px-6 py-2.5 rounded-full border border-[var(--border-medium)] text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:border-[var(--pink-primary)] text-xs font-medium transition-colors cursor-pointer inline-flex items-center gap-1.5"
+              className="px-5 py-2.5 rounded-full border border-[var(--border-medium)] text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:border-[var(--pink-primary)] text-xs font-medium transition-colors cursor-pointer inline-flex items-center gap-1.5"
             >
-              <span>+ Suggest a Song for Us</span>
+              <span>Add a song to our soundtrack ♡</span>
             </button>
           </div>
         </motion.div>

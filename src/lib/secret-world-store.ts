@@ -13,7 +13,7 @@ export interface SecretWorldConfig {
 let secretConfig: SecretWorldConfig = {
   password: "iloveyou",
   hint: "Three words, no spaces, all lowercase — the simplest truth I know 💕",
-  title: "Welcome to Our Private Haven",
+  title: "You found your way in, my love. ♡",
   letter:
     "You found it. 🥺\n\nThis secret space is just for us. No one else in the world knows this exists.\n\nI wanted you to have a place where you know, without any doubt, how much you mean to me. Not in big gestures or fancy words — but in the quiet, honest truth:\n\nYou are my favorite person. My best friend. My safe place. My greatest adventure.\n\nI don't need the world to know. I just need YOU to know.\n\nI love you. Endlessly. Completely. Always.",
   photos: [
@@ -104,7 +104,7 @@ export function verifySecretPassword(
   rateLimitMap.set(clientKey, { attempts: newAttempts, lockedUntil: 0 });
   return {
     success: false,
-    error: "That's not the secret phrase. Check the hint and try again ♡",
+    error: "That doesn't seem quite right. Try our special phrase again ♡",
     remainingAttempts: MAX_ATTEMPTS - newAttempts,
   };
 }

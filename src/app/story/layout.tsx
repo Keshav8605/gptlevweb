@@ -55,7 +55,7 @@ function StoryLayoutInner({ children }: { children: React.ReactNode }) {
       <StoryTransitionOverlay />
 
       {/* Chapter Progress Header */}
-      <StoryChapterHeader />
+      <StoryChapterHeader onOpenAccessModal={() => setIsAccessModalOpen(true)} />
 
       {/* Main Chapter Content Viewport */}
       <main className="relative z-10 w-full min-h-[calc(100vh-60px)]">

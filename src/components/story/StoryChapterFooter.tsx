@@ -19,19 +19,19 @@ export function StoryChapterFooter() {
           <div className="h-px w-12 bg-[var(--border-medium)] opacity-70" />
         </div>
 
-        {/* Emotion cue prompt */}
-        <div className="space-y-1">
-          <p className="text-[11px] font-rounded font-semibold uppercase tracking-widest text-[var(--pink-strong)]">
-            {next ? "Ready for the next moment in our story?" : "You have reached the end of this chapter"}
-          </p>
-          {next && (
-            <p className="font-handwritten text-base text-[var(--text-secondary)]">
-              Next up: {next.emotionalTheme}
+        {/* Emotion cue prompt (when a next chapter exists) */}
+        {next && (
+          <div className="space-y-1.5">
+            <p className="text-[11px] font-rounded font-bold uppercase tracking-widest text-[var(--pink-strong)]">
+              {currentChapter.transitionEyebrow || "A LITTLE SOMETHING NEXT"}
             </p>
-          )}
-        </div>
+            <p className="font-handwritten text-lg sm:text-xl text-[var(--text-secondary)]">
+              {currentChapter.nextSubtitle || next.emotionalTheme}
+            </p>
+          </div>
+        )}
 
-        {/* Big Romantic Continue Action Button */}
+        {/* Primary Destination Action Button (when a next chapter exists) */}
         {next && (
           <motion.button
             whileHover={{ scale: 1.04 }}
@@ -40,14 +40,14 @@ export function StoryChapterFooter() {
             disabled={isTransitioning}
             className="group relative px-8 py-3.5 rounded-full text-white font-rounded font-semibold text-base sm:text-lg bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] shadow-lg shadow-pink-300/40 hover:shadow-xl hover:shadow-pink-400/50 cursor-pointer transition-all duration-300 flex items-center gap-3 disabled:opacity-50"
           >
-            <span>{currentChapter.nextLabel || `Continue to Chapter ${next.chapterNumber}: ${next.title}`}</span>
+            <span>{currentChapter.nextLabel || `Continue to ${next.title}`}</span>
             <span className="text-xl group-hover:scale-125 transition-transform duration-300">
               {next.emoji || "♡"}
             </span>
           </motion.button>
         )}
 
-        {/* Previous and auxiliary navigation */}
+        {/* Auxiliary Navigation: Back link & Start-over link */}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2 text-xs text-[var(--text-muted)]">
           {prev && (
             <button
@@ -55,22 +55,26 @@ export function StoryChapterFooter() {
               disabled={isTransitioning}
               className="hover:text-[var(--pink-strong)] hover:underline cursor-pointer transition-colors inline-flex items-center gap-1"
             >
-              <span>←</span>
-              <span>Back to Chapter {prev.chapterNumber} ({prev.title})</span>
+              <span>← Back to {prev.title}</span>
             </button>
           )}
-          {prev && <span>•</span>}
-          <button
-            onClick={() => navigateWithTransition("welcome")}
-            disabled={isTransitioning}
-            className="hover:text-[var(--pink-strong)] hover:underline cursor-pointer transition-colors"
-          >
-            Return to Chapter 1 (Prologue)
-          </button>
+
+          {prev && currentChapter.slug !== "welcome" && <span>•</span>}
+
+          {currentChapter.slug !== "welcome" && (
+            <button
+              onClick={() => navigateWithTransition("welcome")}
+              disabled={isTransitioning}
+              className="hover:text-[var(--pink-strong)] hover:underline cursor-pointer transition-colors"
+            >
+              Back to the beginning
+            </button>
+          )}
         </div>
 
-        <p className="text-[10px] tracking-wider uppercase text-[var(--pink-primary)] pt-2">
-          © Forever & Always Yours 💕
+        {/* Standardized emotional footer */}
+        <p className="font-script text-base text-[var(--pink-strong)] pt-2 select-none">
+          Made with all my love ♡
         </p>
       </div>
     </footer>

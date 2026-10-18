@@ -62,23 +62,21 @@ export function NotebookSection({
     return () => window.removeEventListener("storage", handleStorage);
   }, [currentUserRole, currentUserName]);
 
-  useEffect(() => {
-    let isMounted = true;
+  const fetchEntries = () => {
+    setIsLoading(true);
     fetch("/api/notebook")
       .then((res) => res.json())
       .then((data) => {
-        if (isMounted) {
-          if (data.entries) setEntries(data.entries);
-          setIsLoading(false);
-        }
+        if (data.entries) setEntries(data.entries);
+        setIsLoading(false);
       })
       .catch(() => {
-        if (isMounted) setIsLoading(false);
+        setIsLoading(false);
       });
+  };
 
-    return () => {
-      isMounted = false;
-    };
+  useEffect(() => {
+    fetchEntries();
   }, []);
 
   const handleCreateEntry = async (e: React.FormEvent) => {
@@ -185,13 +183,14 @@ export function NotebookSection({
   return (
     <SectionWrapper
       id="notebook"
+      eyebrowLabel="LITTLE THOUGHTS, KEPT TOGETHER"
       title="Our Little Notebook"
-      subtitle="A quiet, shared journal where we leave thoughts, memories, and whispered notes for each other"
-      emoji="📝"
+      subtitle="A place for the thoughts, memories, and tiny love notes we don't want to lose."
+      emoji="📖"
       bgVariant="cream"
-      chapterNumber={7}
+      chapterNumber={8}
       nextSectionId="voice"
-      nextSectionLabel="Voice Whispers"
+      nextSectionLabel="Voice Notes, Just for Us"
       nextSectionEmoji="🎙️"
     >
       <div className="max-w-3xl mx-auto space-y-8">
@@ -206,14 +205,14 @@ export function NotebookSection({
         </div>
 
         {/* Top Action Bar */}
-        <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-[var(--border-subtle)] gap-3">
           <div>
             <span className="text-xs uppercase tracking-wider font-semibold text-[var(--pink-strong)]">
-              Shared Couple&apos;s Diary
+              OUR SHARED NOTEBOOK
             </span>
             <div className="flex items-center gap-2 mt-0.5">
               <p className="text-xs text-[var(--text-muted)]">
-                Writing as: <strong className="text-[var(--text-primary)]">{name}</strong> ({role === "creator" ? "Creator" : "Recipient"})
+                Your page, your words (<strong className="text-[var(--text-primary)]">{name}</strong>)
               </p>
               {onOpenAccessModal && (
                 <button
@@ -226,12 +225,21 @@ export function NotebookSection({
             </div>
           </div>
 
-          <button
-            onClick={() => setIsComposing(!isComposing)}
-            className="px-5 py-2.5 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs font-semibold shadow-xs hover:shadow-md cursor-pointer transition-all flex items-center gap-1.5"
-          >
-            <span>{isComposing ? "✕ Close Journal" : "✎ Write an Entry"}</span>
-          </button>
+          <div className="flex items-center gap-2.5">
+            <button
+              type="button"
+              onClick={fetchEntries}
+              className="px-3.5 py-2 rounded-full border border-[var(--border-subtle)] bg-white text-xs font-semibold text-[var(--pink-deep)] hover:bg-[var(--pale-rose)] transition-colors cursor-pointer"
+            >
+              Check for new notes ♡
+            </button>
+            <button
+              onClick={() => setIsComposing(!isComposing)}
+              className="px-5 py-2.5 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs font-semibold shadow-xs hover:shadow-md cursor-pointer transition-all flex items-center gap-1.5"
+            >
+              <span>{isComposing ? "✕ Close Note" : "Write a little note ✎"}</span>
+            </button>
+          </div>
         </div>
 
         {/* Entry Composer */}
@@ -246,7 +254,7 @@ export function NotebookSection({
             >
               <div>
                 <h4 className="font-serif text-2xl font-semibold text-[var(--text-primary)] mb-1">
-                  New Journal Entry
+                  A page from us
                 </h4>
                 <p className="text-xs text-[var(--text-muted)]">
                   Pick a prompt or write whatever is on your heart today.
@@ -267,7 +275,7 @@ export function NotebookSection({
                         setSelectedPrompt(selectedPrompt === p ? null : p);
                         if (!entryTitle) setEntryTitle(p);
                       }}
-                      className={`px-3 py-1.5 rounded-full whitespace-nowrap transition-all cursor-pointer border ${
+                      className={`px-3.5 py-1.5 rounded-full whitespace-nowrap transition-all cursor-pointer border ${
                         selectedPrompt === p
                           ? "bg-[var(--pale-rose)] border-[var(--pink-strong)] text-[var(--pink-deep)] font-semibold"
                           : "bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--pale-rose)]"
@@ -334,7 +342,7 @@ export function NotebookSection({
                   disabled={!entryContent.trim() || isSubmitting}
                   className="px-6 py-2.5 rounded-2xl bg-[var(--pink-strong)] text-white text-xs font-semibold hover:bg-[var(--pink-deep)] shadow-xs hover:shadow-md cursor-pointer transition-all disabled:opacity-50"
                 >
-                  {isSubmitting ? "Saving to Journal..." : "Save Entry to Our Diary ♡"}
+                  {isSubmitting ? "Saving to Notebook..." : "Save to our notebook ♡"}
                 </button>
               </div>
             </motion.form>
@@ -345,22 +353,22 @@ export function NotebookSection({
         <div className="space-y-6">
           {isLoading ? (
             <div className="py-12 text-center text-xs text-[var(--text-muted)] animate-pulse">
-              Opening our shared diary...
+              Opening our notebook...
             </div>
           ) : entries.length === 0 ? (
             <div className="bg-white rounded-3xl p-10 text-center border border-[var(--border-subtle)] space-y-3">
               <span className="text-4xl block">📖</span>
               <h4 className="font-serif text-2xl font-semibold text-[var(--text-primary)]">
-                Our diary is waiting for its first page
+                Our first page is waiting
               </h4>
               <p className="text-xs text-[var(--text-secondary)] max-w-md mx-auto">
-                Leave a sweet thought, a memory from today, or a secret note for your partner to discover.
+                Leave the first little thought here. It doesn&apos;t have to be perfect; it just has to be yours.
               </p>
               <button
                 onClick={() => setIsComposing(true)}
                 className="mt-2 px-6 py-2.5 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] text-xs font-semibold hover:bg-[var(--bg-blush)] cursor-pointer"
               >
-                Write First Entry ♡
+                Write a little note ✎
               </button>
             </div>
           ) : (
@@ -455,7 +463,13 @@ export function NotebookSection({
                       className="text-xs font-semibold text-[var(--pink-strong)] hover:underline cursor-pointer flex items-center gap-1"
                     >
                       <span>💬</span>
-                      <span>{entry.replies.length > 0 ? `Replies (${entry.replies.length})` : "Reply Back"}</span>
+                      <span>
+                        {entry.replies.length === 1
+                          ? "Read the reply"
+                          : entry.replies.length > 1
+                          ? `Read replies (${entry.replies.length})`
+                          : "Leave a little note"}
+                      </span>
                     </button>
                   </div>
 

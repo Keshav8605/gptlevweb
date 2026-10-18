@@ -16,9 +16,9 @@ export const defaultQuizQuestions: ExtendedQuizQuestion[] = [
     id: "q1",
     question: "Who caught feelings first?",
     type: "multiple-choice",
-    options: ["Definitely you", "Definitely me", "Simultaneously from the very first spark", "It was a slow, beautiful burn"],
-    creatorAnswer: "Simultaneously from the very first spark",
-    explanation: "Even before we said anything out loud, there was this undeniable gravity pulling us together.",
+    options: ["Definitely you", "Definitely me", "Somehow, we both fell at the same time.", "It was a slow, beautiful burn"],
+    creatorAnswer: "Somehow, we both fell at the same time.",
+    explanation: "Maybe there wasn't a first. Maybe we were finding our way toward each other all along.",
   },
   {
     id: "q2",
@@ -70,14 +70,11 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
   const [noAttempts, setNoAttempts] = useState(0);
 
   const noPhrases = [
-    "No 🥺",
-    "Oops too slow! 😜",
-    "Can't click this! 🙈",
-    "Wrong button! 🏃",
-    "Say YES instead! 💕",
-    "Nice try! 💨",
-    "Still can't! 🤭",
-    "You have to say YES! 🥰",
+    "Hmm… no? 👀",
+    "Are you sure? 🥺",
+    "Think again, sweetheart 🙈",
+    "My heart says otherwise 💗",
+    "You know you want to say yes 😚",
   ];
 
   const moveNoButton = () => {
@@ -191,13 +188,14 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
   return (
     <SectionWrapper
       id="quiz"
+      eyebrowLabel="A VERY IMPORTANT QUESTION"
       title="Do You Love Me?"
-      subtitle="The only quiz in the world where loving each other is the only correct answer 💕"
-      emoji="💖"
+      subtitle="There is one answer I'm secretly hoping for. ♡"
+      emoji="💗"
       bgVariant="default"
-      chapterNumber={5}
+      chapterNumber={6}
       nextSectionId="letters"
-      nextSectionLabel="Letters I Don't Say Enough"
+      nextSectionLabel="Love Letters"
       nextSectionEmoji="💌"
     >
       <div className="max-w-2xl mx-auto text-center">
@@ -227,7 +225,7 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
                 style={{ transform: `scale(${1 + Math.min(noAttempts * 0.08, 0.4)})` }}
                 className="w-full sm:w-auto px-10 py-3.5 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-base font-rounded font-bold shadow-md hover:shadow-lg hover:scale-105 active:scale-95 cursor-pointer transition-all duration-300 z-10"
               >
-                YES ❤️
+                YES, OBVIOUSLY 💗
               </button>
 
               <motion.button
@@ -246,14 +244,15 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
                   moveNoButton();
                 }}
                 className="w-full sm:w-auto px-6 py-3 rounded-full bg-slate-100 text-slate-600 text-xs font-rounded font-medium border border-slate-200 select-none shadow-2xs whitespace-nowrap z-20 cursor-default"
-                tabIndex={-1}
+                tabIndex={0}
+                aria-label="Playful no button"
               >
                 {noPhrases[noAttempts % noPhrases.length]}
               </motion.button>
             </div>
           </motion.div>
         ) : (
-          /* YAYYY I knew it all along (Matching Reference 5 Success State with Leaping Hugging Couple PNG) */
+          /* YAYYY I knew it all along (Matching User Phase 3B Heading & Message) */
           <motion.div
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
@@ -268,25 +267,43 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
               />
             </div>
 
-            <h3 className="font-rounded text-3xl sm:text-4xl font-bold text-[var(--pink-strong)] mb-1">
-              YAYYY ❤️
+            <h3 className="font-rounded text-3xl sm:text-4xl font-bold text-[var(--pink-strong)] mb-2">
+              I KNEW IT! ♡
             </h3>
             <p className="font-handwritten text-xl text-[var(--romantic-plum)]">
-              I knew it all along! You&apos;re stuck with me forever 🥰
+              Come here, you. If I could, I&apos;d give you the biggest hug right now.
             </p>
 
-            <p className="text-xs text-[var(--text-muted)] mt-4">
-              Now let&apos;s see how well you know our little love story below ↓
-            </p>
+            <div className="mt-6 flex justify-center">
+              <button
+                type="button"
+                onClick={() => {
+                  const el = document.getElementById("relationship-quiz-start");
+                  el?.scrollIntoView({ behavior: "smooth" });
+                }}
+                className="px-8 py-3 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-sm font-rounded font-bold shadow-md hover:shadow-lg hover:scale-105 active:scale-95 cursor-pointer transition-all"
+              >
+                Let&apos;s see how well we know each other →
+              </button>
+            </div>
           </motion.div>
         )}
 
         {/* Relationship Questionnaire Cards */}
-        <div className="text-left mt-8">
+        <div id="relationship-quiz-start" className="text-left mt-8 pt-4">
+          <div className="mb-6 text-center">
+            <h3 className="font-rounded text-2xl sm:text-3xl font-bold text-[var(--romantic-plum)]">
+              How Well Do We Know Each Other?
+            </h3>
+            <p className="font-handwritten text-base sm:text-lg text-[var(--text-secondary)] mt-1">
+              Five little questions about our very favorite subject: us.
+            </p>
+          </div>
+
           <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)] mb-6">
             <div className="flex items-center gap-2">
               <span className="font-rounded text-xs font-semibold text-[var(--pink-strong)] uppercase tracking-wider">
-                Question {currentQ + 1} of {activeQuestions.length}
+                QUESTION {currentQ + 1} OF {activeQuestions.length}
               </span>
               {isAnswered && !isEditing && (
                 <span className="px-2 py-0.5 rounded-full text-[10px] font-rounded font-semibold bg-emerald-100 text-emerald-700">
@@ -299,7 +316,7 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
               onClick={() => setShowSummary(!showSummary)}
               className="text-xs font-rounded font-semibold text-[var(--pink-deep)] hover:underline cursor-pointer"
             >
-              {showSummary ? "Back to Questions" : "View Summary 📜"}
+              {showSummary ? "Back to Questions" : "Our answers ♡"}
             </button>
           </div>
 
@@ -351,7 +368,7 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
                           }}
                           className="text-xs font-rounded font-semibold text-[var(--pink-deep)] hover:underline flex items-center gap-1 cursor-pointer bg-white px-2.5 py-1 rounded-full border border-pink-200 shadow-2xs hover:bg-rose-50 transition-colors"
                         >
-                          <span>✏️ Change Answer</span>
+                          <span>✏️ Change my answer</span>
                         </button>
                       </div>
                       <p className="text-xs sm:text-sm font-medium text-[var(--romantic-plum)] leading-relaxed">
@@ -387,7 +404,7 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
                         </div>
                       ) : (
                         <div className="flex items-center justify-center gap-2 p-3 rounded-2xl bg-rose-50 border border-rose-200 text-rose-800 text-xs font-rounded font-semibold text-center">
-                          <span>💞 Different choices, but together we make the sweetest story! ♡</span>
+                          <span>💞 We don&apos;t have to remember everything the same way to share something beautiful. ♡</span>
                         </div>
                       )
                     ) : (
@@ -588,7 +605,7 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
                             : "bg-[var(--pale-rose)] text-[var(--pink-strong)] hover:bg-[var(--soft-pink)]"
                         }`}
                       >
-                        Next Question →
+                        Next question →
                       </button>
                     </div>
                   )}

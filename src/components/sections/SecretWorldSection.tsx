@@ -129,13 +129,14 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
   return (
     <SectionWrapper
       id="secretWorld"
+      eyebrowLabel="JUST BETWEEN US"
       title="Our Secret World"
-      subtitle="A sanctuary protected by a truth known only to the two of us"
+      subtitle="A tiny corner of the universe that feels like ours."
       emoji="🔒"
       bgVariant="surface"
-      chapterNumber={3}
+      chapterNumber={4}
       nextSectionId="deluluMode"
-      nextSectionLabel="Delulu Mode"
+      nextSectionLabel="Enter our delulu universe 🦋"
       nextSectionEmoji="🦋"
     >
       <div className="max-w-2xl mx-auto">
@@ -160,10 +161,10 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
               </div>
 
               <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-[var(--text-primary)] mb-2">
-                Protected with Love
+                A little secret, just for us
               </h3>
               <p className="text-sm text-[var(--text-secondary)] max-w-md mx-auto leading-relaxed mb-6">
-                Behind this door lies an intimate surprise I prepared just for you. Enter our secret phrase to unlock it.
+                There&apos;s a little surprise waiting behind this door. Enter our special phrase, and let&apos;s see what&apos;s on the other side.
               </p>
 
               {/* Gentle Whisper Hint Toggle Button & Expandable Card */}
@@ -177,7 +178,7 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                     className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--soft-pink)]/80 hover:bg-[var(--soft-pink)] border border-[var(--border-medium)] text-xs sm:text-sm font-rounded font-semibold text-[var(--pink-deep)] shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
                   >
                     <span className="text-sm group-hover:scale-125 transition-transform">🤫</span>
-                    <span>Need a gentle whisper, sweetheart? ♡</span>
+                    <span>Psst… you know the answer.</span>
                     <span className="text-xs text-[var(--pink-strong)]">✨</span>
                   </motion.button>
                 </div>
@@ -195,7 +196,7 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1.5">
                           <span className="text-xs font-bold text-[var(--pink-strong)] uppercase tracking-wider font-rounded">
-                            A Sweet Little Whisper ♡
+                            Psst… you know the answer.
                           </span>
                           <button
                             type="button"
@@ -222,7 +223,7 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                     value={input}
                     disabled={lockoutSeconds > 0 || isLoading}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Type our secret phrase..."
+                    placeholder="Our secret phrase…"
                     className={`w-full px-5 py-3.5 rounded-2xl text-center text-sm sm:text-base border transition-all outline-none font-sans ${
                       errorMessage
                         ? "border-rose-400 bg-rose-50/50"
@@ -268,8 +269,7 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                     </>
                   ) : (
                     <>
-                      <span>Open Our Secret Haven</span>
-                      <span>♡</span>
+                      <span>Unlock our little world ♡</span>
                     </>
                   )}
                 </button>
@@ -296,16 +296,31 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                   />
                 </div>
                 <span className="text-xs font-semibold uppercase tracking-widest text-[var(--pink-strong)] px-3 py-1 rounded-full bg-[var(--pale-rose)]">
-                  Access Granted • Just For You
+                  JUST BETWEEN US
                 </span>
                 <h3 className="font-serif text-3xl sm:text-4xl font-semibold text-[var(--text-primary)] mt-3">
-                  {revealedData?.title || "Our Private Haven"}
+                  You found your way in, my love. ♡
                 </h3>
+                <p className="text-sm sm:text-base font-handwritten text-xl sm:text-2xl text-[var(--pink-strong)] mt-2">
+                  Some things are sweeter when only the two of us understand them.
+                </p>
+                <div className="mt-4">
+                  <button
+                    onClick={() => {
+                      const el = document.getElementById("secret-letter-box");
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="inline-flex items-center gap-1.5 px-6 py-2 rounded-full font-rounded font-semibold text-xs sm:text-sm text-white bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] shadow-sm hover:shadow-md cursor-pointer transition-all"
+                  >
+                    <span>Stay a little while</span>
+                    <span>→</span>
+                  </button>
+                </div>
               </div>
 
               {/* Secret Letter */}
               {revealedData?.letter && (
-                <div className="space-y-4 max-w-xl mx-auto p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-[var(--bg-main)] to-[var(--bg-surface)] border border-[var(--border-subtle)] font-serif italic text-base sm:text-lg leading-relaxed text-[var(--text-primary)] mb-8">
+                <div id="secret-letter-box" className="space-y-4 max-w-xl mx-auto p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-[var(--bg-main)] to-[var(--bg-surface)] border border-[var(--border-subtle)] font-serif italic text-base sm:text-lg leading-relaxed text-[var(--text-primary)] mb-8">
                   {revealedData.letter.split("\n\n").map((para, i) => (
                     <p key={i} className="leading-loose">
                       {para}
@@ -403,7 +418,7 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
 
                 <div className="text-center pt-2 pb-1">
                   <p className="font-handwritten text-lg text-[var(--pink-strong)]">
-                    Our Secret Haven ♡
+                    Our Secret World ♡
                   </p>
                 </div>
               </motion.div>

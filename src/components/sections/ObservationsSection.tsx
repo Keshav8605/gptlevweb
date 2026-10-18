@@ -14,14 +14,16 @@ export function ObservationsSection({ observations }: ObservationsSectionProps) 
   return (
     <SectionWrapper
       id="observations"
+      eyebrowLabel="THE LITTLE THINGS I KEEP"
       title="Things I Noticed About You"
-      subtitle="The little habits, expressions, and details that make you completely unforgettable"
+      subtitle="The tiny details that make you so wonderfully, unmistakably you."
+      introduction="You might think they're ordinary. To me, they're the things that make you unforgettable."
       emoji="👀"
       bgVariant="surface"
-      chapterNumber={1}
+      chapterNumber={2}
       nextSectionId="memories"
-      nextSectionLabel="Our Memories Scrapbook"
-      nextSectionEmoji="📸"
+      nextSectionLabel="Open our memory scrapbook"
+      nextSectionEmoji="📷"
     >
       {/* Gentle Romantic Character Accent */}
       <div className="flex justify-center -mt-3 mb-8">

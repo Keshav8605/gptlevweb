@@ -129,7 +129,7 @@ export function StoryTransitionOverlay() {
                 🔐
               </motion.div>
               <p className="mt-4 font-handwritten text-xl text-[var(--pink-strong)]">
-                Unlocking Our Secret Haven... ✨
+                Unlocking Our Secret World... ✨
               </p>
             </motion.div>
           )}
@@ -187,7 +187,7 @@ export function StoryTransitionOverlay() {
                 ❓
               </motion.div>
               <p className="mt-4 font-handwritten text-xl text-[var(--pink-strong)]">
-                How Well Do You Know Us? ♡
+                Do You Love Me? ♡
               </p>
             </motion.div>
           )}
@@ -344,7 +344,7 @@ export function StoryTransitionOverlay() {
                 🎁
               </div>
               <p className="mt-4 font-handwritten text-xl text-[var(--pink-strong)]">
-                Unwrapping Gifts I Owe You... ✨
+                Unwrapping Little Gifts, Just for You... ✨
               </p>
             </motion.div>
           )}

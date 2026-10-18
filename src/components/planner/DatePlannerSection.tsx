@@ -528,13 +528,14 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
   return (
     <SectionWrapper
       id="datePlanner"
-      title="Plan Our Next Little Adventure ♡"
-      subtitle="Where we explore date ideas, propose magical days, negotiate timing, and build forever memories"
+      eyebrowLabel="OUR NEXT LITTLE ADVENTURE"
+      title="Let's Make a Day of It ♡"
+      subtitle="Little plans, new places, and memories we haven't made yet."
       emoji="🗺️"
       bgVariant="blush"
-      chapterNumber={9}
+      chapterNumber={10}
       nextSectionId="openWhenLetters"
-      nextSectionLabel="Open When..."
+      nextSectionLabel="Open your letters for every kind of day 💌"
       nextSectionEmoji="✉️"
     >
       <div className="max-w-6xl mx-auto space-y-6">
@@ -548,7 +549,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
           />
         </div>
 
-        {/* Top Control Bar: Active Participant, Notifications & Key Metrics */}
+        {/* Top Control Bar: Active Participant, Notifications & Discreet Status */}
         <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-3xl bg-white/90 border border-[var(--border-subtle)] shadow-xs">
           {/* Active Partner Badge */}
           <div className="flex items-center gap-2.5 text-xs text-[var(--text-secondary)]">
@@ -567,17 +568,21 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
             )}
           </div>
 
-          {/* Quick Metrics Badges & Notification Drawer Bell */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-wrap justify-center">
-            <span className="px-3 py-1 rounded-full bg-[var(--pale-rose)] text-[var(--text-primary)] text-xs font-semibold">
-              📋 {shortlistedCount} Shortlisted
+          {/* Discreet Metrics Chips & Notification Drawer */}
+          <div className="flex items-center gap-2 flex-wrap justify-center text-xs">
+            <span className="px-2.5 py-1 rounded-full bg-[var(--pale-rose)] text-[var(--text-primary)] font-medium">
+              {shortlistedCount} Shortlisted
             </span>
-            <span className="px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-semibold">
-              ⏳ {pendingProposalsCount} Pending
-            </span>
-            <span className="px-3 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-semibold">
-              🎉 {confirmedDatesCount} Confirmed
-            </span>
+            {pendingProposalsCount > 0 && (
+              <span className="px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 font-medium">
+                {pendingProposalsCount} Pending
+              </span>
+            )}
+            {confirmedDatesCount > 0 && (
+              <span className="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 font-medium">
+                {confirmedDatesCount} Confirmed
+              </span>
+            )}
 
             {/* In-App Notification Bell Drawer */}
             <DateNotificationDrawer
@@ -616,7 +621,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
               }`}
             >
               <span>💡</span>
-              <span>Browse Date Ideas ({ideas.length})</span>
+              <span>Date ideas</span>
             </button>
 
             <button
@@ -628,7 +633,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
               }`}
             >
               <span>📋</span>
-              <span>Our Perfect Date Builder</span>
+              <span>Build our date</span>
             </button>
 
             <button
@@ -640,7 +645,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
               }`}
             >
               <span>💌</span>
-              <span>Proposals & Responses</span>
+              <span>Our plans</span>
               {pendingProposalsCount > 0 && (
                 <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse ml-0.5" />
               )}
@@ -655,7 +660,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
               }`}
             >
               <span>📅</span>
-              <span>Shared Calendar</span>
+              <span>Shared calendar</span>
             </button>
 
             <button
@@ -667,7 +672,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
               }`}
             >
               <span>📸</span>
-              <span>Our Memories ({memories.length})</span>
+              <span>Memories</span>
             </button>
           </div>
         </div>

@@ -84,19 +84,74 @@ export function FinalHeartSection({
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
+  const [responseText, setResponseText] = useState("");
+  const [isSubmittingResponse, setIsSubmittingResponse] = useState(false);
+  const [responseSuccessMessage, setResponseSuccessMessage] = useState("");
+  const [responseErrorMessage, setResponseErrorMessage] = useState("");
+
+  const handleSendResponse = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!responseText.trim() || isSubmittingResponse) return;
+
+    setIsSubmittingResponse(true);
+    setResponseErrorMessage("");
+
+    try {
+      const token = typeof window !== "undefined" ? localStorage.getItem("gift_auth_token") || "" : "";
+      const res = await fetch("/api/interactions/comments", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          targetType: "finalResponse",
+          targetId: "finale",
+          authorName: "My Love",
+          authorRole: "recipient",
+          content: responseText.trim(),
+          token,
+        }),
+      });
+
+      if (!res.ok) {
+        // Fallback local persistence if offline / dev mode
+        const existing = JSON.parse(localStorage.getItem("gift_recipient_final_responses") || "[]");
+        existing.push({ content: responseText.trim(), date: new Date().toISOString() });
+        localStorage.setItem("gift_recipient_final_responses", JSON.stringify(existing));
+      }
+
+      setResponseSuccessMessage("Your little message is safely tucked into our story. ♡");
+      setResponseText("");
+    } catch {
+      // In case of network exception, also persist locally so words are never lost
+      try {
+        const existing = JSON.parse(localStorage.getItem("gift_recipient_final_responses") || "[]");
+        existing.push({ content: responseText.trim(), date: new Date().toISOString() });
+        localStorage.setItem("gift_recipient_final_responses", JSON.stringify(existing));
+        setResponseSuccessMessage("Your little message is safely tucked into our story. ♡");
+        setResponseText("");
+      } catch {
+        setResponseErrorMessage("Could not send right now. Your words are still safe above, please try again.");
+      }
+    } finally {
+      setIsSubmittingResponse(false);
+    }
+  };
+
   return (
     <SectionWrapper
       id="finalHeart"
+      eyebrowLabel="EVERY LITTLE THING LED HERE"
       title="A Thousand Little Moments, One Big Love"
-      subtitle="Every picture, every heartbeat, every step leading right to you ♡"
+      subtitle="Every picture, every laugh, every little step that brought me closer to you."
       emoji="❤️"
       bgVariant="blush"
-      chapterNumber={14}
-      nextSectionId="welcome"
-      nextSectionLabel="Relive Our Love Story From the Beginning"
-      nextSectionEmoji="✨"
+      chapterNumber={15}
     >
       <div className="max-w-4xl mx-auto space-y-16">
+        {/* Collage instruction cue */}
+        <p className="text-center font-rounded text-xs sm:text-sm text-[var(--pink-strong)] font-medium -mt-4 mb-2">
+          Choose a picture to revisit its memory ♡
+        </p>
+
         {/* The Emotional Climax: Interactive Two-Style Photo Collage */}
         <div className="relative">
           <AnimatePresence mode="wait">
@@ -129,12 +184,12 @@ export function FinalHeartSection({
             )}
           </AnimatePresence>
 
-          {/* Choose Our Memory Style Toggle directly below the collage */}
+          {/* Style Selector */}
           <div className="mt-4 mb-2 flex flex-col items-center justify-center space-y-3">
             <div className="flex items-center gap-2">
               <span className="text-sm">✨</span>
               <h3 className="font-rounded font-bold text-base sm:text-lg text-[var(--plum-dark)] tracking-wide">
-                Choose Our Memory Style ♡
+                How would you like to see our story?
               </h3>
               <span className="text-sm">✨</span>
             </div>
@@ -165,7 +220,7 @@ export function FinalHeartSection({
                   />
                 )}
                 <span>♡</span>
-                <span>Heart Collage</span>
+                <span>Heart collage</span>
               </button>
 
               <button
@@ -189,7 +244,7 @@ export function FinalHeartSection({
                   />
                 )}
                 <span>♡</span>
-                <span>Polaroid Frame</span>
+                <span>Polaroid memories</span>
               </button>
             </div>
           </div>
@@ -212,7 +267,7 @@ export function FinalHeartSection({
               />
             </div>
             <p className="font-handwritten text-2xl md:text-3xl text-[var(--pink-strong)]">
-              We have been loving each other for
+              We&apos;ve been making memories for…
             </p>
           </motion.div>
 
@@ -242,82 +297,127 @@ export function FinalHeartSection({
           </div>
 
           {/* Milestones chips */}
-          {milestones && milestones.length > 0 && (
-            <motion.div
-              initial={{ opacity: 0, y: 15 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              className="flex flex-wrap items-center justify-center gap-2 mt-6"
-            >
-              {milestones.map((m) => (
-                <div
-                  key={m.id}
-                  className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-white/80 border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] shadow-2xs font-rounded"
-                >
-                  <span className="text-[var(--pink-primary)]">✨</span>
-                  <span className="font-semibold text-[var(--text-primary)]">{m.label}</span>
-                  <span className="text-[var(--text-muted)]">
-                    ({new Date(m.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })})
-                  </span>
-                </div>
-              ))}
-            </motion.div>
-          )}
-        </div>
-
-        {/* Personalized Final Letter / Last Secret */}
-        {finalLetter && (
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
+            initial={{ opacity: 0, y: 15 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="bg-white rounded-3xl p-8 sm:p-12 md:p-16 border border-[var(--border-subtle)] shadow-xl relative overflow-hidden"
+            className="flex flex-wrap items-center justify-center gap-2.5 mt-6"
           >
-            {/* Adorable kissing couple companion */}
-            <div className="flex justify-center mb-6">
-              <RomanticCharacter
-                character="kissingCouple"
-                size={210}
-                animation="gentle-float"
-                sparkles
-              />
-            </div>
-
-            {/* Elegant Header Accent */}
-            <div className="flex items-center justify-center gap-3 mb-8">
-              <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[var(--border-medium)]" />
-              <span className="font-handwritten text-3xl sm:text-4xl text-[var(--pink-strong)] px-2">
-                One Last Love Note ♡
-              </span>
-              <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[var(--border-medium)]" />
-            </div>
-
-            <div className="space-y-6 text-base sm:text-lg leading-relaxed text-[var(--text-primary)] font-serif italic">
-              {finalLetter.split("\n\n").map((para, idx) => (
-                <p key={idx} className="leading-loose">
-                  {idx === 0 ? (
-                    <span className="float-left text-4xl sm:text-5xl font-serif text-[var(--pink-strong)] pr-3 pt-1 leading-none font-bold">
-                      {para.charAt(0)}
-                    </span>
-                  ) : null}
-                  {idx === 0 ? para.slice(1) : para}
-                </p>
-              ))}
-            </div>
-
-            {finalMessage && (
-              <div className="mt-8 pt-6 border-t border-[var(--border-subtle)] text-center sm:text-right">
-                <p className="font-handwritten text-2xl text-[var(--pink-strong)]">
-                  {finalMessage}
-                </p>
-                <p className="text-xs uppercase tracking-wider text-[var(--text-muted)] mt-1 font-rounded">
-                  — With endless love, {senderName}
-                </p>
+            {(milestones.length > 0 ? milestones : [
+              { id: "m1", label: "Our first date", date: "2023-07-02" },
+              { id: "m2", label: "Our first adventure together", date: "2024-01-15" },
+            ]).map((m) => (
+              <div
+                key={m.id}
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full bg-white/90 border border-[var(--border-subtle)] text-xs text-[var(--text-secondary)] shadow-2xs font-rounded"
+              >
+                <span className="text-[var(--pink-primary)]">✨</span>
+                <span className="font-semibold text-[var(--text-primary)]">{m.label}</span>
+                <span className="text-[var(--text-muted)]">
+                  ({new Date(m.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })})
+                </span>
               </div>
-            )}
+            ))}
           </motion.div>
-        )}
+        </div>
+
+        {/* Closing Message */}
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+          className="bg-white rounded-3xl p-8 sm:p-12 md:p-16 border border-[var(--border-subtle)] shadow-xl relative overflow-hidden text-center sm:text-left"
+        >
+          {/* Adorable kissing couple companion */}
+          <div className="flex justify-center mb-6">
+            <RomanticCharacter
+              character="kissingCouple"
+              size={210}
+              animation="gentle-float"
+              sparkles
+            />
+          </div>
+
+          {/* Elegant Header Accent */}
+          <div className="flex items-center justify-center gap-3 mb-8">
+            <div className="h-px flex-1 bg-gradient-to-r from-transparent to-[var(--border-medium)]" />
+            <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[var(--romantic-plum)] px-2 text-center">
+              And this is still only the beginning.
+            </h3>
+            <div className="h-px flex-1 bg-gradient-to-l from-transparent to-[var(--border-medium)]" />
+          </div>
+
+          <div className="space-y-5 text-base sm:text-lg leading-relaxed text-[var(--text-primary)] font-serif italic max-w-2xl mx-auto">
+            <p className="leading-loose">
+              Of all the things I could wish for, I hope we keep finding our way to each other in the little moments.
+            </p>
+            <p className="leading-loose">
+              More laughs. More adventures. More ordinary days that turn out to be my favorites, simply because you&apos;re in them.
+            </p>
+            <p className="leading-loose">
+              Thank you for being you, for being part of my life, and for giving me so many reasons to smile.
+            </p>
+            <p className="font-handwritten text-2xl sm:text-3xl text-[var(--pink-strong)] pt-4 font-normal text-center sm:text-right">
+              If I had to choose again, I&apos;d still choose you. ♡
+            </p>
+          </div>
+
+          <div className="mt-8 pt-6 border-t border-[var(--border-subtle)] text-center sm:text-right">
+            <p className="text-xs uppercase tracking-wider text-[var(--text-muted)] font-rounded">
+              — With endless love, {senderName}
+            </p>
+          </div>
+        </motion.div>
+
+        {/* Final Response Interaction */}
+        <div className="bg-white/95 rounded-3xl p-6 sm:p-10 border border-[var(--border-subtle)] shadow-md max-w-2xl mx-auto text-left space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="text-2xl">💌</span>
+            <h4 className="font-serif text-xl sm:text-2xl font-bold text-[var(--romantic-plum)]">
+              Your turn, my love
+            </h4>
+          </div>
+
+          {responseSuccessMessage ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              className="p-5 rounded-2xl bg-[var(--pale-rose)] border border-[var(--pink-primary)] text-center space-y-2"
+            >
+              <span className="text-3xl block">💖</span>
+              <p className="font-serif text-base font-semibold text-[var(--pink-strong)]">
+                {responseSuccessMessage}
+              </p>
+            </motion.div>
+          ) : (
+            <form onSubmit={handleSendResponse} className="space-y-4">
+              <textarea
+                value={responseText}
+                onChange={(e) => setResponseText(e.target.value)}
+                placeholder="Tell me what you're feeling…"
+                rows={4}
+                className="w-full p-4 rounded-2xl border border-[var(--border-medium)] focus:border-[var(--pink-primary)] focus:outline-none bg-[var(--bg-main)] text-sm text-[var(--text-primary)] resize-none"
+              />
+
+              {responseErrorMessage && (
+                <p className="text-xs text-red-500 font-medium">
+                  {responseErrorMessage}
+                </p>
+              )}
+
+              <div className="flex justify-end">
+                <button
+                  type="submit"
+                  disabled={isSubmittingResponse || !responseText.trim()}
+                  className="px-7 py-3 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white font-rounded font-semibold text-xs sm:text-sm hover:shadow-md cursor-pointer transition-all disabled:opacity-50"
+                >
+                  {isSubmittingResponse ? "Sending..." : "Send it back to me ♡"}
+                </button>
+              </div>
+            </form>
+          )}
+        </div>
 
         {/* Send Love Back & Interaction */}
         <div className="text-center pt-4 relative">
@@ -344,7 +444,7 @@ export function FinalHeartSection({
             className="px-8 py-4 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white font-rounded font-semibold shadow-lg hover:shadow-xl transition-all cursor-pointer inline-flex items-center gap-3 text-base shadow-pink-300/40"
           >
             <span className="text-xl">💌</span>
-            <span>{hasSentLove ? "Send More Love!" : "Send Love Back to Me"}</span>
+            <span>Send a little love back ♡</span>
             {loveCount > 0 && (
               <span className="bg-white/25 px-2 py-0.5 rounded-full text-xs font-bold font-rounded">
                 {loveCount}
@@ -368,7 +468,7 @@ export function FinalHeartSection({
               className="text-xs tracking-wider uppercase text-[var(--text-muted)] hover:text-[var(--pink-strong)] transition-colors cursor-pointer inline-flex items-center gap-1.5 font-rounded font-semibold"
             >
               <span>↑</span>
-              <span>Back to beginning of our world</span>
+              <span>Back to the beginning ↑</span>
             </button>
           </div>
         </div>

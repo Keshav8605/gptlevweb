@@ -12,14 +12,14 @@ import type {
 } from "@/lib/server-db";
 
 const categoryLabels: Record<DateCategory, { label: string; emoji: string }> = {
-  cozy_home: { label: "Cozy at Home", emoji: "🛋️" },
-  food_cafes: { label: "Food & Cafés", emoji: "☕" },
-  outdoor_adventures: { label: "Outdoor Adventures", emoji: "🌿" },
-  romantic_evenings: { label: "Romantic Evenings", emoji: "🕯️" },
-  creative_activities: { label: "Creative Activities", emoji: "🎨" },
-  spontaneous_adventures: { label: "Spontaneous Adventures", emoji: "🚗" },
-  budget_friendly: { label: "Budget-Friendly", emoji: "🏷️" },
-  special_occasions: { label: "Special Occasions", emoji: "🥂" },
+  cozy_home: { label: "AT HOME", emoji: "🛋️" },
+  food_cafes: { label: "FOOD & CAFÉS", emoji: "☕" },
+  outdoor_adventures: { label: "OUTDOORS", emoji: "🌿" },
+  romantic_evenings: { label: "ROMANTIC EVENINGS", emoji: "🕯️" },
+  creative_activities: { label: "SOMETHING NEW", emoji: "🎨" },
+  spontaneous_adventures: { label: "SPONTANEOUS", emoji: "🚗" },
+  budget_friendly: { label: "BUDGET-FRIENDLY", emoji: "🏷️" },
+  special_occasions: { label: "SPECIAL OCCASIONS", emoji: "🥂" },
 };
 
 const sampleCoverPresets = [
@@ -201,7 +201,7 @@ export function DateIdeasCatalog({
             }`}
           >
             <span>💖</span>
-            <span>Favorites</span>
+            <span>Saved for us</span>
           </button>
           <button
             onClick={() => setViewFilter("shortlisted")}
@@ -212,7 +212,7 @@ export function DateIdeasCatalog({
             }`}
           >
             <span>📋</span>
-            <span>Shortlist</span>
+            <span>Our shortlist</span>
           </button>
         </div>
 
@@ -222,7 +222,7 @@ export function DateIdeasCatalog({
           className="px-5 py-2.5 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] hover:shadow-md hover:scale-105 transition-all cursor-pointer shadow-xs inline-flex items-center justify-center gap-2"
         >
           <span>✨</span>
-          <span>+ Add Custom Date Idea</span>
+          <span>Add our own idea +</span>
         </button>
       </div>
 
@@ -265,7 +265,7 @@ export function DateIdeasCatalog({
         <div className="flex-1 min-w-[200px]">
           <input
             type="text"
-            placeholder="Search ideas, locations, or notes..."
+            placeholder="Find a date idea, place, or little dream…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full px-3.5 py-1.5 rounded-xl border border-[var(--border-subtle)] bg-white text-[var(--text-primary)] focus:outline-none focus:border-[var(--pink-primary)] placeholder:text-[var(--text-muted)]"
@@ -274,7 +274,7 @@ export function DateIdeasCatalog({
 
         {/* Budget */}
         <div className="flex items-center gap-1.5">
-          <span className="text-[var(--text-muted)] font-medium">Budget:</span>
+          <span className="text-[var(--text-muted)] font-medium">Budget</span>
           <select
             value={selectedBudget}
             onChange={(e) => setSelectedBudget(e.target.value)}
@@ -290,7 +290,7 @@ export function DateIdeasCatalog({
 
         {/* Setting */}
         <div className="flex items-center gap-1.5">
-          <span className="text-[var(--text-muted)] font-medium">Setting:</span>
+          <span className="text-[var(--text-muted)] font-medium">Where?</span>
           <select
             value={selectedEnv}
             onChange={(e) => setSelectedEnv(e.target.value)}
@@ -305,7 +305,7 @@ export function DateIdeasCatalog({
 
         {/* Sort */}
         <div className="flex items-center gap-1.5">
-          <span className="text-[var(--text-muted)] font-medium">Sort:</span>
+          <span className="text-[var(--text-muted)] font-medium">Show me</span>
           <select
             value={sortOption}
             onChange={(e) => setSortOption(e.target.value)}
@@ -503,16 +503,17 @@ export function DateIdeasCatalog({
                             : "bg-[var(--pale-rose)] text-[var(--pink-strong)] hover:bg-[var(--bg-blush)]"
                         }`}
                       >
-                        <span>{isShort ? "✓" : "+"}</span>
-                        <span>{isShort ? "Shortlisted" : "Add to Shortlist"}</span>
+                        <span>{isShort ? "✓" : "♡"}</span>
+                        <span>{isShort ? "Saved for us" : "Save for us ♡"}</span>
                       </button>
 
                       <button
                         onClick={() => handleOpenNoteModal(idea)}
-                        className="p-1.5 px-2.5 rounded-full border border-[var(--border-subtle)] bg-white hover:bg-[var(--pale-rose)] text-xs text-[var(--text-secondary)] cursor-pointer transition-colors"
-                        title="Add private note"
+                        className="py-1.5 px-3 rounded-full border border-[var(--border-subtle)] bg-white hover:bg-[var(--pale-rose)] text-xs text-[var(--text-secondary)] cursor-pointer transition-colors inline-flex items-center gap-1"
+                        title="Add a note"
                       >
-                        ✏️ Note
+                        <span>✏️</span>
+                        <span>Add a note</span>
                       </button>
 
                       {(currentRole === "creator" || idea.isCustom) && onDeleteIdea && (

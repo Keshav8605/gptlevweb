@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { SharedInteractions } from "../interactions/SharedInteractions";
 import { RomanticCharacter } from "../RomanticCharacter";
+import { HeartPhotoCollage } from "../HeartPhotoCollage";
+import { FramedPhotoCollage } from "../FramedPhotoCollage";
 import type { Memory } from "@/lib/gift-data";
 
 interface MemoriesSectionProps {
@@ -16,7 +18,7 @@ const defaultPolaroids = [
   {
     id: "pol-1",
     src: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80",
-    caption: "A moment I'd choose a thousand times ♡",
+    caption: "That little place that became ours.",
     rotation: -3,
     tint: "from-[#FCE7EF] to-[#EDE2FA]",
     emoji: "📸",
@@ -24,7 +26,7 @@ const defaultPolaroids = [
   {
     id: "pol-2",
     src: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=600&q=80",
-    caption: "Little things, big feelings ♡",
+    caption: "I wish I could step back into this afternoon.",
     rotation: 2.5,
     tint: "from-[#FFE0EA] to-[#FFCADB]",
     emoji: "🌸",
@@ -32,7 +34,7 @@ const defaultPolaroids = [
   {
     id: "pol-3",
     src: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=600&q=80",
-    caption: "Right here is where my heart belongs ♡",
+    caption: "One of those moments when everything felt right.",
     rotation: -2,
     tint: "from-[#EDE2FA] to-[#F7F0FF]",
     emoji: "🌅",
@@ -40,7 +42,7 @@ const defaultPolaroids = [
   {
     id: "pol-4",
     src: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80",
-    caption: "One for our imaginary scrapbook ✨",
+    caption: "You weren't even trying, and I still couldn't stop looking at you.",
     rotation: 2,
     tint: "from-[#FFF9F3] to-[#FFE0EA]",
     emoji: "🏖️",
@@ -48,7 +50,7 @@ const defaultPolaroids = [
   {
     id: "pol-5",
     src: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=600&q=80",
-    caption: "The sweetest part of my days ✨",
+    caption: "We were supposed to behave. We did not. ♡",
     rotation: -2.5,
     tint: "from-[#FFCADB] to-[#EDE2FA]",
     emoji: "☕",
@@ -56,7 +58,7 @@ const defaultPolaroids = [
   {
     id: "pol-6",
     src: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
-    caption: "The sweetest view in the whole world ✨",
+    caption: "A moment I'd choose all over again.",
     rotation: 3,
     tint: "from-[#FFE0EA] to-[#FF5F96]/30",
     emoji: "🌿",
@@ -65,6 +67,7 @@ const defaultPolaroids = [
 
 export function MemoriesSection({ memories }: MemoriesSectionProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
+  const [collageStyle, setCollageStyle] = useState<"heart" | "polaroid">("heart");
 
   // Combine user memories with default layout
   const displayItems = memories && memories.length > 0
@@ -122,24 +125,119 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
   return (
     <SectionWrapper
       id="memories"
-      title="Little moments, big feelings ♡"
-      subtitle="Every picture holds a little story."
+      eyebrowLabel="OUR LITTLE ARCHIVE"
+      title="Our Memories Scrapbook"
+      subtitle="A collection of little moments that mean the entire world to me."
       emoji="📸"
       bgVariant="default"
-      chapterNumber={2}
+      chapterNumber={3}
       nextSectionId="secretWorld"
-      nextSectionLabel="Our Secret World"
+      nextSectionLabel="Enter our secret world 🔐"
       nextSectionEmoji="🔒"
     >
-      <div className="max-w-5xl mx-auto">
+      <div className="max-w-5xl mx-auto space-y-12">
         {/* Subtle character accent for memory scrapbook */}
-        <div className="flex justify-center -mt-3 mb-6">
+        <div className="flex justify-center -mt-3 mb-4">
           <RomanticCharacter
             character="kissingCouple"
             size={175}
             animation="subtle-tilt"
             sparkles
           />
+        </div>
+
+        {/* Style selector heading & options */}
+        <div className="flex flex-col items-center justify-center space-y-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm">✨</span>
+            <h3 className="font-rounded font-bold text-base sm:text-lg text-[var(--plum-dark)] tracking-wide">
+              How shall we keep our memories?
+            </h3>
+            <span className="text-sm">✨</span>
+          </div>
+
+          <div
+            role="tablist"
+            aria-label="How shall we keep our memories?"
+            className="inline-flex p-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[var(--border-subtle)] shadow-[0_4px_16px_rgba(81,36,63,0.08)] gap-1.5"
+          >
+            <button
+              type="button"
+              role="tab"
+              id="tab-heart-collage"
+              aria-selected={collageStyle === "heart"}
+              aria-controls="panel-heart-collage"
+              onClick={() => setCollageStyle("heart")}
+              className={`relative px-5 sm:px-7 py-2.5 rounded-full font-rounded font-bold text-xs sm:text-sm transition-all duration-300 flex items-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)] ${
+                collageStyle === "heart"
+                  ? "bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white shadow-md shadow-pink-300/40 scale-102"
+                  : "text-[var(--text-secondary)] hover:text-[var(--romantic-plum)] hover:bg-[var(--soft-pink)]/40"
+              }`}
+            >
+              <span>❤️</span>
+              <span>Heart collage</span>
+            </button>
+
+            <button
+              type="button"
+              role="tab"
+              id="tab-polaroid-frame"
+              aria-selected={collageStyle === "polaroid"}
+              aria-controls="panel-polaroid-frame"
+              onClick={() => setCollageStyle("polaroid")}
+              className={`relative px-5 sm:px-7 py-2.5 rounded-full font-rounded font-bold text-xs sm:text-sm transition-all duration-300 flex items-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)] ${
+                collageStyle === "polaroid"
+                  ? "bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white shadow-md shadow-pink-300/40 scale-102"
+                  : "text-[var(--text-secondary)] hover:text-[var(--romantic-plum)] hover:bg-[var(--soft-pink)]/40"
+              }`}
+            >
+              <span>📷</span>
+              <span>Polaroid frame</span>
+            </button>
+          </div>
+        </div>
+
+        {/* The Two Distinct Collage Presentations */}
+        <div className="relative">
+          <AnimatePresence mode="wait">
+            {collageStyle === "heart" ? (
+              <motion.div
+                key="heart-collage"
+                id="panel-heart-collage"
+                role="tabpanel"
+                aria-labelledby="tab-heart-collage"
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.28, ease: "easeInOut" }}
+              >
+                <HeartPhotoCollage />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="polaroid-collage"
+                id="panel-polaroid-frame"
+                role="tabpanel"
+                aria-labelledby="tab-polaroid-frame"
+                initial={{ opacity: 0, scale: 0.97 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.97 }}
+                transition={{ duration: 0.28, ease: "easeInOut" }}
+              >
+                <FramedPhotoCollage />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+
+        {/* Gallery Introduction & Instruction */}
+        <div className="pt-8 text-center space-y-2 border-t border-[var(--border-subtle)]/70">
+          <p className="font-handwritten text-xl sm:text-2xl text-[var(--pink-strong)]">
+            Some moments last only a second. Somehow, the feeling stays forever.
+          </p>
+          <p className="text-xs sm:text-sm font-rounded font-semibold text-[var(--text-muted)] tracking-wide">
+            Choose a picture to uncover its memory ♡
+          </p>
         </div>
 
         {/* Scrapbook Polaroid Grid (Inspired by Reference 1) */}

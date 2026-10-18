@@ -34,6 +34,7 @@ export function SharedInteractions({
   const [commentText, setCommentText] = useState("");
   const [isCommenting, setIsCommenting] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [savedSuccess, setSavedSuccess] = useState(false);
 
   useEffect(() => {
     const handleStorage = () => {
@@ -104,6 +105,8 @@ export function SharedInteractions({
         setComments((prev) => [...prev, data.comment]);
         setCommentText("");
         setIsCommenting(false);
+        setSavedSuccess(true);
+        setTimeout(() => setSavedSuccess(false), 3500);
       }
     } catch {}
     finally {
@@ -122,8 +125,9 @@ export function SharedInteractions({
     } catch {}
   };
 
-  // Group reactions by emoji
-  const groupedReactions = reactionEmojis.map((emoji) => {
+  // Group reactions by emoji (keep 3 for letter / clean aesthetic)
+  const availableEmojis = targetType === "letter" ? ["❤️", "🥺", "🥰"] : reactionEmojis;
+  const groupedReactions = availableEmojis.map((emoji) => {
     const list = reactions.filter((r) => r.emoji === emoji);
     const hasReacted = list.some((r) => r.author === role);
     return {
@@ -139,12 +143,17 @@ export function SharedInteractions({
       {/* Reactions Bar */}
       <div className="flex items-center justify-between gap-1 flex-wrap">
         <div className="flex items-center gap-1.5 flex-wrap">
+          {targetType === "letter" && (
+            <span className="text-[11px] font-rounded font-semibold text-[var(--pink-deep)] mr-1">
+              Leave a little heart:
+            </span>
+          )}
           {groupedReactions.map((item) => (
             <button
               key={item.emoji}
               onClick={() => handleToggleReaction(item.emoji)}
-              title={item.authors.length > 0 ? `Reacted by ${item.authors.join(", ")}` : undefined}
-              className={`px-2 py-1 rounded-full text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer border ${
+              title={item.authors.length > 0 ? `Reacted by ${item.authors.join(", ")}` : "Leave a little heart"}
+              className={`px-2.5 py-1 rounded-full text-xs font-semibold flex items-center gap-1 transition-all cursor-pointer border ${
                 item.hasReacted
                   ? "bg-[var(--pale-rose)] border-[var(--pink-strong)] text-[var(--pink-deep)] shadow-xs scale-105"
                   : "bg-white border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--bg-surface)]"
@@ -161,7 +170,7 @@ export function SharedInteractions({
           className="text-xs font-semibold text-[var(--pink-strong)] hover:underline cursor-pointer flex items-center gap-1"
         >
           <span>💬</span>
-          <span>{comments.length > 0 ? `Comments (${comments.length})` : "+ Add Note"}</span>
+          <span>{comments.length > 0 ? `Notes (${comments.length})` : "Leave a note for me"}</span>
         </button>
       </div>
 
@@ -239,6 +248,18 @@ export function SharedInteractions({
           </motion.form>
         )}
       </AnimatePresence>
+
+      {/* Saved State Confirmation */}
+      {savedSuccess && (
+        <motion.div
+          initial={{ opacity: 0, y: -4 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0 }}
+          className="p-2.5 rounded-xl bg-[var(--pale-rose)]/70 border border-pink-200 text-[var(--pink-deep)] text-xs text-center font-medium font-rounded"
+        >
+          Tucked safely into our story ♡
+        </motion.div>
+      )}
     </div>
   );
 }

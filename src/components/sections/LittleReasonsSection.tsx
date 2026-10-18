@@ -6,28 +6,9 @@ import { SectionWrapper } from "../SectionWrapper";
 import { RomanticCharacter } from "../RomanticCharacter";
 import type { LittleReason } from "@/lib/gift-data";
 
-export const defaultReasonsList: LittleReason[] = [
-  { id: "lr1", text: "The way you hold my hand a little tighter whenever we cross the street.", emoji: "🤝" },
-  { id: "lr2", text: "How your entire face lights up when your food arrives at the table.", emoji: "😋" },
-  { id: "lr3", text: "That tiny sleepy sigh you make right before you drift off to sleep.", emoji: "😴" },
-  { id: "lr4", text: "The way you remember the smallest things I told you months ago.", emoji: "💭" },
-  { id: "lr5", text: "How safe the whole world feels the second your arms are around me.", emoji: "🫂" },
-  { id: "lr6", text: "Your ridiculous, contagious laugh that makes everyone in the room smile.", emoji: "😂" },
-  { id: "lr7", text: "The way you check if I'm warm enough, even when you're freezing yourself.", emoji: "🧣" },
-  { id: "lr8", text: "How passionate you get talking about the things you truly care about.", emoji: "✨" },
-  { id: "lr9", text: "The gentle forehead kisses that heal even the heaviest days.", emoji: "🥺" },
-  { id: "lr10", text: "The funny faces you make when you think no one is watching.", emoji: "🤪" },
-  { id: "lr11", text: "How your hand fits so effortlessly and perfectly inside mine.", emoji: "🤍" },
-  { id: "lr12", text: "The little notes and memes you send just to make my day brighter.", emoji: "💌" },
-  { id: "lr13", text: "How deeply patient and kind you are, even when everything is stressful.", emoji: "🌸" },
-  { id: "lr14", text: "The way you look at me across a crowded room and smile just for me.", emoji: "👀" },
-  { id: "lr15", text: "Your unconditional loyalty and how fiercely you stand by the people you love.", emoji: "🛡️" },
-  { id: "lr16", text: "How you make ordinary trips to the grocery store feel like our private adventure.", emoji: "🛒" },
-  { id: "lr17", text: "The sound of your voice first thing in the morning.", emoji: "☀️" },
-  { id: "lr18", text: "How you always believe in me, even when I forget to believe in myself.", emoji: "🌱" },
-  { id: "lr19", text: "The way you dance with zero inhibition when your favorite song plays.", emoji: "💃" },
-  { id: "lr20", text: "Simply because out of 8 billion people, loving you is the easiest choice I've ever made.", emoji: "💖" },
-];
+import { hundredReasonsList } from "@/lib/reasons-data";
+
+export const defaultReasonsList: LittleReason[] = hundredReasonsList;
 
 interface LittleReasonsSectionProps {
   reasons?: LittleReason[];
@@ -90,30 +71,19 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
   return (
     <SectionWrapper
       id="littleReasons"
-      title=""
-      subtitle=""
+      eyebrowLabel="A LIST THAT COULD KEEP GROWING"
+      title="A Hundred Little Reasons I Love You"
+      subtitle="I started counting. Then I remembered that loving you isn't something I can finish counting."
       emoji="💗"
       bgVariant="cream"
-      chapterNumber={11}
+      chapterNumber={12}
       nextSectionId="digitalGifts"
-      nextSectionLabel="Gifts For You"
+      nextSectionLabel="Open your little gifts 🎁"
+      nextSectionSubtitle="And because words are lovely, but showing up for each other matters too, I have a few little promises for you."
       nextSectionEmoji="🎁"
     >
       <div className="max-w-2xl mx-auto text-center">
-        {/* Pink pill badge (Matching Reference 4) */}
-        <div className="inline-block px-4 py-1.5 rounded-full bg-[var(--pink-strong)] text-white text-xs font-rounded font-semibold tracking-wide shadow-xs mb-4">
-          a list. for u. only u.
-        </div>
-
-        {/* Multi-Font Styled Romantic Title (Matching Reference 4) */}
-        <h2 className="cute-love-stroke text-4xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[var(--romantic-plum)] leading-tight select-none mb-3">
-          <span className="font-rounded text-[#A588B8] pr-2">reasons</span>
-          <span className="font-script text-[var(--pink-primary)] font-normal text-5xl sm:text-6xl pr-2">why</span>
-          <span className="font-rounded text-[var(--romantic-plum)] pr-2">i love</span>
-          <span className="font-script text-[var(--pink-strong)] font-normal text-5xl sm:text-6xl">you</span>
-        </h2>
-
-        {/* Tender loving couple (Authentic PNG Illustration) */}
+        {/* Tender loving couple */}
         <div className="my-2 flex justify-center">
           <RomanticCharacter
             character="tenderCouple"
@@ -123,32 +93,27 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
           />
         </div>
 
-        {/* Playful Subtitle (Matching Reference 4) */}
-        <div className="space-y-1 mb-8">
-          <p className="font-handwritten text-lg sm:text-xl text-[var(--text-secondary)]">
-            i sat down, counted, it took a while.
-          </p>
-          <p className="font-rounded text-sm sm:text-base font-medium text-[var(--pink-strong)]">
-            there&apos;s like a million okay, here&apos;s some 🥹
-          </p>
-        </div>
+        {/* Introduction line */}
+        <p className="font-rounded text-sm sm:text-base font-semibold text-[var(--pink-strong)] mb-6">
+          Here are a few of my favorites. ♡
+        </p>
 
-        {/* Top Control Bar: Reason Counter & Saved Favorites link */}
+        {/* Top Control Bar: Progress Counter & Saved Reasons link */}
         <div className="flex items-center justify-between px-2 mb-4 pb-2 border-b border-[var(--border-subtle)] text-xs">
-          <span className="font-rounded font-semibold tracking-wider text-[var(--pink-strong)] uppercase">
-            Reason #{currentIndex + 1} of {activeReasons.length}
+          <span className="font-rounded font-bold tracking-wider text-[var(--pink-strong)] uppercase">
+            REASON {String(currentIndex + 1).padStart(2, "0")} OF {activeReasons.length}
           </span>
 
           <button
             onClick={() => setShowFavoritesModal(true)}
             className="font-rounded font-semibold text-[var(--pink-deep)] hover:underline cursor-pointer flex items-center gap-1.5"
           >
-            <span>♥ Saved Favorites ({savedFavorites.length})</span>
+            <span>♥ Your saved reasons ({savedFavorites.length})</span>
           </button>
         </div>
 
         {/* Reason Card Display */}
-        <div className="relative min-h-[220px] flex items-center justify-center">
+        <div className="relative min-h-[240px] flex items-center justify-center">
           <AnimatePresence mode="wait" custom={direction}>
             <motion.div
               key={currentReason?.id || currentIndex}
@@ -157,20 +122,33 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
               animate={{ opacity: 1, x: 0, scale: 1 }}
               exit={{ opacity: 0, x: -direction * 40, scale: 0.95 }}
               transition={{ duration: 0.35, ease: "easeInOut" }}
-              className="w-full bg-white rounded-3xl p-6 sm:p-10 text-center border border-[var(--border-subtle)] shadow-md relative overflow-hidden"
+              className="w-full bg-white rounded-3xl p-6 sm:p-10 text-center border border-[var(--border-subtle)] shadow-md relative overflow-hidden space-y-4"
             >
               {/* Emoji badge */}
-              <div className="w-14 h-14 mx-auto rounded-full bg-[var(--soft-pink)] flex items-center justify-center text-3xl mb-4 shadow-2xs">
+              <div className="w-14 h-14 mx-auto rounded-full bg-[var(--soft-pink)] flex items-center justify-center text-3xl mb-2 shadow-2xs">
                 {currentReason?.emoji || "💕"}
               </div>
 
-              {/* Reason Text */}
-              <p className="font-serif text-xl sm:text-2xl font-medium leading-relaxed text-[var(--romantic-plum)] mb-6">
-                &ldquo;{currentReason?.text}&rdquo;
-              </p>
+              {/* Reason Title & Supporting line */}
+              {currentReason?.title ? (
+                <div className="space-y-2">
+                  <h4 className="font-serif text-2xl sm:text-3xl font-bold leading-snug text-[var(--romantic-plum)]">
+                    {currentReason.title}
+                  </h4>
+                  {currentReason.supportingText && (
+                    <p className="font-serif italic text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed max-w-lg mx-auto">
+                      &ldquo;{currentReason.supportingText}&rdquo;
+                    </p>
+                  )}
+                </div>
+              ) : (
+                <p className="font-serif text-xl sm:text-2xl font-medium leading-relaxed text-[var(--romantic-plum)]">
+                  &ldquo;{currentReason?.text}&rdquo;
+                </p>
+              )}
 
-              {/* Card Footer: Favorite heart */}
-              <div className="flex items-center justify-center">
+              {/* Card Footer: Favorite action */}
+              <div className="flex items-center justify-center pt-2">
                 <button
                   onClick={toggleFavorite}
                   className={`px-5 py-2 rounded-full text-xs font-rounded font-semibold transition-all cursor-pointer flex items-center gap-1.5 border ${
@@ -179,7 +157,7 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
                       : "bg-[var(--pale-rose)] text-[var(--pink-strong)] border-[var(--border-subtle)] hover:bg-[var(--bg-blush)]"
                   }`}
                 >
-                  <span>{isFavorited ? "♥ Saved in My Heart" : "♡ Save to Favorites"}</span>
+                  <span>{isFavorited ? "♥ Tucked into your favorites" : "♡ Keep this one close ♡"}</span>
                 </button>
               </div>
             </motion.div>
@@ -200,7 +178,7 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
             onClick={handleRandom}
             className="px-6 py-2.5 rounded-full bg-white border border-[var(--border-medium)] text-[var(--pink-strong)] hover:bg-[var(--soft-pink)] text-xs font-rounded font-semibold cursor-pointer transition-all shadow-2xs hover:scale-105"
           >
-            🎲 Surprise Me
+            Surprise me ♡
           </button>
 
           {currentIndex === activeReasons.length - 1 ? (
@@ -212,15 +190,15 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
               className="px-6 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-semibold bg-gradient-to-r from-[var(--pink-strong)] to-[var(--pink-primary)] text-white hover:opacity-95 cursor-pointer transition-all shadow-xs hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
               aria-label="Read from Reason 1"
             >
-              Read from Reason 1 ↺
+              Read from Reason 01 ↺
             </button>
           ) : (
             <button
               onClick={handleNext}
               className="px-6 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-semibold bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white hover:opacity-95 cursor-pointer transition-all shadow-xs hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
-              aria-label="Next Reason"
+              aria-label="Next reason"
             >
-              Next Reason →
+              Next reason →
             </button>
           )}
         </div>
@@ -255,10 +233,10 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
               <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)] mb-4">
                 <div>
                   <h3 className="font-rounded text-2xl font-bold text-[var(--romantic-plum)]">
-                    Your Saved Reasons ♥
+                    Your saved reasons ♡
                   </h3>
                   <p className="text-xs text-[var(--text-muted)]">
-                    {favoriteReasonsList.length} moments close to your heart
+                    {favoriteReasonsList.length} moments kept close to your heart
                   </p>
                 </div>
                 <button
@@ -274,7 +252,7 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
                   <div className="py-12 text-center text-xs text-[var(--text-muted)] space-y-2">
                     <span className="text-3xl block">💌</span>
                     <p>No favorites saved yet.</p>
-                    <p className="italic">Click &ldquo;♡ Save to Favorites&rdquo; on any reason to collect it here!</p>
+                    <p className="italic">Click &ldquo;Keep this one close ♡&rdquo; on any reason to collect it here!</p>
                   </div>
                 ) : (
                   favoriteReasonsList.map((reason) => (
