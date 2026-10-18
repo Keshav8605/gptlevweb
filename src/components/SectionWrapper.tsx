@@ -4,6 +4,8 @@ import { motion } from "framer-motion";
 import { ReactNode, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 import { scrollToChapter } from "@/lib/motion";
+import { useStoryTransitionSafe } from "@/context/StoryTransitionContext";
+import { sectionIdToSlug } from "@/lib/story-routes";
 
 interface SectionWrapperProps {
   id: string;
@@ -43,9 +45,20 @@ export function SectionWrapper({
   const ref = useRef<HTMLElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const storyCtx = useStoryTransitionSafe();
 
   const handleContinueNext = () => {
-    if (!nextSectionId || isTransitioning) return;
+    if (!nextSectionId) return;
+
+    // Multi-page emotion transition if within StoryTransitionContext
+    if (storyCtx) {
+      const slug = sectionIdToSlug(nextSectionId);
+      storyCtx.navigateWithTransition(slug);
+      return;
+    }
+
+    // Single-page fallback
+    if (isTransitioning) return;
     setIsTransitioning(true);
     scrollToChapter(nextSectionId, () => {
       setTimeout(() => setIsTransitioning(false), 900);
@@ -125,8 +138,8 @@ export function SectionWrapper({
           {children}
         </motion.div>
 
-        {/* Cinematic Chapter Transition Cue (Bottom of Section) */}
-        {nextSectionId && nextSectionLabel && (
+        {/* Cinematic Chapter Transition Cue (Bottom of Section - single page fallback) */}
+        {nextSectionId && nextSectionLabel && !storyCtx && (
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}

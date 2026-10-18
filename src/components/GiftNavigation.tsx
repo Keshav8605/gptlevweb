@@ -5,6 +5,8 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 
 import { scrollToChapter } from "@/lib/motion";
+import { useStoryTransitionSafe } from "@/context/StoryTransitionContext";
+import { sectionIdToSlug } from "@/lib/story-routes";
 
 export interface NavItem {
   id: string;
@@ -45,6 +47,9 @@ export function GiftNavigation({
   const [participantRole, setParticipantRole] = useState<string>("recipient");
   const [participantName, setParticipantName] = useState<string>("Baby");
   const [activeSectionId, setActiveSectionId] = useState<string>("welcome");
+  const storyCtx = useStoryTransitionSafe();
+
+  const currentActiveId = storyCtx ? storyCtx.currentChapter.id : activeSectionId;
 
   useEffect(() => {
     const updateRole = () => {
@@ -58,9 +63,9 @@ export function GiftNavigation({
     return () => window.removeEventListener("storage", updateRole);
   }, []);
 
-  // Frontend-only active chapter scroll tracking with IntersectionObserver
+  // Frontend-only active chapter scroll tracking with IntersectionObserver (when in single-page mode)
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || storyCtx) return;
 
     const handleScrollBoundary = () => {
       const scrollPos = window.scrollY;
@@ -101,25 +106,30 @@ export function GiftNavigation({
       observer.disconnect();
       window.removeEventListener("scroll", handleScrollBoundary);
     };
-  }, [items]);
+  }, [items, storyCtx]);
 
   // When drawer opens, smoothly bring the active item into view inside the drawer panel
   useEffect(() => {
-    if (isOpen && activeSectionId) {
+    if (isOpen && currentActiveId) {
       const timer = setTimeout(() => {
-        const activeEl = document.getElementById(`nav-item-${activeSectionId}`);
+        const activeEl = document.getElementById(`nav-item-${currentActiveId}`);
         if (activeEl) {
           activeEl.scrollIntoView({ block: "nearest", behavior: "smooth" });
         }
       }, 180);
       return () => clearTimeout(timer);
     }
-  }, [isOpen, activeSectionId]);
+  }, [isOpen, currentActiveId]);
 
   const scrollToSection = (id: string) => {
-    scrollToChapter(id);
-    setActiveSectionId(id);
     setIsOpen(false);
+    if (storyCtx) {
+      const slug = sectionIdToSlug(id);
+      storyCtx.navigateWithTransition(slug);
+    } else {
+      scrollToChapter(id);
+      setActiveSectionId(id);
+    }
   };
 
   return (
@@ -147,7 +157,7 @@ export function GiftNavigation({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.5 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-5 right-5 z-40 w-12 h-12 rounded-full shadow-lg flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105"
+        className="fixed top-4 right-4 z-50 w-12 h-12 rounded-full shadow-lg flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105"
         style={{
           background: isOpen
             ? "var(--pink-primary)"
@@ -238,7 +248,7 @@ export function GiftNavigation({
 
                 <div className="space-y-1">
                   {items.map((item, i) => {
-                    const isActive = activeSectionId === item.id;
+                    const isActive = currentActiveId === item.id;
                     return (
                       <motion.button
                         key={item.id}
