@@ -3,7 +3,6 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { StoryTransitionProvider } from "@/context/StoryTransitionContext";
 import { StoryTransitionOverlay } from "@/components/story/StoryTransitionOverlay";
-import { StoryChapterHeader } from "@/components/story/StoryChapterHeader";
 import { FloatingHearts } from "@/components/FloatingHearts";
 import { CursorHeartTrail } from "@/components/CursorHeartTrail";
 import { GiftNavigation } from "@/components/GiftNavigation";
@@ -54,11 +53,8 @@ function StoryLayoutInner({ children }: { children: React.ReactNode }) {
       {/* Persistent Emotion-Driven Story Transition Overlay */}
       <StoryTransitionOverlay />
 
-      {/* Chapter Progress Header */}
-      <StoryChapterHeader onOpenAccessModal={() => setIsAccessModalOpen(true)} />
-
       {/* Main Chapter Content Viewport */}
-      <main className="relative z-10 w-full min-h-[calc(100vh-60px)]">
+      <main className="relative z-10 w-full min-h-screen">
         {children}
       </main>
 
