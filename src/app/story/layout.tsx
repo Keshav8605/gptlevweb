@@ -3,7 +3,6 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { StoryTransitionProvider } from "@/context/StoryTransitionContext";
 import { StoryTransitionOverlay } from "@/components/story/StoryTransitionOverlay";
-import { FloatingHearts } from "@/components/FloatingHearts";
 import { CursorHeartTrail } from "@/components/CursorHeartTrail";
 import { GiftNavigation } from "@/components/GiftNavigation";
 import { CreatorStudio } from "@/components/creator/CreatorStudio";
@@ -39,8 +38,6 @@ function StoryLayoutInner({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="relative min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)]">
-      {/* Delicate floating background ambience */}
-      <FloatingHearts />
       {/* Delightful cursor heart trail */}
       <CursorHeartTrail />
 

@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import type { GiftRecord } from "@/lib/server-db";
 import { defaultGiftConfig } from "@/lib/gift-data";
-import { FloatingHearts } from "@/components/FloatingHearts";
 import { CursorHeartTrail } from "@/components/CursorHeartTrail";
 import { GiftNavigation } from "@/components/GiftNavigation";
 import { WelcomeExperience } from "@/components/sections/WelcomeExperience";
@@ -122,7 +121,6 @@ function GiftRecipientContent({
   if (errorStatus) {
     return (
       <div className="min-h-screen bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
-        <FloatingHearts />
         <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-[var(--border-subtle)] shadow-xl space-y-5 relative z-10">
           <div className="w-16 h-16 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center text-3xl mx-auto">
             🎀
@@ -162,7 +160,6 @@ function GiftRecipientContent({
   if (isLocked) {
     return (
       <div className="min-h-screen bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
-        <FloatingHearts />
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -240,8 +237,6 @@ function GiftRecipientContent({
 
   return (
     <main className="relative min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)]">
-      {/* Floating hearts ambience */}
-      <FloatingHearts />
       {/* Delightful cursor heart trail */}
       <CursorHeartTrail />
 
