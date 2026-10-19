@@ -370,6 +370,33 @@ export const defaultGiftConfig: GiftConfig = {
       content: "My whole heart,\n\nIf you ever wonder whether you are cherished, let this letter answer you without a single doubt: you are loved beyond words.\n\nI love you for your bright moments and your tired ones. I love the quiet kindness you give to the world, the funny little expressions you make, and the sincere warmth you bring into my life every single day.\n\nYou are not hard to love; loving you is the most natural, effortless thing my heart has ever learned. You matter to me deeply, today and through every tomorrow.\n\nForever and always yours. ♡",
       signature: "Forever and always yours. ♡",
     },
+    {
+      id: "ow7",
+      title: "Open when you're stressed or overwhelmed",
+      heading: "Take a deep breath and let the world pause for a moment",
+      opening: "My sweet love,",
+      emoji: "🌿",
+      content: "My sweet love,\n\nI know how hard you push yourself, and how easy it is for tasks, expectations, and noise to pile up until your chest feels tight. If everything feels like too much all at once right now, stop for just sixty seconds.\n\nDrop your shoulders. Unclench your jaw. You do not have to solve every problem before the sun sets. The world can wait while you take three quiet, deep breaths.\n\nYou have handled hard days before, and you will navigate this one too—not by doing everything perfectly, but simply by taking it one gentle step at a time. And remember: you are never alone in this. I'm right here beside you, ready to help carry whatever you need.\n\nRest your mind for a moment. You are doing so much better than you give yourself credit for.\n\nAlways right by your side. ♡",
+      signature: "Always right by your side. ♡",
+    },
+    {
+      id: "ow8",
+      title: "Open when we've had a disagreement",
+      heading: "A reminder that we are always on the same team",
+      opening: "My favorite person,",
+      emoji: "🕊️",
+      content: "My favorite person,\n\nIf we're hurting or feeling distant after a misunderstanding, please read this and remember: no argument, no frustration, and no bad day could ever shake my love for you.\n\nDisagreements happen because we care, but you and I are never on opposite sides. It is always you and me together against the problem, never you against me. Even when words get tangled or emotions run high, my heart stays anchored to yours.\n\nI care so much more about understanding your heart and keeping us close than about who is right. Whenever you're ready, let's talk softly, listen to each other, and share a long, warm embrace. I love you, through every sunny day and every bumpy road.\n\nLoving you through everything. ♡",
+      signature: "Loving you through everything. ♡",
+    },
+    {
+      id: "ow9",
+      title: "Open when you have something to celebrate",
+      heading: "I am so ridiculously proud of you today",
+      opening: "My superstar,",
+      emoji: "✨",
+      content: "My superstar,\n\nYou did it! Whatever milestone, breakthrough, or tiny personal victory you reached today, I want you to soak in every single ounce of pride and happiness you feel right now.\n\nI see all the quiet work you put in when nobody else is watching—the late nights, the determination, and the heart you pour into everything you care about. Seeing you succeed makes my own heart burst with joy.\n\nCelebrate yourself today. Treat yourself to something sweet, do a little happy dance, and let yourself smile without holding back. I am so lucky to have a front-row seat to your brilliance, and I'll always be your loudest, proudest cheerleader.\n\nCelebrating you with all my heart! ♡",
+      signature: "Celebrating you with all my heart! ♡",
+    },
   ],
   
   observations: [
@@ -417,7 +444,7 @@ export const defaultGiftConfig: GiftConfig = {
     },
   ],
   
-  littleReasons: hundredReasonsList,
+  littleReasons: hundredReasonsList.slice(0, 5),
   
   deluluScenarios: [
     {
@@ -531,6 +558,7 @@ export const defaultGiftConfig: GiftConfig = {
     { id: "g6", title: "A surprise date", description: "Give me a little hint about your mood, and let me plan something thoughtful for us.", emoji: "🎁" },
     { id: "g7", title: "Breakfast in bed", description: "Your favorite breakfast, made with love and served with a side of morning kisses.", emoji: "🥞" },
     { id: "g8", title: "One slow dance", description: "Our favorite song, a little space in the living room, and absolutely no need to know how to dance.", emoji: "💃" },
+    { id: "g9", title: "A relaxing massage", description: "Dim lights, soothing music, and as long as you need to let every bit of stress and tension melt away.", emoji: "💆" },
   ],
   
   bucketListItems: [

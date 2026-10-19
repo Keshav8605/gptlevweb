@@ -18,7 +18,7 @@ const sectionMetadata: Record<
   voice: { label: "Voice Message Whispers", emoji: "🎙️", description: "Recorded audio notes with playback and dedicated chimes", chapter: "Chapter 9" },
   datePlanner: { label: "Plan Our Next Adventure ♡", emoji: "🗺️", description: "Collaborative date ideas, proposals, calendar & countdown", chapter: "Chapter 10" },
   openWhenLetters: { label: "Open When... Envelopes", emoji: "✉️", description: "Special letters sealed until the exact moment arrives", chapter: "Chapter 11" },
-  littleReasons: { label: "A Hundred Little Reasons", emoji: "💗", description: "Dynamic appreciation cards with favorites bookmarking", chapter: "Chapter 12" },
+  littleReasons: { label: "Little Reasons I Love You", emoji: "💗", description: "Dynamic appreciation cards with favorites bookmarking", chapter: "Chapter 12" },
   digitalGifts: { label: "Little Gifts I Owe You", emoji: "🎁", description: "Redeemable digital vouchers with claim verification", chapter: "Chapter 13" },
   ourSong: { label: "Our Song Dedicated Melody", emoji: "🎵", description: "Spinning vinyl record and audio pentatonic chimes", chapter: "Chapter 14" },
   finalHeart: { label: "Forever & Always", emoji: "❤️", description: "Milestone anniversary counter and final love celebration", chapter: "Chapter 15" },

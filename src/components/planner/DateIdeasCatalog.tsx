@@ -1,35 +1,69 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import type {
   DateIdea,
   DatePreference,
-  DateCategory,
   DateCostRange,
-  DateEnvironment,
   DatePreferenceState,
 } from "@/lib/server-db";
 
-const categoryLabels: Record<DateCategory, { label: string; emoji: string }> = {
-  cozy_home: { label: "AT HOME", emoji: "🛋️" },
-  food_cafes: { label: "FOOD & CAFÉS", emoji: "☕" },
-  outdoor_adventures: { label: "OUTDOORS", emoji: "🌿" },
-  romantic_evenings: { label: "ROMANTIC EVENINGS", emoji: "🕯️" },
-  creative_activities: { label: "SOMETHING NEW", emoji: "🎨" },
-  spontaneous_adventures: { label: "SPONTANEOUS", emoji: "🚗" },
-  budget_friendly: { label: "BUDGET-FRIENDLY", emoji: "🏷️" },
-  special_occasions: { label: "SPECIAL OCCASIONS", emoji: "🥂" },
-};
-
-const sampleCoverPresets = [
-  { label: "Picnic Blanket", url: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80" },
-  { label: "Candlelit Dinner", url: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=800&q=80" },
-  { label: "Artisan Coffee", url: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80" },
-  { label: "Night Sky", url: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=800&q=80" },
-  { label: "Pottery & Clay", url: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=80" },
-  { label: "Botanical Garden", url: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80" },
+const primaryCategories = [
+  { id: "all", label: "All Dates", emoji: "✨" },
+  { id: "cozy_home", label: "At Home", emoji: "🛋️" },
+  { id: "food_cafes", label: "Food & Cafés", emoji: "☕" },
+  { id: "outdoor_adventures", label: "Outdoors", emoji: "🌿" },
+  { id: "romantic_evenings", label: "Romantic", emoji: "🕯️" },
+  { id: "creative_activities", label: "Something New", emoji: "🎨" },
 ];
+
+const secondaryCategories = [
+  { id: "spontaneous_adventures", label: "Spontaneous Adventures", emoji: "🚗" },
+  { id: "budget_friendly", label: "Budget-Friendly", emoji: "🏷️" },
+  { id: "special_occasions", label: "Special Occasions", emoji: "🥂" },
+];
+
+function getCategoryDisplay(cat: string): { label: string; emoji: string } {
+  switch (cat) {
+    case "cozy_home":
+      return { label: "AT HOME", emoji: "🛋️" };
+    case "food_cafes":
+      return { label: "FOOD & CAFÉS", emoji: "☕" };
+    case "outdoor_adventures":
+      return { label: "OUTDOORS", emoji: "🌿" };
+    case "romantic_evenings":
+      return { label: "ROMANTIC", emoji: "🕯️" };
+    case "creative_activities":
+      return { label: "SOMETHING NEW", emoji: "🎨" };
+    case "spontaneous_adventures":
+      return { label: "SPONTANEOUS", emoji: "🚗" };
+    case "budget_friendly":
+      return { label: "BUDGET-FRIENDLY", emoji: "🏷️" };
+    case "special_occasions":
+      return { label: "SPECIAL OCCASION", emoji: "🥂" };
+    default:
+      return { label: "DATE IDEA", emoji: "♡" };
+  }
+}
+
+function getBudgetDisplay(costRange?: DateCostRange, text?: string): string {
+  if (text && (text.toLowerCase().includes("free") || text.toLowerCase().includes("cost") || text.toLowerCase().includes("moderate"))) {
+    return text;
+  }
+  switch (costRange) {
+    case "free":
+      return "Free";
+    case "low":
+      return "Low cost";
+    case "medium":
+      return "Moderate";
+    case "high":
+      return "Higher budget";
+    default:
+      return "Low cost";
+  }
+}
 
 interface DateIdeasCatalogProps {
   ideas: DateIdea[];
@@ -39,8 +73,8 @@ interface DateIdeasCatalogProps {
   onUpdatePreferenceState: (ideaId: string, state: DatePreferenceState) => void;
   onSavePersonalNote: (ideaId: string, note: string) => void;
   onCreateIdea: (newIdea: Partial<DateIdea>) => Promise<boolean>;
-  onEditIdea?: (id: string, updates: Partial<DateIdea>) => Promise<boolean>;
-  onDeleteIdea?: (id: string) => Promise<boolean>;
+  onProposeFromIdea?: (idea: DateIdea) => void;
+  onNavigateToPlans?: () => void;
   currentRole: "creator" | "recipient";
   currentName: string;
 }
@@ -48,804 +82,728 @@ interface DateIdeasCatalogProps {
 export function DateIdeasCatalog({
   ideas,
   preferences,
-  onToggleFavorite,
   onToggleShortlist,
   onUpdatePreferenceState,
   onSavePersonalNote,
   onCreateIdea,
-  onDeleteIdea,
-  currentRole,
+  onProposeFromIdea,
 }: DateIdeasCatalogProps) {
-  // Filter states
+  // Navigation & Category states
   const [selectedCategory, setSelectedCategory] = useState<string>("all");
-  const [selectedBudget, setSelectedBudget] = useState<string>("all");
-  const [selectedEnv, setSelectedEnv] = useState<string>("all");
-  const [sortOption, setSortOption] = useState<string>("default");
-  const [viewFilter, setViewFilter] = useState<"all" | "favorites" | "shortlisted">("all");
+  const [isMoreCatOpen, setIsMoreCatOpen] = useState(false);
+
+  // Search & Filter states
   const [searchQuery, setSearchQuery] = useState("");
+  const [selectedBudget, setSelectedBudget] = useState<string>("all");
+  const [selectedSetting, setSelectedSetting] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<"recommended" | "lowest_cost" | "shortest_duration" | "alpha">("recommended");
+  const [showFilters, setShowFilters] = useState(false);
 
-  // Modals
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [noteModalIdea, setNoteModalIdea] = useState<DateIdea | null>(null);
-  const [personalNoteText, setPersonalNoteText] = useState("");
+  // Modals & Feedback
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
+  const [detailIdea, setDetailIdea] = useState<DateIdea | null>(null);
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
 
-  // Form states for new idea
-  const [newTitle, setNewTitle] = useState("");
-  const [newDescription, setNewDescription] = useState("");
-  const [newCoverPhoto, setNewCoverPhoto] = useState(sampleCoverPresets[0].url);
-  const [newCategory, setNewCategory] = useState<DateCategory>("spontaneous_adventures");
-  const [newCostRange, setNewCostRange] = useState<DateCostRange>("low");
-  const [newCostEstimateText, setNewCostEstimateText] = useState("$20 - $35");
-  const [newDuration, setNewDuration] = useState("2 hours");
-  const [newDurationMinutes, setNewDurationMinutes] = useState(120);
-  const [newEnvironment, setNewEnvironment] = useState<DateEnvironment>("both");
-  const [newLocation, setNewLocation] = useState("");
-  const [newPracticalNotes, setNewPracticalNotes] = useState("");
-  const [newAccessibilityNotes, setNewAccessibilityNotes] = useState("");
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  // Custom Idea Form State (Section 11)
+  const [customTitle, setCustomTitle] = useState("");
+  const [customDate, setCustomDate] = useState("");
+  const [customTime, setCustomTime] = useState("");
+  const [customLocation, setCustomLocation] = useState("");
+  const [customNote, setCustomNote] = useState("");
+  const [isSubmittingCustom, setIsSubmittingCustom] = useState(false);
 
-  // Preference mapping helper
-  const getPrefForIdea = (ideaId: string): DatePreference | undefined => {
+  // Personal note inside detail modal
+  const [detailNoteDraft, setDetailNoteDraft] = useState("");
+
+  const triggerToast = (msg: string) => {
+    setToastMessage(msg);
+    setTimeout(() => {
+      setToastMessage((prev) => (prev === msg ? null : prev));
+    }, 2800);
+  };
+
+  const getPrefForIdea = (ideaId: string) => {
     return preferences.find((p) => p.ideaId === ideaId);
   };
 
-  // Filter and sort calculation
-  const filteredIdeas = ideas.filter((idea) => {
-    const pref = getPrefForIdea(idea.id);
-
-    // View filter
-    if (viewFilter === "favorites" && !pref?.isFavorite) return false;
-    if (viewFilter === "shortlisted" && !pref?.isShortlisted) return false;
-
-    // Category filter
-    if (selectedCategory !== "all" && idea.category !== selectedCategory) return false;
-
-    // Budget filter
-    if (selectedBudget !== "all" && idea.costRange !== selectedBudget) return false;
-
-    // Environment filter
-    if (selectedEnv !== "all" && idea.environment !== selectedEnv) return false;
-
-    // Search query
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      const matchTitle = idea.title.toLowerCase().includes(q);
-      const matchDesc = idea.description.toLowerCase().includes(q);
-      const matchLoc = idea.location?.toLowerCase().includes(q);
-      if (!matchTitle && !matchDesc && !matchLoc) return false;
-    }
-
-    return true;
-  });
-
-  // Sorting
-  const sortedIdeas = [...filteredIdeas].sort((a, b) => {
-    if (sortOption === "duration_asc") {
-      return (a.estimatedDurationMinutes || 0) - (b.estimatedDurationMinutes || 0);
-    }
-    if (sortOption === "duration_desc") {
-      return (b.estimatedDurationMinutes || 0) - (a.estimatedDurationMinutes || 0);
-    }
-    if (sortOption === "alpha") {
-      return a.title.localeCompare(b.title);
-    }
-    return (a.sortOrder || 0) - (b.sortOrder || 0);
-  });
-
-  const handleOpenNoteModal = (idea: DateIdea) => {
-    setNoteModalIdea(idea);
-    const pref = getPrefForIdea(idea.id);
-    setPersonalNoteText(pref?.personalNote || "");
+  const isIdeaSaved = (ideaId: string): boolean => {
+    const pref = getPrefForIdea(ideaId);
+    return Boolean(pref?.isShortlisted || pref?.isFavorite);
   };
 
-  const handleSaveNoteSubmit = () => {
-    if (!noteModalIdea) return;
-    onSavePersonalNote(noteModalIdea.id, personalNoteText);
-    setNoteModalIdea(null);
+  const handleToggleSave = async (idea: DateIdea) => {
+    const currentlySaved = isIdeaSaved(idea.id);
+    onToggleShortlist(idea.id, currentlySaved);
+    if (!currentlySaved) {
+      triggerToast("Saved to Our Plans ♡");
+    } else {
+      triggerToast("Removed from Our Plans");
+    }
   };
 
-  const handleCreateSubmit = async (e: React.FormEvent) => {
+  // Filter and sort ideas
+  const visibleIdeas = useMemo(() => {
+    return ideas
+      .filter((idea) => {
+        // Category filter
+        if (selectedCategory !== "all") {
+          if (idea.category !== selectedCategory) return false;
+        }
+
+        // Budget filter
+        if (selectedBudget !== "all") {
+          if (idea.costRange !== selectedBudget) return false;
+        }
+
+        // Setting filter
+        if (selectedSetting !== "all") {
+          if (selectedSetting === "cozy_home" && idea.category !== "cozy_home") return false;
+          if (selectedSetting === "indoor" && idea.environment !== "indoor" && idea.environment !== "both") return false;
+          if (selectedSetting === "outdoor" && idea.environment !== "outdoor" && idea.environment !== "both") return false;
+        }
+
+        // Search
+        if (searchQuery.trim()) {
+          const q = searchQuery.toLowerCase();
+          const matchTitle = idea.title.toLowerCase().includes(q);
+          const matchDesc = idea.description.toLowerCase().includes(q);
+          const matchLoc = idea.location?.toLowerCase().includes(q);
+          if (!matchTitle && !matchDesc && !matchLoc) return false;
+        }
+
+        return true;
+      })
+      .sort((a, b) => {
+        if (sortBy === "lowest_cost") {
+          const costScore: Record<string, number> = { free: 0, low: 1, medium: 2, high: 3 };
+          return (costScore[a.costRange || "low"] ?? 1) - (costScore[b.costRange || "low"] ?? 1);
+        }
+        if (sortBy === "shortest_duration") {
+          return (a.estimatedDurationMinutes || 120) - (b.estimatedDurationMinutes || 120);
+        }
+        if (sortBy === "alpha") {
+          return a.title.localeCompare(b.title);
+        }
+        return (a.sortOrder || 99) - (b.sortOrder || 99);
+      });
+  }, [ideas, selectedCategory, selectedBudget, selectedSetting, searchQuery, sortBy]);
+
+  // Open details modal
+  const handleOpenDetails = (idea: DateIdea) => {
+    setDetailIdea(idea);
+    const pref = getPrefForIdea(idea.id);
+    setDetailNoteDraft(pref?.personalNote || "");
+  };
+
+  const handleSaveDetailNote = () => {
+    if (!detailIdea) return;
+    onSavePersonalNote(detailIdea.id, detailNoteDraft);
+    triggerToast("Note saved ♡");
+  };
+
+  // Submit custom date
+  const handleCustomSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newTitle.trim() || isSubmitting) return;
+    if (!customTitle.trim() || isSubmittingCustom) return;
 
-    setIsSubmitting(true);
-    const success = await onCreateIdea({
-      title: newTitle.trim(),
-      description: newDescription.trim(),
-      coverPhoto: newCoverPhoto,
-      category: newCategory,
-      costRange: newCostRange,
-      costEstimateText: newCostEstimateText.trim() || "$20 - $35",
-      estimatedDuration: newDuration.trim() || "2 hours",
-      estimatedDurationMinutes: Number(newDurationMinutes) || 120,
-      environment: newEnvironment,
-      location: newLocation.trim() || undefined,
-      practicalNotes: newPracticalNotes.trim() || undefined,
-      accessibilityNotes: newAccessibilityNotes.trim() || undefined,
+    setIsSubmittingCustom(true);
+
+    const ok = await onCreateIdea({
+      title: customTitle.trim(),
+      description: customNote.trim() || "A little adventure daydreamed by us.",
+      location: customLocation.trim() || "A place we love",
+      costRange: "low",
+      costEstimateText: "Low cost",
+      estimatedDuration: "About 2 hours",
+      estimatedDurationMinutes: 120,
+      category: "spontaneous_adventures",
+      environment: "both",
+      coverPhoto: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=800&q=80",
+      practicalNotes: customDate ? `Planned for ${customDate}${customTime ? ` at ${customTime}` : ""}` : undefined,
     });
 
-    setIsSubmitting(false);
-    if (success) {
-      setIsAddModalOpen(false);
-      // Reset form
-      setNewTitle("");
-      setNewDescription("");
-      setNewLocation("");
-      setNewPracticalNotes("");
-      setNewAccessibilityNotes("");
+    setIsSubmittingCustom(false);
+    if (ok) {
+      setIsCreateModalOpen(false);
+      triggerToast("Saved to Our Plans ♡");
+      setCustomTitle("");
+      setCustomDate("");
+      setCustomTime("");
+      setCustomLocation("");
+      setCustomNote("");
     }
   };
+
+  const hasActiveFilters = selectedBudget !== "all" || selectedSetting !== "all" || sortBy !== "recommended";
 
   return (
     <div className="space-y-6">
-      {/* Top Controls: Search, View Filter Pills & Add Button */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4">
-        {/* View Toggle Tabs */}
-        <div className="inline-flex p-1 rounded-2xl bg-white border border-[var(--border-subtle)] shadow-xs">
-          <button
-            onClick={() => setViewFilter("all")}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all ${
-              viewFilter === "all"
-                ? "bg-[var(--pink-primary)] text-white shadow-xs"
-                : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)]"
-            }`}
+      {/* Toast Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: -20, scale: 0.95 }}
+            className="fixed top-6 right-6 z-50 bg-[var(--romantic-plum)] text-white px-5 py-2.5 rounded-full shadow-lg font-rounded text-xs sm:text-sm font-semibold flex items-center gap-2 border border-pink-300/30"
           >
-            All Ideas ({ideas.length})
-          </button>
-          <button
-            onClick={() => setViewFilter("favorites")}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all inline-flex items-center gap-1.5 ${
-              viewFilter === "favorites"
-                ? "bg-[var(--pink-primary)] text-white shadow-xs"
-                : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)]"
-            }`}
-          >
-            <span>💖</span>
-            <span>Saved for us</span>
-          </button>
-          <button
-            onClick={() => setViewFilter("shortlisted")}
-            className={`px-4 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all inline-flex items-center gap-1.5 ${
-              viewFilter === "shortlisted"
-                ? "bg-[var(--pink-primary)] text-white shadow-xs"
-                : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)]"
-            }`}
-          >
-            <span>📋</span>
-            <span>Our shortlist</span>
-          </button>
+            <span>♡</span>
+            <span>{toastMessage}</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Header section (Section 6) */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
+        <div>
+          <h3 className="font-rounded text-xl sm:text-2xl font-bold text-[var(--romantic-plum)]">
+            What sounds fun for us? ♡
+          </h3>
+          <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1">
+            Pick a little idea, save your favorite, and make it happen together.
+          </p>
         </div>
 
-        {/* Action: Add Custom Idea */}
+        {/* Action: Create our own date + (Section 11) */}
         <button
-          onClick={() => setIsAddModalOpen(true)}
-          className="px-5 py-2.5 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] hover:shadow-md hover:scale-105 transition-all cursor-pointer shadow-xs inline-flex items-center justify-center gap-2"
+          onClick={() => setIsCreateModalOpen(true)}
+          className="self-start sm:self-auto px-4 py-2 rounded-full text-xs font-rounded font-semibold text-white bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] hover:shadow-md hover:scale-105 active:scale-95 transition-all cursor-pointer shadow-xs inline-flex items-center gap-1.5"
         >
-          <span>✨</span>
-          <span>Add our own idea +</span>
+          <span>Create our own date +</span>
         </button>
       </div>
 
-      {/* Filter Bar: Category Pills */}
-      <div className="overflow-x-auto pb-2 -mx-2 px-2 scrollbar-none">
-        <div className="flex items-center gap-2 min-w-max">
+      {/* Category Chips (Section 6) */}
+      <div className="flex items-center gap-2 flex-wrap">
+        {primaryCategories.map((cat) => {
+          const isActive = selectedCategory === cat.id;
+          return (
+            <button
+              key={cat.id}
+              onClick={() => {
+                setSelectedCategory(cat.id);
+                setIsMoreCatOpen(false);
+              }}
+              className={`px-3.5 py-1.5 rounded-full text-xs font-rounded font-medium transition-all cursor-pointer flex items-center gap-1.5 ${
+                isActive
+                  ? "bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white shadow-xs font-semibold"
+                  : "bg-white text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:bg-[var(--pale-rose)] hover:text-[var(--pink-strong)]"
+              }`}
+            >
+              <span>{cat.emoji}</span>
+              <span>{cat.label}</span>
+            </button>
+          );
+        })}
+
+        {/* Compact "More categories" control */}
+        <div className="relative">
           <button
-            onClick={() => setSelectedCategory("all")}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all ${
-              selectedCategory === "all"
-                ? "bg-[var(--pink-strong)] text-white shadow-xs"
+            onClick={() => setIsMoreCatOpen(!isMoreCatOpen)}
+            className={`px-3 py-1.5 rounded-full text-xs font-rounded font-medium transition-all cursor-pointer flex items-center gap-1 ${
+              secondaryCategories.some((c) => c.id === selectedCategory)
+                ? "bg-[var(--pink-strong)] text-white font-semibold shadow-xs"
                 : "bg-white text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:bg-[var(--pale-rose)]"
             }`}
           >
-            All Categories ✨
+            <span>More categories</span>
+            <span className="text-[10px]">{isMoreCatOpen ? "▲" : "▾"}</span>
           </button>
-          {(Object.keys(categoryLabels) as DateCategory[]).map((cat) => {
-            const config = categoryLabels[cat];
-            return (
-              <button
-                key={cat}
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-medium cursor-pointer transition-all inline-flex items-center gap-1.5 ${
-                  selectedCategory === cat
-                    ? "bg-[var(--pink-strong)] text-white shadow-xs"
-                    : "bg-white text-[var(--text-secondary)] border border-[var(--border-subtle)] hover:bg-[var(--pale-rose)]"
-                }`}
-              >
-                <span>{config.emoji}</span>
-                <span>{config.label}</span>
-              </button>
-            );
-          })}
+
+          {isMoreCatOpen && (
+            <div className="absolute top-full left-0 mt-1.5 w-52 bg-white rounded-2xl border border-[var(--border-subtle)] shadow-lg p-2 z-30 space-y-1">
+              {secondaryCategories.map((cat) => (
+                <button
+                  key={cat.id}
+                  onClick={() => {
+                    setSelectedCategory(cat.id);
+                    setIsMoreCatOpen(false);
+                  }}
+                  className={`w-full text-left px-3 py-2 rounded-xl text-xs font-rounded flex items-center gap-2 cursor-pointer transition-colors ${
+                    selectedCategory === cat.id
+                      ? "bg-[var(--pale-rose)] text-[var(--pink-strong)] font-semibold"
+                      : "text-[var(--text-secondary)] hover:bg-[var(--pale-rose)]"
+                  }`}
+                >
+                  <span>{cat.emoji}</span>
+                  <span>{cat.label}</span>
+                </button>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Secondary Filter Dropdowns & Search */}
-      <div className="p-4 rounded-2xl bg-white/70 border border-[var(--border-subtle)] shadow-xs flex flex-wrap items-center justify-between gap-3 text-xs">
-        {/* Search */}
-        <div className="flex-1 min-w-[200px]">
+      {/* Search and Filters Bar (Section 6 & 13) */}
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3">
+        {/* Compact Search */}
+        <div className="relative flex-1">
           <input
             type="text"
-            placeholder="Find a date idea, place, or little dream…"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            className="w-full px-3.5 py-1.5 rounded-xl border border-[var(--border-subtle)] bg-white text-[var(--text-primary)] focus:outline-none focus:border-[var(--pink-primary)] placeholder:text-[var(--text-muted)]"
+            placeholder="Find a date idea…"
+            className="w-full pl-9 pr-4 py-2 rounded-full bg-white border border-[var(--border-subtle)] text-xs sm:text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-hidden focus:border-[var(--pink-primary)] focus:ring-1 focus:ring-[var(--pink-primary)] transition-all shadow-2xs font-rounded"
           />
+          <span className="absolute left-3 top-2.5 text-xs text-[var(--text-muted)]">🔍</span>
+          {searchQuery && (
+            <button
+              onClick={() => setSearchQuery("")}
+              className="absolute right-3 top-2.5 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] cursor-pointer"
+            >
+              ✕
+            </button>
+          )}
         </div>
 
-        {/* Budget */}
-        <div className="flex items-center gap-1.5">
-          <span className="text-[var(--text-muted)] font-medium">Budget</span>
-          <select
-            value={selectedBudget}
-            onChange={(e) => setSelectedBudget(e.target.value)}
-            className="px-2.5 py-1.5 rounded-xl border border-[var(--border-subtle)] bg-white text-[var(--text-primary)] cursor-pointer focus:outline-none focus:border-[var(--pink-primary)]"
-          >
-            <option value="all">All Budgets</option>
-            <option value="free">Free ($0)</option>
-            <option value="low">Low ($)</option>
-            <option value="medium">Medium ($$)</option>
-            <option value="high">Special Occasion ($$$)</option>
-          </select>
-        </div>
-
-        {/* Setting */}
-        <div className="flex items-center gap-1.5">
-          <span className="text-[var(--text-muted)] font-medium">Where?</span>
-          <select
-            value={selectedEnv}
-            onChange={(e) => setSelectedEnv(e.target.value)}
-            className="px-2.5 py-1.5 rounded-xl border border-[var(--border-subtle)] bg-white text-[var(--text-primary)] cursor-pointer focus:outline-none focus:border-[var(--pink-primary)]"
-          >
-            <option value="all">Indoor & Outdoor</option>
-            <option value="indoor">Indoor Only 🛋️</option>
-            <option value="outdoor">Outdoor Only 🌿</option>
-            <option value="both">Both ⛅</option>
-          </select>
-        </div>
-
-        {/* Sort */}
-        <div className="flex items-center gap-1.5">
-          <span className="text-[var(--text-muted)] font-medium">Show me</span>
-          <select
-            value={sortOption}
-            onChange={(e) => setSortOption(e.target.value)}
-            className="px-2.5 py-1.5 rounded-xl border border-[var(--border-subtle)] bg-white text-[var(--text-primary)] cursor-pointer focus:outline-none focus:border-[var(--pink-primary)]"
-          >
-            <option value="default">Featured</option>
-            <option value="duration_asc">Shortest duration first</option>
-            <option value="duration_desc">Longest duration first</option>
-            <option value="alpha">Alphabetical (A - Z)</option>
-          </select>
-        </div>
+        {/* Compact Filters toggle */}
+        <button
+          onClick={() => setShowFilters(!showFilters)}
+          className={`px-4 py-2 rounded-full text-xs font-rounded font-semibold cursor-pointer transition-all inline-flex items-center gap-1.5 border ${
+            hasActiveFilters || showFilters
+              ? "bg-[var(--pale-rose)] text-[var(--pink-strong)] border-[var(--pink-light)] shadow-2xs"
+              : "bg-white text-[var(--text-secondary)] border-[var(--border-subtle)] hover:bg-[var(--pale-rose)]"
+          }`}
+        >
+          <span>✨ Filters</span>
+          {hasActiveFilters && <span className="w-1.5 h-1.5 rounded-full bg-[var(--pink-strong)]" />}
+        </button>
       </div>
 
-      {/* Ideas Grid */}
-      {sortedIdeas.length === 0 ? (
-        <div className="p-12 text-center rounded-3xl bg-white border border-[var(--border-subtle)] space-y-3">
-          <span className="text-4xl block">🔍</span>
-          <h4 className="font-serif text-lg font-bold text-[var(--text-primary)]">
-            No date ideas match your current filter
-          </h4>
-          <p className="text-xs text-[var(--text-secondary)]">
-            Try resetting your filters or create a brand new custom date idea!
+      {/* Expandable Filter Panel */}
+      {showFilters && (
+        <motion.div
+          initial={{ opacity: 0, height: 0 }}
+          animate={{ opacity: 1, height: "auto" }}
+          exit={{ opacity: 0, height: 0 }}
+          className="p-4 rounded-2xl bg-white border border-[var(--border-subtle)] shadow-xs grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs font-rounded"
+        >
+          {/* Budget Filter */}
+          <div>
+            <label className="block font-semibold text-[var(--text-secondary)] mb-1">Budget</label>
+            <select
+              value={selectedBudget}
+              onChange={(e) => setSelectedBudget(e.target.value)}
+              className="w-full p-2 rounded-xl bg-[var(--bg-main)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] cursor-pointer"
+            >
+              <option value="all">Any budget</option>
+              <option value="free">Free</option>
+              <option value="low">Low cost</option>
+              <option value="medium">Moderate</option>
+              <option value="high">Higher budget</option>
+            </select>
+          </div>
+
+          {/* Setting Filter */}
+          <div>
+            <label className="block font-semibold text-[var(--text-secondary)] mb-1">Setting</label>
+            <select
+              value={selectedSetting}
+              onChange={(e) => setSelectedSetting(e.target.value)}
+              className="w-full p-2 rounded-xl bg-[var(--bg-main)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] cursor-pointer"
+            >
+              <option value="all">Any setting</option>
+              <option value="cozy_home">At home</option>
+              <option value="indoor">Indoors</option>
+              <option value="outdoor">Outdoors</option>
+            </select>
+          </div>
+
+          {/* Sort By */}
+          <div>
+            <label className="block font-semibold text-[var(--text-secondary)] mb-1">Sort by</label>
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value as "recommended" | "lowest_cost" | "shortest_duration" | "alpha")}
+              className="w-full p-2 rounded-xl bg-[var(--bg-main)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] cursor-pointer"
+            >
+              <option value="recommended">Recommended</option>
+              <option value="lowest_cost">Lowest cost</option>
+              <option value="shortest_duration">Shortest duration</option>
+              <option value="alpha">Alphabetical</option>
+            </select>
+          </div>
+
+          {hasActiveFilters && (
+            <div className="sm:col-span-3 flex justify-end">
+              <button
+                onClick={() => {
+                  setSelectedBudget("all");
+                  setSelectedSetting("all");
+                  setSortBy("recommended");
+                }}
+                className="text-xs text-[var(--pink-strong)] hover:underline cursor-pointer"
+              >
+                Reset filters
+              </button>
+            </div>
+          )}
+        </motion.div>
+      )}
+
+      {/* Date Idea Cards Grid (Section 8) */}
+      {visibleIdeas.length === 0 ? (
+        <div className="py-16 text-center space-y-3 bg-white/70 rounded-3xl border border-[var(--border-subtle)] p-6">
+          <span className="text-3xl block">🔍</span>
+          <p className="font-rounded font-semibold text-[var(--romantic-plum)]">
+            No date ideas found matching that filter.
           </p>
           <button
             onClick={() => {
               setSelectedCategory("all");
-              setSelectedBudget("all");
-              setSelectedEnv("all");
-              setViewFilter("all");
               setSearchQuery("");
+              setSelectedBudget("all");
+              setSelectedSetting("all");
             }}
-            className="px-4 py-2 rounded-full text-xs font-semibold text-[var(--pink-strong)] bg-[var(--pale-rose)] hover:bg-[var(--bg-blush)] transition-colors cursor-pointer"
+            className="px-4 py-2 rounded-full text-xs font-rounded font-semibold text-[var(--pink-strong)] border border-[var(--pink-light)] hover:bg-[var(--pale-rose)] transition-colors cursor-pointer"
           >
-            Reset All Filters
+            Show all date ideas
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {sortedIdeas.map((idea, index) => {
-            const pref = getPrefForIdea(idea.id);
-            const isFav = pref?.isFavorite ?? false;
-            const isShort = pref?.isShortlisted ?? false;
-            const currentPrefState = pref?.status || "none";
-            const catConfig = categoryLabels[idea.category] || { label: "Adventure", emoji: "✨" };
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {visibleIdeas.map((idea) => {
+            const isSaved = isIdeaSaved(idea.id);
+            const categoryInfo = getCategoryDisplay(idea.category);
 
             return (
-              <motion.div
+              <div
                 key={idea.id}
-                initial={{ opacity: 0, y: 15 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.04 }}
-                className="group relative rounded-3xl bg-white border border-[var(--border-subtle)] hover:border-[var(--pink-primary)] shadow-sm hover:shadow-[var(--shadow-pink-strong)] transition-all flex flex-col overflow-hidden"
+                className="group flex flex-col justify-between h-full bg-white rounded-3xl border border-[var(--border-subtle)] hover:border-[var(--pink-light)] shadow-xs hover:shadow-md transition-all duration-300 overflow-hidden"
               >
-                {/* Cover Image & Overlays */}
-                <div className="relative h-48 w-full overflow-hidden bg-[var(--pale-rose)]">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={idea.coverPhoto}
-                    alt={idea.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20" />
-
-                  {/* Top Badges */}
-                  <div className="absolute top-3 left-3 flex items-center gap-1.5 flex-wrap">
-                    <span className="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-white/90 backdrop-blur-md text-[var(--text-primary)] shadow-xs">
-                      {catConfig.emoji} {catConfig.label}
-                    </span>
-                    {idea.isCustom && (
-                      <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[var(--lavender)] text-[var(--text-primary)]">
-                        Custom
+                {/* Image & Category Overlay */}
+                <div>
+                  <div className="relative aspect-[16/10] w-full overflow-hidden bg-[var(--pale-rose)]">
+                    <img
+                      src={idea.coverPhoto}
+                      alt={idea.title}
+                      loading="lazy"
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                    <div className="absolute top-3 left-3">
+                      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-white/90 backdrop-blur-xs text-[10px] font-bold font-rounded tracking-wide text-[var(--pink-strong)] shadow-2xs">
+                        <span>{categoryInfo.emoji}</span>
+                        <span>{categoryInfo.label}</span>
                       </span>
-                    )}
-                  </div>
-
-                  {/* Top Right Heart Favorite Button */}
-                  <button
-                    onClick={() => onToggleFavorite(idea.id, isFav)}
-                    className="absolute top-3 right-3 w-9 h-9 rounded-full bg-white/90 backdrop-blur-md flex items-center justify-center text-lg hover:scale-110 active:scale-95 transition-all cursor-pointer shadow-xs"
-                    title={isFav ? "Remove from favorites" : "Add to favorites"}
-                  >
-                    {isFav ? "💖" : "🤍"}
-                  </button>
-
-                  {/* Bottom Image Badges: Duration & Cost */}
-                  <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between text-[11px] text-white font-medium">
-                    <span className="px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-xs">
-                      ⏳ {idea.estimatedDuration}
-                    </span>
-                    <span className="px-2 py-0.5 rounded-full bg-black/40 backdrop-blur-xs font-semibold">
-                      💰 {idea.costEstimateText}
-                    </span>
-                  </div>
-                </div>
-
-                {/* Card Content */}
-                <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
-                  <div className="space-y-2">
-                    <div className="flex items-start justify-between gap-2">
-                      <h4 className="font-serif text-lg font-bold text-[var(--text-primary)] leading-snug">
-                        {idea.title}
-                      </h4>
                     </div>
+                  </div>
 
-                    <p className="text-xs text-[var(--text-secondary)] leading-relaxed line-clamp-3">
+                  {/* Card Content (Short, clean, no truncated ellipsis) */}
+                  <div className="p-5 space-y-2.5">
+                    <h4 className="font-rounded text-base sm:text-lg font-bold text-[var(--romantic-plum)] leading-snug">
+                      {idea.title}
+                    </h4>
+
+                    <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
                       {idea.description}
                     </p>
-
-                    {idea.location && (
-                      <p className="text-[11px] text-[var(--pink-strong)] flex items-center gap-1 font-medium pt-1">
-                        <span>📍</span>
-                        <span>{idea.location}</span>
-                      </p>
-                    )}
-
-                    {/* Practical & Accessibility Notes Dropdown/Expander */}
-                    {(idea.practicalNotes || idea.accessibilityNotes) && (
-                      <details className="text-[11px] text-[var(--text-muted)] bg-[var(--bg-surface)] rounded-xl p-2.5 cursor-pointer mt-2 group/notes">
-                        <summary className="font-semibold text-[var(--text-secondary)] list-none flex items-center justify-between">
-                          <span>💡 Notes & Tips</span>
-                          <span className="text-[10px] text-[var(--pink-strong)]">View</span>
-                        </summary>
-                        <div className="pt-2 space-y-1.5 border-t border-[var(--border-subtle)] mt-1.5">
-                          {idea.practicalNotes && (
-                            <p>
-                              <strong className="text-[var(--text-primary)]">Tip:</strong> {idea.practicalNotes}
-                            </p>
-                          )}
-                          {idea.accessibilityNotes && (
-                            <p>
-                              <strong className="text-[var(--text-primary)]">Access:</strong> {idea.accessibilityNotes}
-                            </p>
-                          )}
-                        </div>
-                      </details>
-                    )}
-
-                    {/* Saved Personal Note Preview */}
-                    {pref?.personalNote && (
-                      <div className="p-2.5 rounded-xl bg-[var(--warm-cream)] border border-[var(--border-subtle)] text-[11px] text-[var(--text-primary)] font-script italic">
-                        &ldquo;{pref.personalNote}&rdquo;
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Interactive Action Controls */}
-                  <div className="pt-3 border-t border-[var(--border-subtle)] space-y-2.5">
-                    {/* Preference Selector Pills */}
-                    <div className="space-y-1">
-                      <span className="text-[10px] tracking-wider uppercase text-[var(--text-muted)] font-bold block">
-                        My Preference:
-                      </span>
-                      <div className="grid grid-cols-3 gap-1 text-[10px]">
-                        <button
-                          onClick={() => onUpdatePreferenceState(idea.id, currentPrefState === "really_want" ? "none" : "really_want")}
-                          className={`py-1 px-1 rounded-lg border text-center transition-all cursor-pointer font-medium ${
-                            currentPrefState === "really_want"
-                              ? "bg-[var(--pink-primary)] text-white border-[var(--pink-strong)] shadow-xs"
-                              : "bg-white text-[var(--text-secondary)] border-[var(--border-subtle)] hover:bg-[var(--pale-rose)]"
-                          }`}
-                        >
-                          🔥 Really Want
-                        </button>
-                        <button
-                          onClick={() => onUpdatePreferenceState(idea.id, currentPrefState === "sounds_cute" ? "none" : "sounds_cute")}
-                          className={`py-1 px-1 rounded-lg border text-center transition-all cursor-pointer font-medium ${
-                            currentPrefState === "sounds_cute"
-                              ? "bg-[var(--pink-primary)] text-white border-[var(--pink-strong)] shadow-xs"
-                              : "bg-white text-[var(--text-secondary)] border-[var(--border-subtle)] hover:bg-[var(--pale-rose)]"
-                          }`}
-                        >
-                          ✨ Sounds Cute
-                        </button>
-                        <button
-                          onClick={() => onUpdatePreferenceState(idea.id, currentPrefState === "maybe_someday" ? "none" : "maybe_someday")}
-                          className={`py-1 px-1 rounded-lg border text-center transition-all cursor-pointer font-medium ${
-                            currentPrefState === "maybe_someday"
-                              ? "bg-[var(--pink-primary)] text-white border-[var(--pink-strong)] shadow-xs"
-                              : "bg-white text-[var(--text-secondary)] border-[var(--border-subtle)] hover:bg-[var(--pale-rose)]"
-                          }`}
-                        >
-                          ☁️ Someday
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Bottom Action Row: Shortlist & Personal Note */}
-                    <div className="flex items-center justify-between gap-2 pt-1">
-                      <button
-                        onClick={() => onToggleShortlist(idea.id, isShort)}
-                        className={`flex-1 py-1.5 px-3 rounded-full text-xs font-semibold transition-all cursor-pointer inline-flex items-center justify-center gap-1.5 ${
-                          isShort
-                            ? "bg-emerald-500 text-white shadow-xs"
-                            : "bg-[var(--pale-rose)] text-[var(--pink-strong)] hover:bg-[var(--bg-blush)]"
-                        }`}
-                      >
-                        <span>{isShort ? "✓" : "♡"}</span>
-                        <span>{isShort ? "Saved for us" : "Save for us ♡"}</span>
-                      </button>
-
-                      <button
-                        onClick={() => handleOpenNoteModal(idea)}
-                        className="py-1.5 px-3 rounded-full border border-[var(--border-subtle)] bg-white hover:bg-[var(--pale-rose)] text-xs text-[var(--text-secondary)] cursor-pointer transition-colors inline-flex items-center gap-1"
-                        title="Add a note"
-                      >
-                        <span>✏️</span>
-                        <span>Add a note</span>
-                      </button>
-
-                      {(currentRole === "creator" || idea.isCustom) && onDeleteIdea && (
-                        <button
-                          onClick={() => {
-                            if (confirm(`Remove "${idea.title}"?`)) {
-                              onDeleteIdea(idea.id);
-                            }
-                          }}
-                          className="p-1.5 rounded-full text-xs text-[var(--text-muted)] hover:text-red-500 hover:bg-red-50 transition-colors cursor-pointer"
-                          title="Remove idea"
-                        >
-                          🗑️
-                        </button>
-                      )}
-                    </div>
                   </div>
                 </div>
-              </motion.div>
+
+                {/* Card Actions (Section 8: Single primary action & optional details action) */}
+                <div className="p-5 pt-0 flex items-center justify-between gap-3 border-t border-[var(--border-subtle)]/40 mt-3 pt-3">
+                  {/* Primary Action: Save for us ♡ / Saved ♡ */}
+                  <button
+                    onClick={() => handleToggleSave(idea)}
+                    className={`flex-1 py-2 px-3.5 rounded-full text-xs font-rounded font-semibold transition-all cursor-pointer inline-flex items-center justify-center gap-1.5 active:scale-95 ${
+                      isSaved
+                        ? "bg-[var(--pale-rose)] text-[var(--pink-strong)] border border-[var(--pink-light)] shadow-2xs font-bold"
+                        : "bg-white text-[var(--romantic-plum)] border border-[var(--border-medium)] hover:border-[var(--pink-primary)] hover:text-[var(--pink-strong)] hover:bg-[var(--pale-rose)]/50"
+                    }`}
+                  >
+                    <span>{isSaved ? "♥" : "♡"}</span>
+                    <span>{isSaved ? "Saved ♡" : "Save for us ♡"}</span>
+                  </button>
+
+                  {/* Secondary Action: View details */}
+                  <button
+                    onClick={() => handleOpenDetails(idea)}
+                    className="py-2 px-3 rounded-full text-xs font-rounded font-medium text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:bg-[var(--pale-rose)]/50 transition-colors cursor-pointer"
+                  >
+                    View details
+                  </button>
+                </div>
+              </div>
             );
           })}
         </div>
       )}
 
-      {/* Note Edit Modal */}
+      {/* View Details Modal */}
       <AnimatePresence>
-        {noteModalIdea && (
+        {detailIdea && (
           <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setNoteModalIdea(null)}
-              className="fixed inset-0 bg-black/40 backdrop-blur-xs"
+              onClick={() => setDetailIdea(null)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-xs"
             />
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="relative w-full max-w-md bg-white rounded-3xl p-6 shadow-2xl z-10 space-y-4 border border-[var(--border-subtle)]"
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="relative w-full max-w-lg bg-white rounded-3xl shadow-xl overflow-hidden z-10 max-h-[90vh] flex flex-col"
             >
-              <div className="flex items-center justify-between">
-                <h4 className="font-serif text-lg font-bold text-[var(--text-primary)]">
-                  Personal Note for &ldquo;{noteModalIdea.title}&rdquo;
-                </h4>
+              {/* Image banner */}
+              <div className="relative aspect-[16/9] w-full bg-[var(--pale-rose)] shrink-0">
+                <img
+                  src={detailIdea.coverPhoto}
+                  alt={detailIdea.title}
+                  className="w-full h-full object-cover"
+                />
                 <button
-                  onClick={() => setNoteModalIdea(null)}
-                  className="w-7 h-7 rounded-full border border-[var(--border-subtle)] flex items-center justify-center text-xs text-[var(--text-muted)] cursor-pointer"
+                  onClick={() => setDetailIdea(null)}
+                  className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 text-[var(--text-primary)] hover:bg-white flex items-center justify-center text-sm cursor-pointer shadow-xs"
                 >
                   ✕
                 </button>
+                <div className="absolute bottom-3 left-3">
+                  <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-white/95 text-xs font-bold font-rounded text-[var(--pink-strong)] shadow-xs">
+                    {getCategoryDisplay(detailIdea.category).label}
+                  </span>
+                </div>
               </div>
 
-              <p className="text-xs text-[var(--text-secondary)]">
-                Add a little reminder or hint (e.g. &ldquo;You promised to cook the pasta!&rdquo; or &ldquo;Let&apos;s go on a rainy afternoon&rdquo;).
-              </p>
+              {/* Scrollable details content */}
+              <div className="p-6 overflow-y-auto space-y-4 font-rounded">
+                <div>
+                  <h3 className="text-xl font-bold text-[var(--romantic-plum)]">
+                    {detailIdea.title}
+                  </h3>
+                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] mt-1.5 leading-relaxed">
+                    {detailIdea.description}
+                  </p>
+                </div>
 
-              <textarea
-                value={personalNoteText}
-                onChange={(e) => setPersonalNoteText(e.target.value)}
-                placeholder="Write your personal note here..."
-                rows={3}
-                className="w-full p-3 rounded-2xl border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] focus:outline-none focus:border-[var(--pink-primary)] resize-none"
-              />
+                {/* Practical details */}
+                <div className="grid grid-cols-2 gap-3 text-xs bg-[var(--bg-main)] p-3.5 rounded-2xl">
+                  <div>
+                    <span className="text-[var(--text-muted)] block text-[10px] font-semibold uppercase">Duration</span>
+                    <span className="text-[var(--text-primary)] font-medium">{detailIdea.estimatedDuration || "About 2 hours"}</span>
+                  </div>
+                  <div>
+                    <span className="text-[var(--text-muted)] block text-[10px] font-semibold uppercase">Budget</span>
+                    <span className="text-[var(--text-primary)] font-medium">{getBudgetDisplay(detailIdea.costRange, detailIdea.costEstimateText)}</span>
+                  </div>
+                  {detailIdea.location && (
+                    <div className="col-span-2">
+                      <span className="text-[var(--text-muted)] block text-[10px] font-semibold uppercase">Location</span>
+                      <span className="text-[var(--text-primary)] font-medium">📍 {detailIdea.location}</span>
+                    </div>
+                  )}
+                  {detailIdea.practicalNotes && (
+                    <div className="col-span-2">
+                      <span className="text-[var(--text-muted)] block text-[10px] font-semibold uppercase">Little tip</span>
+                      <span className="text-[var(--text-secondary)]">{detailIdea.practicalNotes}</span>
+                    </div>
+                  )}
+                </div>
 
-              <div className="flex items-center justify-end gap-2 pt-2">
+                {/* Personal Note */}
+                <div className="space-y-1.5 pt-1">
+                  <label className="text-xs font-bold text-[var(--romantic-plum)]">
+                    Add a little note for us ♡
+                  </label>
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      value={detailNoteDraft}
+                      onChange={(e) => setDetailNoteDraft(e.target.value)}
+                      placeholder="e.g. Let's do this on a Friday evening!"
+                      className="flex-1 px-3 py-2 rounded-xl bg-[var(--bg-main)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] focus:outline-hidden focus:border-[var(--pink-primary)]"
+                    />
+                    <button
+                      onClick={handleSaveDetailNote}
+                      className="px-3.5 py-2 rounded-xl bg-[var(--pale-rose)] text-[var(--pink-strong)] text-xs font-semibold hover:bg-[var(--pink-light)]/40 transition-colors cursor-pointer"
+                    >
+                      Save note
+                    </button>
+                  </div>
+                </div>
+
+                {/* Compact Preference state */}
+                <div className="space-y-1.5 pt-1">
+                  <span className="text-xs font-bold text-[var(--text-secondary)]">How do you feel about this idea?</span>
+                  <div className="flex items-center gap-2">
+                    {[
+                      { state: "really_want" as const, label: "Really want! 💕" },
+                      { state: "sounds_cute" as const, label: "Sounds cute ✨" },
+                      { state: "maybe_someday" as const, label: "Someday 🌿" },
+                    ].map((opt) => {
+                      const pref = getPrefForIdea(detailIdea.id);
+                      const isSelected = pref?.status === opt.state;
+                      return (
+                        <button
+                          key={opt.state}
+                          onClick={() => onUpdatePreferenceState(detailIdea.id, opt.state)}
+                          className={`flex-1 py-1.5 px-2 rounded-xl text-[11px] font-semibold cursor-pointer transition-all border ${
+                            isSelected
+                              ? "bg-[var(--pink-strong)] text-white border-[var(--pink-strong)]"
+                              : "bg-white text-[var(--text-secondary)] border-[var(--border-subtle)] hover:bg-[var(--pale-rose)]"
+                          }`}
+                        >
+                          {opt.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+
+              {/* Bottom Actions */}
+              <div className="p-4 border-t border-[var(--border-subtle)] flex items-center justify-between gap-3 bg-[var(--bg-main)]/50">
                 <button
-                  onClick={() => setNoteModalIdea(null)}
-                  className="px-4 py-2 rounded-full text-xs text-[var(--text-secondary)] hover:bg-[var(--pale-rose)] cursor-pointer"
+                  onClick={() => {
+                    handleToggleSave(detailIdea);
+                  }}
+                  className={`flex-1 py-2.5 px-4 rounded-full text-xs font-rounded font-semibold transition-all cursor-pointer inline-flex items-center justify-center gap-2 ${
+                    isIdeaSaved(detailIdea.id)
+                      ? "bg-[var(--pale-rose)] text-[var(--pink-strong)] border border-[var(--pink-light)]"
+                      : "bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white shadow-xs"
+                  }`}
                 >
-                  Cancel
+                  <span>{isIdeaSaved(detailIdea.id) ? "♥ Saved ♡" : "♡ Save for us"}</span>
                 </button>
-                <button
-                  onClick={handleSaveNoteSubmit}
-                  className="px-5 py-2 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] hover:shadow-md cursor-pointer"
-                >
-                  Save Note
-                </button>
+
+                {onProposeFromIdea && (
+                  <button
+                    onClick={() => {
+                      onProposeFromIdea(detailIdea);
+                      setDetailIdea(null);
+                    }}
+                    className="py-2.5 px-4 rounded-full text-xs font-rounded font-semibold text-[var(--romantic-plum)] bg-white border border-[var(--border-medium)] hover:border-[var(--pink-primary)] transition-all cursor-pointer"
+                  >
+                    Plan this date ♡
+                  </button>
+                )}
               </div>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
 
-      {/* Add Custom Date Idea Modal */}
+      {/* Create Our Own Date Modal (Section 11) */}
       <AnimatePresence>
-        {isAddModalOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto">
+        {isCreateModalOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsAddModalOpen(false)}
-              className="fixed inset-0 bg-black/40 backdrop-blur-xs"
+              onClick={() => setIsCreateModalOpen(false)}
+              className="absolute inset-0 bg-black/40 backdrop-blur-xs"
             />
             <motion.div
-              initial={{ scale: 0.95, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.95, opacity: 0 }}
-              className="relative w-full max-w-xl bg-white rounded-3xl p-6 sm:p-8 shadow-2xl z-10 space-y-5 border border-[var(--border-subtle)] max-h-[90vh] overflow-y-auto"
+              initial={{ opacity: 0, scale: 0.95, y: 15 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 15 }}
+              className="relative w-full max-w-md bg-white rounded-3xl shadow-xl overflow-hidden z-10 p-6 space-y-4 font-rounded"
             >
-              <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
-                <div className="flex items-center gap-2">
-                  <span className="text-2xl">✨</span>
-                  <h3 className="font-serif text-xl font-bold text-[var(--text-primary)]">
-                    Create a Custom Date Idea
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-xl font-bold text-[var(--romantic-plum)]">
+                    Create our own date ♡
                   </h3>
+                  <p className="text-xs text-[var(--text-secondary)] mt-0.5">
+                    Daydream something new just for the two of us.
+                  </p>
                 </div>
                 <button
-                  onClick={() => setIsAddModalOpen(false)}
-                  className="w-8 h-8 rounded-full border border-[var(--border-subtle)] flex items-center justify-center text-sm text-[var(--text-muted)] hover:bg-[var(--pale-rose)] cursor-pointer"
+                  onClick={() => setIsCreateModalOpen(false)}
+                  className="w-8 h-8 rounded-full bg-[var(--bg-main)] text-[var(--text-secondary)] hover:bg-[var(--pale-rose)] flex items-center justify-center text-sm cursor-pointer"
                 >
                   ✕
                 </button>
               </div>
 
-              <form onSubmit={handleCreateSubmit} className="space-y-4 text-xs">
-                {/* Title */}
-                <div className="space-y-1">
-                  <label className="font-semibold text-[var(--text-primary)] block">
-                    Idea Title *
+              <form onSubmit={handleCustomSubmit} className="space-y-3.5 text-xs">
+                {/* What would we like to do? */}
+                <div>
+                  <label className="block font-bold text-[var(--text-primary)] mb-1">
+                    What would we like to do? *
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. Midnight Rooftop Stargazing & Milkshakes"
-                    value={newTitle}
-                    onChange={(e) => setNewTitle(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-[var(--border-subtle)] focus:outline-none focus:border-[var(--pink-primary)] text-xs text-[var(--text-primary)]"
+                    value={customTitle}
+                    onChange={(e) => setCustomTitle(e.target.value)}
+                    placeholder="e.g. Sunset picnic, ceramic mug painting, ramen night..."
+                    className="w-full px-3.5 py-2.5 rounded-xl bg-[var(--bg-main)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] focus:outline-hidden focus:border-[var(--pink-primary)]"
                   />
                 </div>
 
-                {/* Description */}
-                <div className="space-y-1">
-                  <label className="font-semibold text-[var(--text-primary)] block">
-                    Romantic Description *
+                {/* Date & Time */}
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block font-semibold text-[var(--text-secondary)] mb-1">
+                      When? (Optional)
+                    </label>
+                    <input
+                      type="date"
+                      value={customDate}
+                      onChange={(e) => setCustomDate(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-[var(--bg-main)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)]"
+                    />
+                  </div>
+                  <div>
+                    <label className="block font-semibold text-[var(--text-secondary)] mb-1">
+                      What time? (Optional)
+                    </label>
+                    <input
+                      type="time"
+                      value={customTime}
+                      onChange={(e) => setCustomTime(e.target.value)}
+                      className="w-full px-3 py-2 rounded-xl bg-[var(--bg-main)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)]"
+                    />
+                  </div>
+                </div>
+
+                {/* Where? */}
+                <div>
+                  <label className="block font-semibold text-[var(--text-secondary)] mb-1">
+                    Where? (Optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={customLocation}
+                    onChange={(e) => setCustomLocation(e.target.value)}
+                    placeholder="e.g. Our kitchen, quiet seaside pier, local cafe..."
+                    className="w-full px-3.5 py-2 rounded-xl bg-[var(--bg-main)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)]"
+                  />
+                </div>
+
+
+                {/* A little note */}
+                <div>
+                  <label className="block font-semibold text-[var(--text-secondary)] mb-1">
+                    A little note (Optional)
                   </label>
                   <textarea
-                    required
-                    placeholder="Describe what we will do and why it will be special..."
-                    rows={3}
-                    value={newDescription}
-                    onChange={(e) => setNewDescription(e.target.value)}
-                    className="w-full p-2.5 rounded-xl border border-[var(--border-subtle)] focus:outline-none focus:border-[var(--pink-primary)] text-xs text-[var(--text-primary)] resize-none"
+                    rows={2}
+                    value={customNote}
+                    onChange={(e) => setCustomNote(e.target.value)}
+                    placeholder="e.g. Bring your favorite dessert and warm cozy socks..."
+                    className="w-full px-3.5 py-2 rounded-xl bg-[var(--bg-main)] border border-[var(--border-subtle)] text-xs text-[var(--text-primary)] resize-none"
                   />
                 </div>
 
-                {/* Category & Budget */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="font-semibold text-[var(--text-primary)] block">
-                      Category
-                    </label>
-                    <select
-                      value={newCategory}
-                      onChange={(e) => setNewCategory(e.target.value as DateCategory)}
-                      className="w-full p-2 rounded-xl border border-[var(--border-subtle)] text-xs cursor-pointer focus:outline-none focus:border-[var(--pink-primary)]"
-                    >
-                      {(Object.keys(categoryLabels) as DateCategory[]).map((cat) => (
-                        <option key={cat} value={cat}>
-                          {categoryLabels[cat].emoji} {categoryLabels[cat].label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="font-semibold text-[var(--text-primary)] block">
-                      Estimated Cost Range
-                    </label>
-                    <select
-                      value={newCostRange}
-                      onChange={(e) => {
-                        const val = e.target.value as DateCostRange;
-                        setNewCostRange(val);
-                        if (val === "free") setNewCostEstimateText("Free ($0)");
-                        else if (val === "low") setNewCostEstimateText("$15 - $30");
-                        else if (val === "medium") setNewCostEstimateText("$40 - $70");
-                        else setNewCostEstimateText("$80+");
-                      }}
-                      className="w-full p-2 rounded-xl border border-[var(--border-subtle)] text-xs cursor-pointer focus:outline-none focus:border-[var(--pink-primary)]"
-                    >
-                      <option value="free">Free ($0)</option>
-                      <option value="low">Budget-Friendly ($15 - $30)</option>
-                      <option value="medium">Moderate ($40 - $70)</option>
-                      <option value="high">Special Occasion ($80+)</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Duration & Environment */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  <div className="space-y-1">
-                    <label className="font-semibold text-[var(--text-primary)] block">
-                      Duration Text
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. 2.5 hours"
-                      value={newDuration}
-                      onChange={(e) => setNewDuration(e.target.value)}
-                      className="w-full p-2 rounded-xl border border-[var(--border-subtle)] text-xs"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="font-semibold text-[var(--text-primary)] block">
-                      Duration Minutes
-                    </label>
-                    <input
-                      type="number"
-                      min={15}
-                      step={15}
-                      value={newDurationMinutes}
-                      onChange={(e) => setNewDurationMinutes(Number(e.target.value))}
-                      className="w-full p-2 rounded-xl border border-[var(--border-subtle)] text-xs"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="font-semibold text-[var(--text-primary)] block">
-                      Setting
-                    </label>
-                    <select
-                      value={newEnvironment}
-                      onChange={(e) => setNewEnvironment(e.target.value as DateEnvironment)}
-                      className="w-full p-2 rounded-xl border border-[var(--border-subtle)] text-xs cursor-pointer"
-                    >
-                      <option value="indoor">Indoor 🛋️</option>
-                      <option value="outdoor">Outdoor 🌿</option>
-                      <option value="both">Both ⛅</option>
-                    </select>
-                  </div>
-                </div>
-
-                {/* Location */}
-                <div className="space-y-1">
-                  <label className="font-semibold text-[var(--text-primary)] block">
-                    Optional Location / Neighborhood
-                  </label>
-                  <input
-                    type="text"
-                    placeholder="e.g. River Promenade or Downtown Bistro"
-                    value={newLocation}
-                    onChange={(e) => setNewLocation(e.target.value)}
-                    className="w-full p-2 rounded-xl border border-[var(--border-subtle)] text-xs"
-                  />
-                </div>
-
-                {/* Cover Photo presets & URL */}
-                <div className="space-y-2">
-                  <label className="font-semibold text-[var(--text-primary)] block">
-                    Cover Photograph
-                  </label>
-                  <div className="flex items-center gap-2 overflow-x-auto pb-1">
-                    {sampleCoverPresets.map((preset, idx) => (
-                      <button
-                        type="button"
-                        key={idx}
-                        onClick={() => setNewCoverPhoto(preset.url)}
-                        className={`p-1 rounded-xl border transition-all cursor-pointer shrink-0 ${
-                          newCoverPhoto === preset.url
-                            ? "border-[var(--pink-strong)] ring-2 ring-[var(--pink-primary)]/40"
-                            : "border-[var(--border-subtle)]"
-                        }`}
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={preset.url}
-                          alt={preset.label}
-                          className="w-14 h-10 object-cover rounded-lg"
-                        />
-                        <span className="block text-[9px] text-center text-[var(--text-muted)] mt-0.5 max-w-[60px] truncate">
-                          {preset.label}
-                        </span>
-                      </button>
-                    ))}
-                  </div>
-
-                  <input
-                    type="url"
-                    placeholder="Or paste custom image URL..."
-                    value={newCoverPhoto}
-                    onChange={(e) => setNewCoverPhoto(e.target.value)}
-                    className="w-full p-2 rounded-xl border border-[var(--border-subtle)] text-xs text-[var(--text-muted)]"
-                  />
-                </div>
-
-                {/* Practical Notes & Accessibility */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  <div className="space-y-1">
-                    <label className="font-semibold text-[var(--text-primary)] block">
-                      Practical Notes / What to Bring
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Bring a warm hoodie and camera"
-                      value={newPracticalNotes}
-                      onChange={(e) => setNewPracticalNotes(e.target.value)}
-                      className="w-full p-2 rounded-xl border border-[var(--border-subtle)] text-xs"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label className="font-semibold text-[var(--text-primary)] block">
-                      Accessibility Information
-                    </label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Wheelchair accessible, seated areas"
-                      value={newAccessibilityNotes}
-                      onChange={(e) => setNewAccessibilityNotes(e.target.value)}
-                      className="w-full p-2 rounded-xl border border-[var(--border-subtle)] text-xs"
-                    />
-                  </div>
-                </div>
-
-                {/* Modal Buttons */}
-                <div className="flex items-center justify-end gap-3 pt-4 border-t border-[var(--border-subtle)]">
+                {/* Form Buttons */}
+                <div className="pt-2 flex items-center justify-end gap-2.5">
                   <button
                     type="button"
-                    onClick={() => setIsAddModalOpen(false)}
-                    className="px-4 py-2 rounded-full text-xs text-[var(--text-secondary)] hover:bg-[var(--pale-rose)] cursor-pointer"
+                    onClick={() => setIsCreateModalOpen(false)}
+                    className="px-4 py-2 rounded-full text-xs font-semibold text-[var(--text-secondary)] hover:bg-[var(--pale-rose)] transition-colors cursor-pointer"
                   >
                     Cancel
                   </button>
                   <button
                     type="submit"
-                    disabled={isSubmitting}
-                    className="px-6 py-2.5 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] hover:shadow-md cursor-pointer disabled:opacity-50"
+                    disabled={isSubmittingCustom}
+                    className="px-5 py-2 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] hover:shadow-md transition-all cursor-pointer disabled:opacity-50"
                   >
-                    {isSubmitting ? "Creating..." : "Add to Our Date Ideas ♡"}
+                    {isSubmittingCustom ? "Saving..." : "Save our date ♡"}
                   </button>
                 </div>
               </form>

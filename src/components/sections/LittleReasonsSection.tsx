@@ -8,7 +8,7 @@ import type { LittleReason } from "@/lib/gift-data";
 
 import { hundredReasonsList } from "@/lib/reasons-data";
 
-export const defaultReasonsList: LittleReason[] = hundredReasonsList;
+export const defaultReasonsList: LittleReason[] = hundredReasonsList.slice(0, 5);
 
 interface LittleReasonsSectionProps {
   reasons?: LittleReason[];
@@ -72,7 +72,7 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
     <SectionWrapper
       id="littleReasons"
       eyebrowLabel="A LIST THAT COULD KEEP GROWING"
-      title="A Hundred Little Reasons I Love You"
+      title="Little Reasons I Love You"
       subtitle="I started counting. Then I remembered that loving you isn't something I can finish counting."
       emoji="💗"
       bgVariant="cream"
@@ -101,7 +101,7 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
         {/* Top Control Bar: Progress Counter & Saved Reasons link */}
         <div className="flex items-center justify-between px-2 mb-4 pb-2 border-b border-[var(--border-subtle)] text-xs">
           <span className="font-rounded font-bold tracking-wider text-[var(--pink-strong)] uppercase">
-            REASON {String(currentIndex + 1).padStart(2, "0")} OF {activeReasons.length}
+            REASON {String(currentIndex + 1).padStart(2, "0")} OF {String(activeReasons.length).padStart(2, "0")}
           </span>
 
           <button

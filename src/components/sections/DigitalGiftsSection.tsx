@@ -61,6 +61,12 @@ export const defaultGiftsList: DigitalGift[] = [
     description: "Our favorite song, a little space in the living room, and absolutely no need to know how to dance.",
     emoji: "💃",
   },
+  {
+    id: "g9",
+    title: "A relaxing massage",
+    description: "Dim lights, soothing music, and as long as you need to let every bit of stress and tension melt away.",
+    emoji: "💆",
+  },
 ];
 
 interface DigitalGiftsSectionProps {

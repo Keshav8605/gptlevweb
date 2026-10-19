@@ -80,9 +80,6 @@ export function FinalHeartSection({
     }, 1500);
   };
 
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
 
   const [responseText, setResponseText] = useState("");
   const [isSubmittingResponse, setIsSubmittingResponse] = useState(false);
@@ -462,15 +459,6 @@ export function FinalHeartSection({
             </motion.p>
           )}
 
-          <div className="mt-12">
-            <button
-              onClick={scrollToTop}
-              className="text-xs tracking-wider uppercase text-[var(--text-muted)] hover:text-[var(--pink-strong)] transition-colors cursor-pointer inline-flex items-center gap-1.5 font-rounded font-semibold"
-            >
-              <span>↑</span>
-              <span>Back to the beginning ↑</span>
-            </button>
-          </div>
         </div>
       </div>
     </SectionWrapper>

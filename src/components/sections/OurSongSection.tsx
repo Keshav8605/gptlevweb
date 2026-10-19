@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useState, useRef, useEffect } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import type { SongDedication } from "@/lib/gift-data";
@@ -18,13 +18,47 @@ interface SongSuggestion {
   timestamp: string;
 }
 
+// Gentle romantic acoustic melody inspired by Stephen Sanchez - "Until I Found You"
+const SONG_MELODY: Array<{ freq: number; duration: number }> = [
+  // "Georgia..."
+  { freq: 392.0, duration: 700 },   // G4
+  { freq: 329.63, duration: 600 },  // E4
+  { freq: 293.66, duration: 600 },  // D4
+  { freq: 261.63, duration: 900 },  // C4
+  // "...wrap me up in all your"
+  { freq: 293.66, duration: 550 },  // D4
+  { freq: 329.63, duration: 550 },  // E4
+  { freq: 392.0, duration: 850 },   // G4
+  // "I would never fall in love..."
+  { freq: 440.0, duration: 600 },   // A4
+  { freq: 523.25, duration: 950 },  // C5
+  { freq: 440.0, duration: 600 },   // A4
+  { freq: 392.0, duration: 900 },   // G4
+  // "...until I found her"
+  { freq: 349.23, duration: 600 },  // F4
+  { freq: 329.63, duration: 600 },  // E4
+  { freq: 293.66, duration: 750 },  // D4
+  // "I said, I would never fall..."
+  { freq: 261.63, duration: 600 },  // C4
+  { freq: 293.66, duration: 600 },  // D4
+  { freq: 329.63, duration: 600 },  // E4
+  { freq: 392.0, duration: 900 },   // G4
+  { freq: 440.0, duration: 600 },   // A4
+  { freq: 523.25, duration: 1100 }, // C5
+  // "...until I found you ♡"
+  { freq: 440.0, duration: 600 },   // A4
+  { freq: 392.0, duration: 800 },   // G4
+  { freq: 329.63, duration: 700 },  // E4
+  { freq: 293.66, duration: 800 },  // D4
+  { freq: 261.63, duration: 1800 }, // C4 (warm final resolving chime)
+];
+
 export function OurSongSection({ featuredSong, additionalSongs }: OurSongSectionProps) {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [showSuggestModal, setShowSuggestModal] = useState(false);
-  const [suggestTitle, setSuggestTitle] = useState("");
-  const [suggestArtist, setSuggestArtist] = useState("");
-  const [suggestNote, setSuggestNote] = useState("");
-  const [suggestions, setSuggestions] = useState<SongSuggestion[]>(() => {
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [currentNoteIndex, setCurrentNoteIndex] = useState(0);
+
+  const [suggestions] = useState<SongSuggestion[]>(() => {
     if (typeof window === "undefined") return [];
     try {
       const saved = localStorage.getItem("gift_song_suggestions");
@@ -33,91 +67,93 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
       return [];
     }
   });
-  const [suggestSuccess, setSuggestSuccess] = useState(false);
 
-  // Audio synthesis reference for delightful ambient melody when played
   const audioCtxRef = useRef<AudioContext | null>(null);
-  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const noteIndexRef = useRef(0);
+
+  useEffect(() => {
+    noteIndexRef.current = currentNoteIndex;
+  }, [currentNoteIndex]);
 
   useEffect(() => {
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current);
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (audioCtxRef.current && audioCtxRef.current.state !== "closed") {
         audioCtxRef.current.close().catch(() => {});
       }
     };
   }, []);
 
-  const playChimeNote = (freq: number) => {
-    if (!audioCtxRef.current || audioCtxRef.current.state === "closed") {
-      const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-      audioCtxRef.current = new AudioCtx();
+  const playChimeNote = (freq: number, durationMs: number = 650) => {
+    try {
+      if (!audioCtxRef.current || audioCtxRef.current.state === "closed") {
+        const AudioCtx =
+          window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        audioCtxRef.current = new AudioCtx();
+      }
+      const ctx = audioCtxRef.current;
+      if (ctx.state === "suspended") {
+        ctx.resume().catch(() => {});
+      }
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+
+      osc.type = "sine";
+      osc.frequency.setValueAtTime(freq, ctx.currentTime);
+
+      const decayTime = Math.max(0.7, durationMs / 1000 + 0.7);
+
+      gain.gain.setValueAtTime(0, ctx.currentTime);
+      gain.gain.linearRampToValueAtTime(0.09, ctx.currentTime + 0.05);
+      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + decayTime);
+
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+
+      osc.start();
+      osc.stop(ctx.currentTime + decayTime);
+    } catch {
+      // AudioContext fallback
     }
-    const ctx = audioCtxRef.current;
-    if (ctx.state === "suspended") {
-      ctx.resume().catch(() => {});
+  };
+
+  const playNextNote = (index: number) => {
+    if (index >= SONG_MELODY.length) {
+      setIsPlaying(false);
+      setIsCompleted(true);
+      setCurrentNoteIndex(SONG_MELODY.length);
+      noteIndexRef.current = 0;
+      return;
     }
 
-    const osc = ctx.createOscillator();
-    const gain = ctx.createGain();
+    const note = SONG_MELODY[index];
+    playChimeNote(note.freq, note.duration);
+    setCurrentNoteIndex(index + 1);
+    noteIndexRef.current = index + 1;
 
-    osc.type = "sine";
-    osc.frequency.setValueAtTime(freq, ctx.currentTime);
-
-    gain.gain.setValueAtTime(0, ctx.currentTime);
-    gain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.1);
-    gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.8);
-
-    osc.connect(gain);
-    gain.connect(ctx.destination);
-
-    osc.start();
-    osc.stop(ctx.currentTime + 1.8);
+    timeoutRef.current = setTimeout(() => {
+      playNextNote(index + 1);
+    }, note.duration);
   };
 
   const handleTogglePlay = () => {
     if (isPlaying) {
+      // Pause
+      if (timeoutRef.current) clearTimeout(timeoutRef.current);
       setIsPlaying(false);
-      if (intervalRef.current) clearInterval(intervalRef.current);
     } else {
+      // Play, Resume, or Replay
+      if (isCompleted) {
+        setIsCompleted(false);
+        setCurrentNoteIndex(0);
+        noteIndexRef.current = 0;
+      }
       setIsPlaying(true);
-      // Play a gentle pentatonic romantic sequence
-      const pentatonic = [261.63, 293.66, 329.63, 392.0, 440.0, 523.25];
-      let step = 0;
-      playChimeNote(pentatonic[0]);
-      intervalRef.current = setInterval(() => {
-        step = (step + 1) % pentatonic.length;
-        playChimeNote(pentatonic[step]);
-      }, 700);
+      playNextNote(noteIndexRef.current >= SONG_MELODY.length ? 0 : noteIndexRef.current);
     }
-  };
-
-  const handleSubmitSuggestion = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!suggestTitle.trim()) return;
-
-    const newSuggestion: SongSuggestion = {
-      id: Date.now().toString(),
-      title: suggestTitle.trim(),
-      artist: suggestArtist.trim() || "Unknown Artist",
-      note: suggestNote.trim(),
-      timestamp: new Date().toLocaleDateString("en-US", { month: "short", day: "numeric" }),
-    };
-
-    const updated = [newSuggestion, ...suggestions];
-    setSuggestions(updated);
-    try {
-      localStorage.setItem("gift_song_suggestions", JSON.stringify(updated));
-    } catch {}
-
-    setSuggestSuccess(true);
-    setTimeout(() => {
-      setSuggestSuccess(false);
-      setShowSuggestModal(false);
-      setSuggestTitle("");
-      setSuggestArtist("");
-      setSuggestNote("");
-    }, 1500);
   };
 
   return (
@@ -171,14 +207,24 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
               </div>
             </motion.div>
 
-            {/* Play/Pause Button Overlay */}
+            {/* Play/Pause/Replay Button Overlay on Vinyl */}
             <button
               onClick={handleTogglePlay}
-              className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-white/90 backdrop-blur-sm text-[var(--pink-strong)] flex items-center justify-center shadow-md hover:scale-110 transition-transform cursor-pointer"
-              title={isPlaying ? "Pause our song" : "Play our song"}
+              className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-white/90 backdrop-blur-xs text-[var(--pink-strong)] flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-transform cursor-pointer"
+              title={
+                isPlaying
+                  ? "Pause our song"
+                  : isCompleted
+                  ? "Replay our song"
+                  : currentNoteIndex > 0
+                  ? "Resume our song"
+                  : "Play our song"
+              }
             >
               {isPlaying ? (
                 <span className="text-sm font-bold">❚❚</span>
+              ) : isCompleted ? (
+                <span className="text-sm font-bold">🔄</span>
               ) : (
                 <span className="text-sm ml-0.5 font-bold">▶</span>
               )}
@@ -189,9 +235,39 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
           <h3 className="font-serif text-2xl md:text-3xl font-semibold mb-1 text-[var(--text-primary)]">
             {featuredSong.title}
           </h3>
-          <p className="text-sm mb-6 text-[var(--text-muted)] font-medium">
+          <p className="text-sm mb-5 text-[var(--text-muted)] font-medium">
             by {featuredSong.artist}
           </p>
+
+          {/* Playback progress bar */}
+          {(isPlaying || currentNoteIndex > 0 || isCompleted) && (
+            <div className="w-full max-w-xs mx-auto mb-6">
+              <div className="h-1.5 w-full bg-[var(--pale-rose)] rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] rounded-full transition-all duration-300"
+                  style={{
+                    width: isCompleted
+                      ? "100%"
+                      : `${Math.round((currentNoteIndex / SONG_MELODY.length) * 100)}%`,
+                  }}
+                />
+              </div>
+              <div className="flex justify-between items-center text-[10px] text-[var(--text-muted)] font-rounded mt-1">
+                <span>
+                  {isPlaying
+                    ? "Playing melody..."
+                    : isCompleted
+                    ? "Melody complete ♡"
+                    : "Paused"}
+                </span>
+                <span>
+                  {isCompleted
+                    ? "Ended"
+                    : `${Math.round((currentNoteIndex / SONG_MELODY.length) * 100)}%`}
+                </span>
+              </div>
+            </div>
+          )}
 
           {/* Dedication */}
           <div className="rounded-2xl p-6 mb-6 bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-left">
@@ -210,29 +286,33 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
             </p>
           )}
 
-          {/* Interactive controls & suggest CTA */}
-          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+          {/* Single clean interactive control */}
+          <div className="pt-2 flex items-center justify-center">
             <button
               onClick={handleTogglePlay}
-              className="px-6 py-2.5 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs font-semibold shadow-xs hover:shadow-md transition-all cursor-pointer inline-flex items-center gap-2"
+              className="px-8 py-3 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs sm:text-sm font-rounded font-semibold shadow-xs hover:shadow-md hover:scale-102 active:scale-98 transition-all cursor-pointer inline-flex items-center gap-2"
             >
-              <span>{isPlaying ? "Pause our song" : "Play our song"}</span>
-              <span>{isPlaying ? "⏸" : "▶"}</span>
-            </button>
-
-            <button
-              onClick={handleTogglePlay}
-              className="px-5 py-2.5 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] text-xs font-medium hover:bg-[var(--bg-blush)] transition-colors cursor-pointer inline-flex items-center gap-2"
-            >
-              <span>{isPlaying ? "Pause instrumental" : "Play a soft instrumental"}</span>
-              <span>✨</span>
-            </button>
-
-            <button
-              onClick={() => setShowSuggestModal(true)}
-              className="px-5 py-2.5 rounded-full border border-[var(--border-medium)] text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:border-[var(--pink-primary)] text-xs font-medium transition-colors cursor-pointer inline-flex items-center gap-1.5"
-            >
-              <span>Add a song to our soundtrack ♡</span>
+              {isPlaying ? (
+                <>
+                  <span>Pause our song</span>
+                  <span className="text-sm">⏸</span>
+                </>
+              ) : isCompleted ? (
+                <>
+                  <span>Replay our song</span>
+                  <span className="text-sm">🔄</span>
+                </>
+              ) : currentNoteIndex > 0 ? (
+                <>
+                  <span>Resume our song</span>
+                  <span className="text-sm">▶</span>
+                </>
+              ) : (
+                <>
+                  <span>Play our song</span>
+                  <span className="text-sm">▶</span>
+                </>
+              )}
             </button>
           </div>
         </motion.div>
@@ -297,109 +377,6 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
           </div>
         )}
       </div>
-
-      {/* Suggest Song Modal */}
-      <AnimatePresence>
-        {showSuggestModal && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowSuggestModal(false)}
-              className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.9, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.9, y: 20 }}
-              className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-md w-full z-50 bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-[var(--border-subtle)]"
-            >
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="font-serif text-2xl font-semibold text-[var(--text-primary)]">
-                  Suggest a Song for Us
-                </h3>
-                <button
-                  onClick={() => setShowSuggestModal(false)}
-                  className="w-8 h-8 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-blush)]"
-                >
-                  ✕
-                </button>
-              </div>
-
-              {suggestSuccess ? (
-                <div className="py-8 text-center space-y-2">
-                  <span className="text-4xl animate-bounce inline-block">💖</span>
-                  <p className="font-script text-2xl text-[var(--pink-strong)]">
-                    Added to our playlist!
-                  </p>
-                  <p className="text-xs text-[var(--text-muted)]">
-                    I can&apos;t wait to listen to this while thinking of you.
-                  </p>
-                </div>
-              ) : (
-                <form onSubmit={handleSubmitSuggestion} className="space-y-4">
-                  <div>
-                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                      Song Title *
-                    </label>
-                    <input
-                      type="text"
-                      required
-                      value={suggestTitle}
-                      onChange={(e) => setSuggestTitle(e.target.value)}
-                      placeholder="e.g. Lover, Golden Hour..."
-                      className="w-full text-xs p-3 rounded-xl border border-[var(--border-medium)] focus:border-[var(--pink-primary)] focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                      Artist
-                    </label>
-                    <input
-                      type="text"
-                      value={suggestArtist}
-                      onChange={(e) => setSuggestArtist(e.target.value)}
-                      placeholder="e.g. Taylor Swift, JVKE..."
-                      className="w-full text-xs p-3 rounded-xl border border-[var(--border-medium)] focus:border-[var(--pink-primary)] focus:outline-none"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-[var(--text-secondary)] mb-1">
-                      Why this song reminds you of us:
-                    </label>
-                    <textarea
-                      value={suggestNote}
-                      onChange={(e) => setSuggestNote(e.target.value)}
-                      placeholder="Share a sweet memory or feeling connected to this song..."
-                      rows={3}
-                      className="w-full text-xs p-3 rounded-xl border border-[var(--border-medium)] focus:border-[var(--pink-primary)] focus:outline-none resize-none"
-                    />
-                  </div>
-
-                  <div className="flex justify-end gap-2 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => setShowSuggestModal(false)}
-                      className="px-4 py-2 text-xs text-[var(--text-muted)] cursor-pointer"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="px-5 py-2 text-xs rounded-xl bg-[var(--pink-strong)] text-white hover:bg-[var(--pink-deep)] font-semibold transition-colors cursor-pointer"
-                    >
-                      Send Dedication ♡
-                    </button>
-                  </div>
-                </form>
-              )}
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
     </SectionWrapper>
   );
 }

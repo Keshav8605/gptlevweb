@@ -4,32 +4,27 @@ import { motion } from "framer-motion";
 import { useState, useEffect, useCallback } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { RomanticCharacter } from "../RomanticCharacter";
-import { DateCountdownBanner } from "./DateCountdownBanner";
 import { DateIdeasCatalog } from "./DateIdeasCatalog";
-import { DateItineraryBuilder } from "./DateItineraryBuilder";
 import { DateProposalsView } from "./DateProposalsView";
-import { DateCalendarView } from "./DateCalendarView";
 import { DateMemoriesGallery } from "./DateMemoriesGallery";
-import { DateNotificationDrawer } from "./DateNotificationDrawer";
 import type {
   DateIdea,
   DatePreference,
   DateProposal,
   DateMemory,
-  DateNotification,
-  NotificationSettings,
   DatePreferenceState,
   ChecklistItem,
 } from "@/lib/server-db";
 
-type PlannerTab = "ideas" | "builder" | "proposals" | "calendar" | "memories";
+type PlannerTab = "discover" | "plans" | "memories";
 
 interface DatePlannerSectionProps {
   onOpenAccessModal?: () => void;
 }
 
 export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProps) {
-  const [activeTab, setActiveTab] = useState<PlannerTab>("ideas");
+  // Navigation: 3 destinations (Section 5 exact labels)
+  const [activeTab, setActiveTab] = useState<PlannerTab>("discover");
 
   // Dynamic user role & name from localStorage
   const [currentRole, setCurrentRole] = useState<"creator" | "recipient">(() => {
@@ -47,14 +42,10 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
   const [preferences, setPreferences] = useState<DatePreference[]>([]);
   const [proposals, setProposals] = useState<DateProposal[]>([]);
   const [memories, setMemories] = useState<DateMemory[]>([]);
-  const [notifications, setNotifications] = useState<DateNotification[]>([]);
-  const [unreadNotifCount, setUnreadNotifCount] = useState<number>(0);
-  const [notifSettings, setNotifSettings] = useState<NotificationSettings | undefined>(undefined);
-
   const [isLoading, setIsLoading] = useState(true);
   const [initialProposalForMemory, setInitialProposalForMemory] = useState<DateProposal | null>(null);
 
-  // Read role from localStorage
+  // Sync role and recipient name from localStorage
   const syncRole = useCallback(() => {
     if (typeof window === "undefined") return;
     const role = (localStorage.getItem("gift_participant_role") as "creator" | "recipient") || "recipient";
@@ -90,21 +81,6 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
         const data = await memRes.json();
         if (data.memories) setMemories(data.memories);
       }
-
-      // 4. Fetch Notifications
-      const notifRes = await fetch(`/api/dates/notifications?role=${role}&token=${encodeURIComponent(token)}`);
-      if (notifRes.ok) {
-        const data = await notifRes.json();
-        if (data.notifications) setNotifications(data.notifications);
-        if (typeof data.unreadCount === "number") setUnreadNotifCount(data.unreadCount);
-      }
-
-      // 5. Fetch Notification Settings
-      const setRes = await fetch("/api/dates/notifications/settings");
-      if (setRes.ok) {
-        const data = await setRes.json();
-        if (data.settings) setNotifSettings(data.settings);
-      }
     } catch (err) {
       console.error("Error loading Date Planner data:", err);
     } finally {
@@ -114,7 +90,6 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
 
   useEffect(() => {
     fetchAllData();
-
     window.addEventListener("storage", syncRole);
     return () => window.removeEventListener("storage", syncRole);
   }, [syncRole, fetchAllData]);
@@ -124,7 +99,6 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
   // Toggle Favorite
   const handleToggleFavorite = async (ideaId: string, currentFav: boolean) => {
     const token = localStorage.getItem("gift_auth_token") || "";
-    // Optimistic UI update
     setPreferences((prev) => {
       const idx = prev.findIndex((p) => p.ideaId === ideaId);
       if (idx !== -1) {
@@ -165,15 +139,14 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
     }
   };
 
-  // Toggle Shortlist
+  // Toggle Shortlist / Save (Section 8 & 9.B)
   const handleToggleShortlist = async (ideaId: string, currentShortlisted: boolean) => {
     const token = localStorage.getItem("gift_auth_token") || "";
-    // Optimistic UI update
     setPreferences((prev) => {
       const idx = prev.findIndex((p) => p.ideaId === ideaId);
       if (idx !== -1) {
         const next = [...prev];
-        next[idx] = { ...next[idx], isShortlisted: !currentShortlisted };
+        next[idx] = { ...next[idx], isShortlisted: !currentShortlisted, isFavorite: !currentShortlisted ? true : next[idx].isFavorite };
         return next;
       }
       return [
@@ -184,7 +157,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
           participantRole: currentRole,
           participantName: currentName,
           status: "none",
-          isFavorite: false,
+          isFavorite: !currentShortlisted,
           isShortlisted: !currentShortlisted,
           updatedAt: new Date().toISOString(),
         },
@@ -197,7 +170,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           ideaId,
-          updates: { isShortlisted: !currentShortlisted },
+          updates: { isShortlisted: !currentShortlisted, isFavorite: !currentShortlisted },
           token,
           role: currentRole,
           name: currentName,
@@ -209,7 +182,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
     }
   };
 
-  // Update Preference State ("really_want" | "sounds_cute" | "maybe_someday" | "none")
+  // Update Preference State
   const handleUpdatePreferenceState = async (ideaId: string, state: DatePreferenceState) => {
     const token = localStorage.getItem("gift_auth_token") || "";
     setPreferences((prev) => {
@@ -296,7 +269,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
     }
   };
 
-  // Create Custom Idea
+  // Create Custom Idea (Section 11)
   const handleCreateIdea = async (newIdea: Partial<DateIdea>): Promise<boolean> => {
     const token = localStorage.getItem("gift_auth_token") || "";
     try {
@@ -314,6 +287,8 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
         const data = await res.json();
         if (data.idea) {
           setIdeas((prev) => [...prev, data.idea]);
+          // Also automatically save the newly created idea to Our Plans
+          handleToggleShortlist(data.idea.id, false);
           return true;
         }
       }
@@ -323,24 +298,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
     }
   };
 
-  // Delete Idea
-  const handleDeleteIdea = async (id: string): Promise<boolean> => {
-    const token = localStorage.getItem("gift_auth_token") || "";
-    try {
-      const res = await fetch(`/api/dates/ideas?id=${encodeURIComponent(id)}&token=${encodeURIComponent(token)}&role=${currentRole}`, {
-        method: "DELETE",
-      });
-      if (res.ok) {
-        setIdeas((prev) => prev.filter((i) => i.id !== id));
-        return true;
-      }
-      return false;
-    } catch {
-      return false;
-    }
-  };
-
-  // Propose Date
+  // Propose Date (Section 9.D)
   const handleProposeDate = async (proposalData: Partial<DateProposal>): Promise<boolean> => {
     const token = localStorage.getItem("gift_auth_token") || "";
     try {
@@ -359,7 +317,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
         const data = await res.json();
         if (data.proposal) {
           setProposals((prev) => [data.proposal, ...prev]);
-          setActiveTab("proposals");
+          setActiveTab("plans");
           return true;
         }
       }
@@ -369,7 +327,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
     }
   };
 
-  // Transition Proposal (Accept, Decline, Changes, Reschedule, Cancel, Complete, Reveal)
+  // Transition Proposal (Accept, Reschedule, Complete, etc.)
   const handleTransitionProposal = async (
     id: string,
     action: "accept" | "request_changes" | "reschedule" | "decline" | "cancel" | "complete" | "reveal_surprise",
@@ -400,16 +358,12 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
           setProposals((prev) =>
             prev.map((p) => (p.id === id ? data.proposal : p))
           );
-          // If marked completed, switch to memories tab
           if (action === "complete") {
             setInitialProposalForMemory(data.proposal);
             setActiveTab("memories");
           }
           return true;
         }
-      } else {
-        const errData = await res.json();
-        alert(errData.error || "Action could not be completed.");
       }
       return false;
     } catch {
@@ -444,7 +398,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
     }
   };
 
-  // Add Date Memory
+  // Add Memory (Section 12)
   const handleAddMemory = async (memoryData: Partial<DateMemory>): Promise<boolean> => {
     const token = localStorage.getItem("gift_auth_token") || "";
     try {
@@ -473,7 +427,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
     }
   };
 
-  // Delete Date Memory
+  // Delete Memory
   const handleDeleteMemory = async (id: string): Promise<boolean> => {
     const token = localStorage.getItem("gift_auth_token") || "";
     try {
@@ -491,44 +445,10 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
     }
   };
 
-  // Mark Notifications Read
-  const handleMarkNotificationsRead = async (ids: string[] | "all") => {
-    const token = localStorage.getItem("gift_auth_token") || "";
-    setNotifications((prev) =>
-      prev.map((n) => (ids === "all" || ids.includes(n.id) ? { ...n, isRead: true } : n))
-    );
-    setUnreadNotifCount(0);
-
-    try {
-      await fetch("/api/dates/notifications", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids, token, role: currentRole }),
-      });
-    } catch {}
-  };
-
-  // Update Notification Settings
-  const handleUpdateNotifSettings = async (updates: Partial<NotificationSettings>) => {
-    setNotifSettings((prev) => (prev ? { ...prev, ...updates } : undefined));
-    try {
-      await fetch("/api/dates/notifications/settings", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updates),
-      });
-    } catch {}
-  };
-
-  // Counters for status bar
-  const shortlistedCount = preferences.filter((p) => p.isShortlisted).length;
-  const pendingProposalsCount = proposals.filter((p) => p.status === "proposed" || p.status === "changes_requested").length;
-  const confirmedDatesCount = proposals.filter((p) => p.status === "confirmed").length;
-
   return (
     <SectionWrapper
       id="datePlanner"
-      eyebrowLabel="OUR NEXT LITTLE ADVENTURE"
+      eyebrowLabel="OUR NEXT LITTLE ADVENTURE ✨"
       title="Let's Make a Day of It ♡"
       subtitle="Little plans, new places, and memories we haven't made yet."
       emoji="🗺️"
@@ -536,163 +456,87 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
       chapterNumber={10}
       nextSectionId="openWhenLetters"
       nextSectionLabel="Open your letters for every kind of day 💌"
+      nextSectionSubtitle="And for the days when we can't plan an adventure, I still want you to have a little reminder of how loved you are."
       nextSectionEmoji="✉️"
     >
-      <div className="max-w-6xl mx-auto space-y-6">
-        {/* Playful adventurous couple companion */}
-        <div className="flex justify-center -mt-3 mb-6">
+      <div className="max-w-5xl mx-auto space-y-6">
+        {/* Balanced Hero Illustration (Section 3) */}
+        <div className="flex justify-center -mt-2 mb-2">
           <RomanticCharacter
             character="huggingCouple"
-            size={180}
+            size={130}
             animation="gentle-float"
             sparkles
           />
         </div>
 
-        {/* Top Control Bar: Active Participant, Notifications & Discreet Status */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 rounded-3xl bg-white/90 border border-[var(--border-subtle)] shadow-xs">
-          {/* Active Partner Badge */}
-          <div className="flex items-center gap-2.5 text-xs text-[var(--text-secondary)]">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-            <span>Planning as:</span>
-            <span className="font-serif text-sm font-bold text-[var(--pink-strong)]">
-              {currentName} ({currentRole === "creator" ? "Creator" : "Recipient"})
-            </span>
-            {onOpenAccessModal && (
-              <button
-                onClick={onOpenAccessModal}
-                className="text-[11px] text-[var(--pink-strong)] underline hover:opacity-80 cursor-pointer font-medium ml-1"
-              >
-                Switch
-              </button>
-            )}
-          </div>
-
-          {/* Discreet Metrics Chips & Notification Drawer */}
-          <div className="flex items-center gap-2 flex-wrap justify-center text-xs">
-            <span className="px-2.5 py-1 rounded-full bg-[var(--pale-rose)] text-[var(--text-primary)] font-medium">
-              {shortlistedCount} Shortlisted
-            </span>
-            {pendingProposalsCount > 0 && (
-              <span className="px-2.5 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 font-medium">
-                {pendingProposalsCount} Pending
-              </span>
-            )}
-            {confirmedDatesCount > 0 && (
-              <span className="px-2.5 py-1 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-800 font-medium">
-                {confirmedDatesCount} Confirmed
-              </span>
-            )}
-
-            {/* In-App Notification Bell Drawer */}
-            <DateNotificationDrawer
-              notifications={notifications}
-              unreadCount={unreadNotifCount}
-              onMarkRead={handleMarkNotificationsRead}
-              onSelectNotification={(notif) => {
-                if (notif.type === "new_proposal" || notif.type === "changes_requested" || notif.type === "proposal_accepted") {
-                  setActiveTab("proposals");
-                } else if (notif.type === "post_date_memory_prompt") {
-                  setActiveTab("memories");
-                }
-              }}
-              settings={notifSettings}
-              onUpdateSettings={handleUpdateNotifSettings}
-            />
-          </div>
+        {/* Small, unobtrusive recipient identity (Section 4) */}
+        <div className="flex items-center justify-center gap-1.5 text-xs text-[var(--text-secondary)] font-rounded mb-6">
+          <span>Planning for {currentName || "Baby"} ♡</span>
+          {onOpenAccessModal && (
+            <button
+              onClick={onOpenAccessModal}
+              className="text-[11px] text-[var(--pink-strong)] underline hover:opacity-80 cursor-pointer font-medium ml-1"
+            >
+              (switch)
+            </button>
+          )}
         </div>
 
-        {/* Live Countdown Banner for nearest confirmed future date */}
-        <DateCountdownBanner
-          proposals={proposals}
-          onViewEvent={() => setActiveTab("calendar")}
-          onExploreIdeas={() => setActiveTab("ideas")}
-        />
-
-        {/* 5-Tab Romantic Navigation Bar */}
-        <div className="flex items-center justify-start sm:justify-center overflow-x-auto pb-2 -mx-2 px-2 scrollbar-none">
-          <div className="inline-flex p-1.5 rounded-3xl bg-white border border-[var(--border-subtle)] shadow-xs min-w-max">
+        {/* Simple Three-Part Navigation (Section 5 exact labels) */}
+        <div className="flex justify-center pb-2">
+          <div className="grid grid-cols-3 p-1.5 rounded-full bg-white border border-[var(--border-subtle)] shadow-xs max-w-md w-full text-center">
             <button
-              onClick={() => setActiveTab("ideas")}
-              className={`px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold cursor-pointer transition-all inline-flex items-center gap-2 ${
-                activeTab === "ideas"
+              onClick={() => setActiveTab("discover")}
+              className={`py-2 px-2 sm:px-4 rounded-full text-xs sm:text-sm font-rounded font-semibold cursor-pointer transition-all ${
+                activeTab === "discover"
                   ? "bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white shadow-xs"
-                  : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:bg-[var(--pale-rose)]"
+                  : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:bg-[var(--pale-rose)]/50"
               }`}
             >
-              <span>💡</span>
-              <span>Date ideas</span>
+              Discover Dates
             </button>
 
             <button
-              onClick={() => setActiveTab("builder")}
-              className={`px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold cursor-pointer transition-all inline-flex items-center gap-2 ${
-                activeTab === "builder"
+              onClick={() => setActiveTab("plans")}
+              className={`py-2 px-2 sm:px-4 rounded-full text-xs sm:text-sm font-rounded font-semibold cursor-pointer transition-all ${
+                activeTab === "plans"
                   ? "bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white shadow-xs"
-                  : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:bg-[var(--pale-rose)]"
+                  : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:bg-[var(--pale-rose)]/50"
               }`}
             >
-              <span>📋</span>
-              <span>Build our date</span>
-            </button>
-
-            <button
-              onClick={() => setActiveTab("proposals")}
-              className={`px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold cursor-pointer transition-all inline-flex items-center gap-2 relative ${
-                activeTab === "proposals"
-                  ? "bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white shadow-xs"
-                  : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:bg-[var(--pale-rose)]"
-              }`}
-            >
-              <span>💌</span>
-              <span>Our plans</span>
-              {pendingProposalsCount > 0 && (
-                <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse ml-0.5" />
-              )}
-            </button>
-
-            <button
-              onClick={() => setActiveTab("calendar")}
-              className={`px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold cursor-pointer transition-all inline-flex items-center gap-2 ${
-                activeTab === "calendar"
-                  ? "bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white shadow-xs"
-                  : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:bg-[var(--pale-rose)]"
-              }`}
-            >
-              <span>📅</span>
-              <span>Shared calendar</span>
+              Our Plans
             </button>
 
             <button
               onClick={() => setActiveTab("memories")}
-              className={`px-4 sm:px-5 py-2.5 rounded-2xl text-xs sm:text-sm font-semibold cursor-pointer transition-all inline-flex items-center gap-2 ${
+              className={`py-2 px-2 sm:px-4 rounded-full text-xs sm:text-sm font-rounded font-semibold cursor-pointer transition-all ${
                 activeTab === "memories"
                   ? "bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white shadow-xs"
-                  : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:bg-[var(--pale-rose)]"
+                  : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:bg-[var(--pale-rose)]/50"
               }`}
             >
-              <span>📸</span>
-              <span>Memories</span>
+              Our Memories
             </button>
           </div>
         </div>
 
         {/* Tab Content Display */}
         {isLoading ? (
-          <div className="py-24 text-center space-y-3">
-            <span className="text-4xl inline-block animate-bounce">💖</span>
-            <p className="font-serif text-lg text-[var(--text-secondary)]">
+          <div className="py-20 text-center space-y-3">
+            <span className="text-3xl inline-block animate-bounce">💖</span>
+            <p className="font-rounded text-sm text-[var(--text-secondary)]">
               Opening our little adventure book...
             </p>
           </div>
         ) : (
           <motion.div
             key={activeTab}
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.25 }}
           >
-            {activeTab === "ideas" && (
+            {activeTab === "discover" && (
               <DateIdeasCatalog
                 ideas={ideas}
                 preferences={preferences}
@@ -701,40 +545,27 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
                 onUpdatePreferenceState={handleUpdatePreferenceState}
                 onSavePersonalNote={handleSavePersonalNote}
                 onCreateIdea={handleCreateIdea}
-                onDeleteIdea={handleDeleteIdea}
+                onProposeFromIdea={() => {
+                  setActiveTab("plans");
+                }}
+                onNavigateToPlans={() => setActiveTab("plans")}
                 currentRole={currentRole}
                 currentName={currentName}
               />
             )}
 
-            {activeTab === "builder" && (
-              <DateItineraryBuilder
+            {activeTab === "plans" && (
+              <DateProposalsView
                 ideas={ideas}
                 preferences={preferences}
+                proposals={proposals}
+                onToggleShortlist={handleToggleShortlist}
                 onProposeDate={handleProposeDate}
-                onSwitchToCatalog={() => setActiveTab("ideas")}
-                currentRole={currentRole}
-                currentName={currentName}
-              />
-            )}
-
-            {activeTab === "proposals" && (
-              <DateProposalsView
-                proposals={proposals}
                 onTransitionProposal={handleTransitionProposal}
-                onOpenBuilder={() => setActiveTab("builder")}
-                currentRole={currentRole}
-                currentName={currentName}
-              />
-            )}
-
-            {activeTab === "calendar" && (
-              <DateCalendarView
-                proposals={proposals}
                 onUpdateChecklist={handleUpdateChecklist}
-                onTransitionProposal={handleTransitionProposal}
-                onOpenMemoriesForProposal={(prop) => {
-                  setInitialProposalForMemory(prop);
+                onExploreIdeas={() => setActiveTab("discover")}
+                onOpenMemories={(prop) => {
+                  if (prop) setInitialProposalForMemory(prop);
                   setActiveTab("memories");
                 }}
                 currentRole={currentRole}
@@ -749,6 +580,7 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
                 onAddMemory={handleAddMemory}
                 onDeleteMemory={handleDeleteMemory}
                 initialProposalForMemory={initialProposalForMemory}
+                onExploreIdeas={() => setActiveTab("discover")}
                 currentRole={currentRole}
                 currentName={currentName}
               />

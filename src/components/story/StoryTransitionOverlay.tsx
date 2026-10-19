@@ -327,7 +327,7 @@ export function StoryTransitionOverlay() {
                 <span className="text-5xl">💐</span>
               </div>
               <p className="mt-4 font-handwritten text-xl text-[var(--pink-strong)]">
-                A Hundred Little Reasons Why... ♡
+                Little Reasons Why... ♡
               </p>
             </motion.div>
           )}
