@@ -845,6 +845,13 @@ export const defaultDateIdeas: DateIdea[] = [
 
 export const defaultDateProposals: DateProposal[] = [];
 
+// Helper to compute dynamic future date (e.g. 3 days from now)
+function getFutureDateString(daysFromNow: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + daysFromNow);
+  return d.toISOString().split("T")[0];
+}
+
 function getPastDateString(daysAgo: number): string {
   const d = new Date();
   d.setDate(d.getDate() - daysAgo);

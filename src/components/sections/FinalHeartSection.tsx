@@ -144,10 +144,6 @@ export function FinalHeartSection({
       chapterNumber={15}
     >
       <div className="max-w-4xl mx-auto space-y-16">
-        {/* Collage instruction cue */}
-        <p className="text-center font-rounded text-xs sm:text-sm text-[var(--pink-strong)] font-medium -mt-4 mb-2">
-          Choose a picture to revisit its memory ♡
-        </p>
 
         {/* The Emotional Climax: Interactive Two-Style Photo Collage */}
         <div className="relative">
@@ -455,7 +451,7 @@ export function FinalHeartSection({
               animate={{ opacity: 1, y: 0 }}
               className="mt-4 font-handwritten text-2xl text-[var(--pink-strong)]"
             >
-              Your love has been sent right to my heart! 🥺💕
+              Your love has been sent right to my heart! 🥹💕
             </motion.p>
           )}
 

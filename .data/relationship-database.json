@@ -674,6 +674,26 @@
       "authorName": "Baby",
       "createdAt": "2026-10-19T17:46:38.437Z",
       "isViewedByCreator": false
+    },
+    {
+      "id": "cm_1792438668960_h66l",
+      "targetType": "finalResponse",
+      "targetId": "finale",
+      "content": "jrhiohk klqnflf",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-19T19:37:48.960Z",
+      "isViewedByCreator": false
+    },
+    {
+      "id": "cm_1792439115448_gx9z",
+      "targetType": "finalResponse",
+      "targetId": "finale",
+      "content": "Loving you is the best part of every day!",
+      "author": "recipient",
+      "authorName": "Baby",
+      "createdAt": "2026-10-19T19:45:15.448Z",
+      "isViewedByCreator": false
     }
   ],
   "journalEntries": [
@@ -1985,10 +2005,10 @@
       "participantRole": "recipient",
       "participantName": "Baby",
       "status": "really_want",
-      "isFavorite": true,
-      "isShortlisted": true,
+      "isFavorite": false,
+      "isShortlisted": false,
       "personalNote": "I want to watch the sunset with you so badly!",
-      "updatedAt": "2026-10-17T05:52:33.312Z"
+      "updatedAt": "2026-10-19T19:35:04.299Z"
     },
     {
       "id": "pref_init_2",
@@ -2010,6 +2030,16 @@
       "isFavorite": false,
       "isShortlisted": true,
       "updatedAt": "2026-10-19T15:04:48.355Z"
+    },
+    {
+      "id": "pref_1792438476270_hryh",
+      "ideaId": "idea_thrift_challenge",
+      "participantRole": "recipient",
+      "participantName": "Baby",
+      "status": "none",
+      "isFavorite": false,
+      "isShortlisted": false,
+      "updatedAt": "2026-10-19T19:35:05.438Z"
     }
   ],
   "dateProposals": [
