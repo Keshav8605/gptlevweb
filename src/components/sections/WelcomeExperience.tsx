@@ -1,9 +1,15 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { RomanticCharacter } from "../RomanticCharacter";
 import { useStoryScene } from "@/context/StorySceneContext";
+
+export interface HeroPolaroid {
+  id?: string;
+  src?: string;
+  caption?: string;
+}
 
 interface WelcomeExperienceProps {
   recipientNickname: string;
@@ -12,6 +18,7 @@ interface WelcomeExperienceProps {
   message?: string;
   startDate?: string;
   onEnter: () => void;
+  polaroids?: HeroPolaroid[];
 }
 
 export function WelcomeExperience({
@@ -20,9 +27,12 @@ export function WelcomeExperience({
   subtitle,
   message,
   onEnter,
+  polaroids,
 }: WelcomeExperienceProps) {
   const [photoLoaded, setPhotoLoaded] = useState<Record<string, boolean>>({});
+  const [clickedHeart, setClickedHeart] = useState<string | null>(null);
 
+<<<<<<< HEAD
   let sceneContext: ReturnType<typeof useStoryScene> | null = null;
   try {
     // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -41,10 +51,22 @@ export function WelcomeExperience({
 
   // 4 Curated Romantic Hero Polaroids (matching Reference 2)
   const heroPolaroids = [
+=======
+  const handleCardClick = (id: string) => {
+    setClickedHeart(id);
+    setTimeout(() => {
+      setClickedHeart((curr) => (curr === id ? null : curr));
+    }, 1200);
+  };
+
+  // 4 Universal Romantic Hero Polaroids
+  // Crafted so ANY photo — couple photo, solo portrait of partner/sender, or scenic memory — looks deeply lovable, connecting, and impressive.
+  const defaultPolaroidsData = [
+>>>>>>> d158bf5f03c3f4e4709a5dd17b3510469507a888
     {
       id: "p1",
       src: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80",
-      caption: "A moment I'd keep forever",
+      caption: "A moment I'd choose all over again.",
       rotation: -5,
       delay: 0,
       positionClass: "hidden lg:block absolute top-6 lg:top-8 left-4 xl:left-12",
@@ -52,7 +74,7 @@ export function WelcomeExperience({
     {
       id: "p2",
       src: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=600&q=80",
-      caption: "Our favourite view",
+      caption: "Somehow, my heart always finds its way back to you.",
       rotation: 4.5,
       delay: 0.5,
       positionClass: "hidden lg:block absolute top-8 lg:top-10 right-4 xl:right-12",
@@ -60,7 +82,7 @@ export function WelcomeExperience({
     {
       id: "p3",
       src: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80",
-      caption: "Anywhere is lovely with you",
+      caption: "The world feels softer when I share it with you.",
       rotation: 4,
       delay: 1,
       positionClass: "hidden md:block absolute top-[44%] lg:top-[42%] left-4 xl:left-12",
@@ -68,12 +90,21 @@ export function WelcomeExperience({
     {
       id: "p4",
       src: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=600&q=80",
-      caption: "Told mostly in bad jokes",
+      caption: "My favorite person, in a thousand little ways.",
       rotation: -3.5,
       delay: 1.5,
       positionClass: "hidden md:block absolute top-[46%] lg:top-[44%] right-4 xl:right-12",
     },
   ];
+
+  const heroPolaroids = defaultPolaroidsData.map((item, idx) => {
+    const custom = polaroids?.[idx];
+    return {
+      ...item,
+      src: custom?.src?.trim() || item.src,
+      caption: custom?.caption?.trim() || item.caption,
+    };
+  });
 
   return (
     <section
@@ -105,7 +136,8 @@ export function WelcomeExperience({
         animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[0].rotation }}
         transition={{ duration: 0.9, delay: 0.3 }}
         whileHover={{ scale: 1.06, rotate: -2, zIndex: 30 }}
-        className={`${heroPolaroids[0].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl`}
+        onClick={() => handleCardClick(heroPolaroids[0].id)}
+        className={`${heroPolaroids[0].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl select-none`}
       >
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--soft-pink)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -118,6 +150,19 @@ export function WelcomeExperience({
           {!photoLoaded.p1 && (
             <div className="absolute inset-0 flex items-center justify-center text-3xl">📸</div>
           )}
+          <AnimatePresence>
+            {clickedHeart === heroPolaroids[0].id && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.4, y: 10 }}
+                animate={{ opacity: 1, scale: 1.3, y: -16 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.6 }}
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+              >
+                <span className="text-4xl drop-shadow-lg">💖</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         <p className="mt-3 font-handwritten text-center text-base xl:text-lg text-[var(--romantic-plum)] font-semibold">
           {heroPolaroids[0].caption}
@@ -130,7 +175,8 @@ export function WelcomeExperience({
         animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[1].rotation }}
         transition={{ duration: 0.9, delay: 0.4 }}
         whileHover={{ scale: 1.06, rotate: 1, zIndex: 30 }}
-        className={`${heroPolaroids[1].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl`}
+        onClick={() => handleCardClick(heroPolaroids[1].id)}
+        className={`${heroPolaroids[1].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl select-none`}
       >
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--lavender)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -143,6 +189,19 @@ export function WelcomeExperience({
           {!photoLoaded.p2 && (
             <div className="absolute inset-0 flex items-center justify-center text-3xl">🌅</div>
           )}
+          <AnimatePresence>
+            {clickedHeart === heroPolaroids[1].id && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.4, y: 10 }}
+                animate={{ opacity: 1, scale: 1.3, y: -16 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.6 }}
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+              >
+                <span className="text-4xl drop-shadow-lg">💖</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         <p className="mt-3 font-handwritten text-center text-base xl:text-lg text-[var(--romantic-plum)] font-semibold">
           {heroPolaroids[1].caption}
@@ -155,7 +214,8 @@ export function WelcomeExperience({
         animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[2].rotation }}
         transition={{ duration: 0.9, delay: 0.5 }}
         whileHover={{ scale: 1.06, rotate: 0, zIndex: 30 }}
-        className={`${heroPolaroids[2].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl`}
+        onClick={() => handleCardClick(heroPolaroids[2].id)}
+        className={`${heroPolaroids[2].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl select-none`}
       >
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--soft-pink)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -168,6 +228,19 @@ export function WelcomeExperience({
           {!photoLoaded.p3 && (
             <div className="absolute inset-0 flex items-center justify-center text-3xl">✨</div>
           )}
+          <AnimatePresence>
+            {clickedHeart === heroPolaroids[2].id && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.4, y: 10 }}
+                animate={{ opacity: 1, scale: 1.3, y: -16 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.6 }}
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+              >
+                <span className="text-4xl drop-shadow-lg">💖</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         <p className="mt-3 font-handwritten text-center text-base xl:text-lg text-[var(--romantic-plum)] font-semibold">
           {heroPolaroids[2].caption}
@@ -180,7 +253,8 @@ export function WelcomeExperience({
         animate={{ opacity: 1, scale: 1, rotate: heroPolaroids[3].rotation }}
         transition={{ duration: 0.9, delay: 0.6 }}
         whileHover={{ scale: 1.06, rotate: 0, zIndex: 30 }}
-        className={`${heroPolaroids[3].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl`}
+        onClick={() => handleCardClick(heroPolaroids[3].id)}
+        className={`${heroPolaroids[3].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl select-none`}
       >
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--pale-rose)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -193,6 +267,19 @@ export function WelcomeExperience({
           {!photoLoaded.p4 && (
             <div className="absolute inset-0 flex items-center justify-center text-3xl">💛</div>
           )}
+          <AnimatePresence>
+            {clickedHeart === heroPolaroids[3].id && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.4, y: 10 }}
+                animate={{ opacity: 1, scale: 1.3, y: -16 }}
+                exit={{ opacity: 0, scale: 0.8 }}
+                transition={{ duration: 0.6 }}
+                className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+              >
+                <span className="text-4xl drop-shadow-lg">💖</span>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
         <p className="mt-3 font-handwritten text-center text-base xl:text-lg text-[var(--romantic-plum)] font-semibold">
           {heroPolaroids[3].caption}
@@ -226,12 +313,12 @@ export function WelcomeExperience({
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 border border-[var(--border-subtle)] shadow-2xs mb-4"
         >
           <span className="text-[11px] font-bold tracking-widest uppercase font-rounded text-[var(--pink-strong)]">
-            CHAPTER ∞ · AN ONGOING STORY
+            A LITTLE WORLD, JUST FOR YOU
           </span>
           <span className="text-xs">✨</span>
         </motion.div>
 
-        {/* Main Title: "You & Me" in Chunky Rounded Display Font (Inspired by Reference) */}
+        {/* Main Title: "You & Me" in Chunky Rounded Display Font */}
         <motion.h1
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -251,53 +338,62 @@ export function WelcomeExperience({
           )}
         </motion.h1>
 
-        {/* Personalized dedication for recipient */}
+        {/* Handwritten line */}
         <motion.p
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.7, delay: 0.6 }}
-          className="mt-3 font-handwritten text-xl sm:text-2xl text-[var(--pink-strong)]"
+          transition={{ duration: 0.7, delay: 0.5 }}
+          className="mt-2 font-handwritten text-xl sm:text-2xl md:text-3xl text-[var(--pink-strong)]"
         >
-          For my sweetest {recipientNickname} ♡
+          If I could put everything I feel into one place, it would look a little like this.
         </motion.p>
 
-        {/* Subtitle / Romantic Tagline */}
+        {/* Recipient dedication */}
         <motion.p
-          initial={{ opacity: 0, y: 15 }}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, delay: 0.6 }}
+          className="mt-2 font-handwritten text-lg sm:text-xl text-[var(--romantic-plum)]"
+        >
+          For my sweetest {recipientNickname || "Baby"} ♡
+        </motion.p>
+
+        {/* Supporting text */}
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.7 }}
           className="mt-3 text-sm sm:text-base md:text-lg text-[var(--text-secondary)] max-w-lg leading-relaxed font-sans"
         >
-          {subtitle || "an entirely accidental love story told mostly in polaroids and bad jokes 🥹"}
+          {subtitle || "A little world made from my favorite person, our little moments, and all the things I sometimes struggle to put into words."}
         </motion.p>
 
-        {/* Optional heartfelt personal message snippet if provided */}
-        {message && message !== subtitle && (
-          <motion.p
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 0.8, delay: 0.85 }}
-            className="mt-3 text-xs sm:text-sm text-[var(--text-muted)] italic max-w-md"
-          >
-            &ldquo;{message}&rdquo;
-          </motion.p>
-        )}
+        {/* Quote */}
+        <motion.p
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
+          className="mt-3 text-xs sm:text-sm text-[var(--text-muted)] italic max-w-md"
+        >
+          &ldquo;{message || "Of all the stories life could give me, you're the one I'd choose to keep living."}&rdquo;
+        </motion.p>
 
-        {/* Primary Action Button: "Let's continue ♡" */}
+        {/* Primary Action Button: "Come inside, my love ♡" */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.9 }}
-          className="mt-8 flex flex-col items-center gap-4"
+          className="mt-8 flex flex-col items-center gap-3"
         >
           <button
             onClick={handleStartStory}
             className="group relative px-9 py-3.5 rounded-full text-white font-rounded font-semibold text-base sm:text-lg bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] shadow-lg shadow-pink-300/40 hover:shadow-xl hover:shadow-pink-400/50 hover:scale-105 active:scale-95 cursor-pointer transition-all duration-300 flex items-center gap-2"
           >
-            <span>Let&apos;s continue</span>
+            <span>Come inside, my love</span>
             <span className="text-xl group-hover:scale-125 transition-transform duration-300">♡</span>
           </button>
 
+<<<<<<< HEAD
           {/* Story Cue */}
           <div className="flex flex-col items-center gap-1.5 pt-3">
             <span className="text-[10px] font-bold tracking-widest uppercase font-rounded text-[var(--pink-strong)]">
@@ -310,6 +406,15 @@ export function WelcomeExperience({
               open chapter 1 ✨
             </button>
           </div>
+=======
+          {/* Single subtle scroll hint */}
+          <button
+            onClick={onEnter}
+            className="group inline-flex items-center gap-1.5 pt-2 text-xs font-rounded font-semibold text-[var(--pink-strong)] hover:text-[var(--pink-deep)] transition-colors cursor-pointer"
+          >
+            <span>There&apos;s more waiting for you ↓</span>
+          </button>
+>>>>>>> d158bf5f03c3f4e4709a5dd17b3510469507a888
         </motion.div>
       </div>
     </section>

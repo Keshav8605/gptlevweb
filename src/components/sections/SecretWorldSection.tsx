@@ -59,6 +59,26 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
     return () => clearInterval(interval);
   }, [lockoutSeconds]);
 
+  // Full-size photo lightbox Escape key & body scroll lock
+  useEffect(() => {
+    if (!activePhoto) return;
+
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setActivePhoto(null);
+      }
+    };
+
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    window.addEventListener("keydown", handleKeyDown);
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = originalOverflow;
+    };
+  }, [activePhoto]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!input.trim() || isLoading || lockoutSeconds > 0) return;
@@ -109,13 +129,14 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
   return (
     <SectionWrapper
       id="secretWorld"
+      eyebrowLabel="JUST BETWEEN US"
       title="Our Secret World"
-      subtitle="A sanctuary protected by a truth known only to the two of us"
+      subtitle="A tiny corner of the universe that feels like ours."
       emoji="🔒"
       bgVariant="surface"
-      chapterNumber={3}
+      chapterNumber={4}
       nextSectionId="deluluMode"
-      nextSectionLabel="Delulu Mode"
+      nextSectionLabel="Enter our delulu universe 🦋"
       nextSectionEmoji="🦋"
     >
       <div className="max-w-2xl mx-auto">
@@ -140,10 +161,10 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
               </div>
 
               <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-[var(--text-primary)] mb-2">
-                Protected with Love
+                A little secret, just for us
               </h3>
               <p className="text-sm text-[var(--text-secondary)] max-w-md mx-auto leading-relaxed mb-6">
-                Behind this door lies an intimate surprise I prepared just for you. Enter our secret phrase to unlock it.
+                There&apos;s a little surprise waiting behind this door. Enter our special phrase, and let&apos;s see what&apos;s on the other side.
               </p>
 
               {/* Gentle Whisper Hint Toggle Button & Expandable Card */}
@@ -154,11 +175,11 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.96 }}
                     onClick={() => setShowHint(true)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--soft-pink)]/80 hover:bg-[var(--soft-pink)] border border-[var(--border-medium)] text-xs sm:text-sm font-rounded font-semibold text-[var(--pink-deep)] shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
+                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-[var(--pale-rose)] via-[#FFF4F7] to-[var(--pale-rose)] hover:from-[#FFE4EC] hover:to-[#FFE4EC] border border-[var(--pink-primary)]/35 hover:border-[var(--pink-primary)] text-xs sm:text-sm font-rounded font-semibold text-[var(--pink-strong)] shadow-[0_2px_10px_rgba(255,95,150,0.12)] hover:shadow-[0_4px_16px_rgba(255,95,150,0.22)] transition-all duration-300 cursor-pointer group"
                   >
-                    <span className="text-sm group-hover:scale-125 transition-transform">🤫</span>
-                    <span>Need a gentle whisper, sweetheart? ♡</span>
-                    <span className="text-xs text-[var(--pink-strong)]">✨</span>
+                    <span className="text-sm group-hover:scale-120 transition-transform">💌</span>
+                    <span>Need a sweet little hint, my love?</span>
+                    <span className="text-xs text-[var(--pink-strong)]">♡</span>
                   </motion.button>
                 </div>
               ) : (
@@ -169,20 +190,20 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                   transition={{ duration: 0.35, ease: "easeOut" }}
                   className="mb-8 max-w-lg mx-auto overflow-hidden"
                 >
-                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[var(--warm-cream)] to-[var(--soft-pink)]/50 border border-[var(--border-medium)] shadow-xs relative text-left">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[var(--warm-cream)] via-[#FFF5F8] to-[var(--pale-rose)]/60 border border-[var(--pink-primary)]/30 shadow-sm relative text-left">
                     <div className="flex items-start gap-3">
-                      <span className="text-xl mt-0.5">💡</span>
+                      <span className="text-xl mt-0.5">💌</span>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1.5">
                           <span className="text-xs font-bold text-[var(--pink-strong)] uppercase tracking-wider font-rounded">
-                            A Sweet Little Whisper ♡
+                            A sweet little clue for you ♡
                           </span>
                           <button
                             type="button"
                             onClick={() => setShowHint(false)}
-                            className="text-xs text-[var(--text-muted)] hover:text-[var(--pink-strong)] font-rounded cursor-pointer px-1.5 py-0.5 rounded hover:bg-white/60 transition-colors"
+                            className="text-xs text-[var(--text-muted)] hover:text-[var(--pink-strong)] font-rounded cursor-pointer px-2 py-0.5 rounded-full hover:bg-white/80 transition-colors"
                           >
-                            hide ✕
+                            hide ♡
                           </button>
                         </div>
                         <p className="font-serif italic text-sm sm:text-base text-[var(--romantic-plum)] leading-relaxed">
@@ -202,7 +223,7 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                     value={input}
                     disabled={lockoutSeconds > 0 || isLoading}
                     onChange={(e) => setInput(e.target.value)}
-                    placeholder="Type our secret phrase..."
+                    placeholder="Our secret phrase…"
                     className={`w-full px-5 py-3.5 rounded-2xl text-center text-sm sm:text-base border transition-all outline-none font-sans ${
                       errorMessage
                         ? "border-rose-400 bg-rose-50/50"
@@ -248,8 +269,7 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                     </>
                   ) : (
                     <>
-                      <span>Open Our Secret Haven</span>
-                      <span>♡</span>
+                      <span>Unlock our little world ♡</span>
                     </>
                   )}
                 </button>
@@ -276,16 +296,31 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                   />
                 </div>
                 <span className="text-xs font-semibold uppercase tracking-widest text-[var(--pink-strong)] px-3 py-1 rounded-full bg-[var(--pale-rose)]">
-                  Access Granted • Just For You
+                  JUST BETWEEN US
                 </span>
                 <h3 className="font-serif text-3xl sm:text-4xl font-semibold text-[var(--text-primary)] mt-3">
-                  {revealedData?.title || "Our Private Haven"}
+                  You found your way in, my love. ♡
                 </h3>
+                <p className="text-sm sm:text-base font-handwritten text-xl sm:text-2xl text-[var(--pink-strong)] mt-2">
+                  Some things are sweeter when only the two of us understand them.
+                </p>
+                <div className="mt-4">
+                  <button
+                    onClick={() => {
+                      const el = document.getElementById("secret-letter-box");
+                      if (el) el.scrollIntoView({ behavior: "smooth" });
+                    }}
+                    className="inline-flex items-center gap-1.5 px-6 py-2 rounded-full font-rounded font-semibold text-xs sm:text-sm text-white bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] shadow-sm hover:shadow-md cursor-pointer transition-all"
+                  >
+                    <span>Stay a little while</span>
+                    <span>→</span>
+                  </button>
+                </div>
               </div>
 
               {/* Secret Letter */}
               {revealedData?.letter && (
-                <div className="space-y-4 max-w-xl mx-auto p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-[var(--bg-main)] to-[var(--bg-surface)] border border-[var(--border-subtle)] font-serif italic text-base sm:text-lg leading-relaxed text-[var(--text-primary)] mb-8">
+                <div id="secret-letter-box" className="space-y-4 max-w-xl mx-auto p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-[var(--bg-main)] to-[var(--bg-surface)] border border-[var(--border-subtle)] font-serif italic text-base sm:text-lg leading-relaxed text-[var(--text-primary)] mb-8">
                   {revealedData.letter.split("\n\n").map((para, i) => (
                     <p key={i} className="leading-loose">
                       {para}
@@ -304,13 +339,22 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                     {revealedData.photos.map((src, i) => (
                       <div
                         key={i}
+                        role="button"
+                        tabIndex={0}
                         onClick={() => setActivePhoto(src)}
-                        className="rounded-2xl overflow-hidden aspect-[4/3] border border-[var(--border-subtle)] shadow-sm hover:shadow-md transition-all cursor-pointer group"
+                        onKeyDown={(e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                            e.preventDefault();
+                            setActivePhoto(src);
+                          }
+                        }}
+                        aria-label={`View secret photo ${i + 1} in full size`}
+                        className="rounded-2xl overflow-hidden aspect-[4/3] border border-[var(--border-subtle)] shadow-sm hover:shadow-md transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={src}
-                          alt="Secret memory"
+                          alt={`Secret memory moment ${i + 1}`}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                         />
                       </div>
@@ -323,7 +367,7 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
               <div className="text-center pt-2 border-t border-[var(--border-subtle)]">
                 <button
                   onClick={handleLockAgain}
-                  className="text-xs text-[var(--text-muted)] hover:text-[var(--pink-strong)] transition-colors cursor-pointer inline-flex items-center gap-1.5"
+                  className="text-xs text-[var(--text-muted)] hover:text-[var(--pink-strong)] transition-colors cursor-pointer inline-flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
                 >
                   <span>🔒</span>
                   <span>Lock this haven again</span>
@@ -343,27 +387,40 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setActivePhoto(null)}
-              className="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm"
+              className="fixed inset-0 z-50 bg-black/75 backdrop-blur-md"
             />
-            <div className="fixed inset-4 sm:inset-10 z-50 flex items-center justify-center pointer-events-none">
+            <div
+              className="fixed inset-4 sm:inset-10 z-50 flex items-center justify-center"
+              onClick={() => setActivePhoto(null)}
+            >
               <motion.div
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                className="max-w-2xl max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl pointer-events-auto relative bg-white p-2"
+                initial={{ opacity: 0, scale: 0.92, y: 15 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                exit={{ opacity: 0, scale: 0.92, y: 15 }}
+                transition={{ duration: 0.25 }}
+                onClick={(e) => e.stopPropagation()}
+                className="max-w-3xl max-h-[85vh] rounded-3xl overflow-hidden shadow-2xl relative bg-white p-2.5 sm:p-3 border border-white/20"
               >
                 <button
                   onClick={() => setActivePhoto(null)}
-                  className="absolute top-4 right-4 w-9 h-9 rounded-full bg-black/60 text-white flex items-center justify-center cursor-pointer hover:bg-black/80"
+                  className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-black/60 text-white flex items-center justify-center cursor-pointer hover:bg-black/80 transition-colors shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
+                  aria-label="Close full-size photo"
                 >
                   ✕
                 </button>
+
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={activePhoto}
-                  alt="Enlarged secret photo"
-                  className="max-h-[80vh] w-auto rounded-2xl object-contain mx-auto"
+                  alt="Secret memory in full resolution"
+                  className="max-h-[78vh] w-auto rounded-2xl object-contain mx-auto"
                 />
+
+                <div className="text-center pt-2 pb-1">
+                  <p className="font-handwritten text-lg text-[var(--pink-strong)]">
+                    Our Secret World ♡
+                  </p>
+                </div>
               </motion.div>
             </div>
           </>

@@ -15,39 +15,57 @@ export interface ClaimRecord {
 export const defaultGiftsList: DigitalGift[] = [
   {
     id: "g1",
-    title: "One Long, Unhurried Hug",
-    description: "Valid for whenever the world feels overwhelming. Wrap your arms around me and don't let go until you feel better.",
-    emoji: "🫂",
+    title: "One really good hug",
+    description: "Available whenever you need one. No rushing, no clock-watching. Just a hug until you feel a little better.",
+    emoji: "🤗",
   },
   {
     id: "g2",
-    title: "Movie Night — You Choose",
-    description: "You have 100% control over the remote. Any genre, any length, endless popcorn, and zero complaints from me.",
+    title: "A movie night, your way",
+    description: "You choose the movie, the snacks, and the blanket arrangement. I'll try not to complain about your choice. Much.",
     emoji: "🎬",
   },
   {
     id: "g3",
-    title: "Your Favorite Sweet Treat",
-    description: "Ice cream, pastry, boba, or midnight dessert — redeem this and I will fetch it for you with a smile.",
+    title: "Your favorite treat",
+    description: "That one snack or dessert you've been craving? Consider it a little mission for me.",
     emoji: "🧁",
   },
   {
     id: "g4",
-    title: "A Day Planned Completely by You",
-    description: "From morning coffee to evening dinner, you are the boss. I am your enthusiastic companion for whatever you desire.",
+    title: "A day planned entirely for you",
+    description: "You tell me what kind of day your heart wants. I'll take care of the little details.",
     emoji: "👑",
   },
   {
     id: "g5",
-    title: "Get Out of Any Chore Free",
-    description: "Hand me this card, walk away, and consider the dishes/laundry/errand completely handled by me.",
-    emoji: "🧹",
+    title: "An uninterrupted us day",
+    description: "Phones away, distractions down, and time to be together without rushing anywhere.",
+    emoji: "📵",
   },
   {
     id: "g6",
-    title: "Midnight Drive with Music",
-    description: "Windows slightly cracked, city lights glowing, our favorite songs on repeat, driving to nowhere in particular.",
-    emoji: "🚗",
+    title: "A surprise date",
+    description: "Give me a little hint about your mood, and let me plan something thoughtful for us.",
+    emoji: "🎁",
+  },
+  {
+    id: "g7",
+    title: "Breakfast in bed",
+    description: "Your favorite breakfast, made with love and served with a side of morning kisses.",
+    emoji: "🥞",
+  },
+  {
+    id: "g8",
+    title: "One slow dance",
+    description: "Our favorite song, a little space in the living room, and absolutely no need to know how to dance.",
+    emoji: "💃",
+  },
+  {
+    id: "g9",
+    title: "A relaxing massage",
+    description: "Dim lights, soothing music, and as long as you need to let every bit of stress and tension melt away.",
+    emoji: "💆",
   },
 ];
 
@@ -69,9 +87,20 @@ export function DigitalGiftsSection({ gifts = defaultGiftsList }: DigitalGiftsSe
     }
   });
 
+  // Stored fulfillment records: giftId -> string (date)
+  const [fulfilledMap, setFulfilledMap] = useState<Record<string, string>>(() => {
+    if (typeof window === "undefined") return {};
+    try {
+      const saved = localStorage.getItem("gift_digital_vouchers_fulfilled");
+      return saved ? JSON.parse(saved) : {};
+    } catch {
+      return {};
+    }
+  });
+
   const [activeClaimModalGift, setActiveClaimModalGift] = useState<DigitalGift | null>(null);
   const [redemptionNote, setRedemptionNote] = useState("");
-  const [celebrationGiftId, setCelebrationGiftId] = useState<string | null>(null);
+  const [celebrationGift, setCelebrationGift] = useState<DigitalGift | null>(null);
 
   const handleOpenClaimModal = (gift: DigitalGift) => {
     // Idempotent: cannot claim if already claimed
@@ -107,13 +136,31 @@ export function DigitalGiftsSection({ gifts = defaultGiftsList }: DigitalGiftsSe
       localStorage.setItem("gift_digital_vouchers_claims", JSON.stringify(updated));
     } catch {}
 
-    setCelebrationGiftId(giftId);
+    setCelebrationGift(activeClaimModalGift);
     setActiveClaimModalGift(null);
     setRedemptionNote("");
 
     setTimeout(() => {
-      setCelebrationGiftId(null);
-    }, 2000);
+      setCelebrationGift(null);
+    }, 2500);
+  };
+
+  const handleToggleFulfilled = (giftId: string) => {
+    const isCurrentlyFulfilled = !!fulfilledMap[giftId];
+    const updated = { ...fulfilledMap };
+    if (isCurrentlyFulfilled) {
+      delete updated[giftId];
+    } else {
+      updated[giftId] = new Date().toLocaleDateString("en-US", {
+        month: "short",
+        day: "numeric",
+        year: "numeric",
+      });
+    }
+    setFulfilledMap(updated);
+    try {
+      localStorage.setItem("gift_digital_vouchers_fulfilled", JSON.stringify(updated));
+    } catch {}
   };
 
   const claimedCount = Object.keys(claims).length;
@@ -121,13 +168,15 @@ export function DigitalGiftsSection({ gifts = defaultGiftsList }: DigitalGiftsSe
   return (
     <SectionWrapper
       id="digitalGifts"
-      title="Little Gifts I Owe You"
-      subtitle="Tiny promises waiting in your pocket — redeem them whenever you want, no expiration date 🎁"
+      eyebrowLabel="A FEW LITTLE PROMISES"
+      title="Little Gifts, Just for You"
+      subtitle="A few things I'd love to do for you. No expiry date, just love."
       emoji="🎁"
       bgVariant="cream"
-      chapterNumber={12}
+      chapterNumber={13}
       nextSectionId="ourSong"
-      nextSectionLabel="Our Song"
+      nextSectionLabel="Play our song 🎵"
+      nextSectionSubtitle="One last thing before the final surprise: there's a song that makes me think of you."
       nextSectionEmoji="🎵"
     >
       <div className="max-w-4xl mx-auto space-y-8">
@@ -146,102 +195,137 @@ export function DigitalGiftsSection({ gifts = defaultGiftsList }: DigitalGiftsSe
           <span className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] text-xs font-semibold shadow-xs">
             <span>🎁</span>
             <span>
-              {claimedCount} of {activeGifts.length} promises redeemed
+              {claimedCount} of {activeGifts.length} little promises claimed
             </span>
           </span>
         </div>
 
         {/* Gift Cards Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-          {activeGifts.map((gift, i) => {
-            const claim = claims[gift.id];
-            const isClaimed = !!claim;
-            const isCelebrating = celebrationGiftId === gift.id;
+        {activeGifts.length === 0 ? (
+          <div className="text-center py-12 rounded-3xl bg-white border border-[var(--border-subtle)] p-8">
+            <span className="text-4xl block mb-2">🎁</span>
+            <p className="font-serif text-lg text-[var(--text-secondary)]">
+              All your little promises are waiting here.
+            </p>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {activeGifts.map((gift, i) => {
+              const claim = claims[gift.id];
+              const isClaimed = !!claim;
+              const isFulfilled = !!fulfilledMap[gift.id];
+              const isCelebrating = celebrationGift?.id === gift.id;
 
-            return (
-              <motion.div
-                key={gift.id}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.08, duration: 0.5 }}
-                whileHover={!isClaimed ? { y: -5 } : {}}
-                className={`rounded-3xl p-6 sm:p-7 flex flex-col justify-between border transition-all duration-300 relative overflow-hidden ${
-                  isClaimed
-                    ? "bg-gradient-to-br from-[var(--pale-rose)] via-[var(--bg-surface)] to-white border-[var(--pink-primary)] shadow-md"
-                    : "bg-white border-[var(--border-subtle)] shadow-[0_4px_20px_var(--shadow-pink)] hover:shadow-lg"
-                }`}
-              >
-                {/* Celebration Sparkle Burst */}
-                <AnimatePresence>
-                  {isCelebrating && (
-                    <motion.div
-                      initial={{ scale: 0, opacity: 0 }}
-                      animate={{ scale: [0, 1.3, 1], opacity: [0, 1, 0] }}
-                      exit={{ opacity: 0 }}
-                      transition={{ duration: 1.5 }}
-                      className="absolute inset-0 bg-white/80 backdrop-blur-xs flex items-center justify-center z-20 pointer-events-none"
-                    >
-                      <div className="text-center">
-                        <span className="text-5xl block animate-bounce">🎉</span>
-                        <span className="font-script text-2xl text-[var(--pink-strong)]">
-                          Redeemed!
-                        </span>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-
-                <div>
-                  {/* Top row: Emoji & Status Tag */}
-                  <div className="flex items-center justify-between mb-4">
-                    <span className="text-3xl">{gift.emoji || "🎁"}</span>
-                    {isClaimed ? (
-                      <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[var(--pink-strong)] text-white shadow-xs">
-                        Redeemed ✓
-                      </span>
-                    ) : (
-                      <span className="text-[11px] font-semibold uppercase tracking-wider px-2.5 py-0.5 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)]">
-                        Available
-                      </span>
+              return (
+                <motion.div
+                  key={gift.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.08, duration: 0.5 }}
+                  whileHover={!isClaimed ? { y: -5 } : {}}
+                  className={`rounded-3xl p-6 sm:p-7 flex flex-col justify-between border transition-all duration-300 relative overflow-hidden ${
+                    isClaimed
+                      ? "bg-gradient-to-br from-[var(--pale-rose)] via-[var(--bg-surface)] to-white border-[var(--pink-primary)] shadow-md"
+                      : "bg-white border-[var(--border-subtle)] shadow-[0_4px_20px_var(--shadow-pink)] hover:shadow-lg"
+                  }`}
+                >
+                  {/* Celebration Sparkle Burst */}
+                  <AnimatePresence>
+                    {isCelebrating && (
+                      <motion.div
+                        initial={{ scale: 0, opacity: 0 }}
+                        animate={{ scale: [0, 1.1, 1], opacity: [0, 1, 0] }}
+                        exit={{ opacity: 0 }}
+                        transition={{ duration: 2 }}
+                        className="absolute inset-0 bg-white/90 backdrop-blur-xs flex items-center justify-center z-20 pointer-events-none p-4"
+                      >
+                        <div className="text-center space-y-1">
+                          <span className="text-4xl block animate-bounce">🎉</span>
+                          <span className="font-script text-2xl text-[var(--pink-strong)] block">
+                            This one&apos;s yours ♡
+                          </span>
+                          <span className="font-serif text-xs text-[var(--text-secondary)] block">
+                            &ldquo;{celebrationGift.title}&rdquo;
+                          </span>
+                        </div>
+                      </motion.div>
                     )}
-                  </div>
+                  </AnimatePresence>
 
-                  <h3 className="font-serif text-xl sm:text-2xl font-semibold text-[var(--text-primary)] mb-2">
-                    {gift.title}
-                  </h3>
-
-                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
-                    {gift.description}
-                  </p>
-                </div>
-
-                {/* Footer Claim Action / Details */}
-                <div className="pt-4 border-t border-[var(--border-subtle)]">
-                  {isClaimed ? (
-                    <div className="space-y-1">
-                      <p className="text-[11px] text-[var(--text-muted)]">
-                        Claimed on {claim.claimedAt}
-                      </p>
-                      {claim.redemptionNote && (
-                        <p className="text-xs italic text-[var(--pink-deep)] font-medium">
-                          &ldquo;{claim.redemptionNote}&rdquo;
-                        </p>
+                  <div>
+                    {/* Top row: Emoji & Status Tag */}
+                    <div className="flex items-center justify-between mb-4">
+                      <span className="text-3xl">{gift.emoji || "🎁"}</span>
+                      {isClaimed ? (
+                        <span className="text-[11px] font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-[var(--pink-strong)] text-white shadow-xs">
+                          This one&apos;s yours ♡
+                        </span>
+                      ) : (
+                        <span className="text-[11px] font-semibold tracking-wider px-2.5 py-0.5 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)]">
+                          Ready whenever you are
+                        </span>
                       )}
                     </div>
-                  ) : (
-                    <button
-                      onClick={() => handleOpenClaimModal(gift)}
-                      className="w-full py-2.5 rounded-2xl bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs font-semibold shadow-xs hover:shadow-md cursor-pointer transition-all"
-                    >
-                      Claim This Promise ♡
-                    </button>
-                  )}
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
+
+                    <h3 className="font-serif text-xl sm:text-2xl font-semibold text-[var(--text-primary)] mb-2">
+                      {gift.title}
+                    </h3>
+
+                    <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed mb-4">
+                      {gift.description}
+                    </p>
+                  </div>
+
+                  {/* Footer Claim Action / Fulfillment Details */}
+                  <div className="pt-4 border-t border-[var(--border-subtle)] space-y-2">
+                    {isClaimed ? (
+                      <div className="space-y-2">
+                        <div className="space-y-0.5">
+                          <p className="text-[11px] text-[var(--text-muted)]">
+                            Claimed on {claim.claimedAt}
+                          </p>
+                          {claim.redemptionNote && (
+                            <p className="text-xs italic text-[var(--pink-deep)] font-medium">
+                              &ldquo;{claim.redemptionNote}&rdquo;
+                            </p>
+                          )}
+                        </div>
+
+                        {/* Optional Fulfillment Toggle */}
+                        <div className="pt-1">
+                          <button
+                            type="button"
+                            onClick={() => handleToggleFulfilled(gift.id)}
+                            className={`w-full py-1.5 px-3 rounded-xl text-[11px] font-semibold transition-all cursor-pointer inline-flex items-center justify-center gap-1.5 ${
+                              isFulfilled
+                                ? "bg-emerald-500 text-white shadow-2xs"
+                                : "bg-white border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--pale-rose)]"
+                            }`}
+                          >
+                            <span>{isFulfilled ? "✓" : "♡"}</span>
+                            <span>
+                              {isFulfilled
+                                ? `Fulfilled on ${fulfilledMap[gift.id]} ✓`
+                                : "Mark as fulfilled ♡"}
+                            </span>
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                      <button
+                        onClick={() => handleOpenClaimModal(gift)}
+                        className="w-full py-2.5 rounded-2xl bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs font-semibold shadow-xs hover:shadow-md cursor-pointer transition-all"
+                      >
+                        I&apos;ll claim this one ♡
+                      </button>
+                    )}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       {/* Claim Modal with Optional Note */}
@@ -265,7 +349,7 @@ export function DigitalGiftsSection({ gifts = defaultGiftsList }: DigitalGiftsSe
                 <div className="flex items-center gap-2.5">
                   <span className="text-2xl">{activeClaimModalGift.emoji || "🎁"}</span>
                   <h3 className="font-serif text-xl font-semibold text-[var(--text-primary)]">
-                    Claim Your Gift
+                    Claim this promise ♡
                   </h3>
                 </div>
                 <button
@@ -311,7 +395,7 @@ export function DigitalGiftsSection({ gifts = defaultGiftsList }: DigitalGiftsSe
                     type="submit"
                     className="px-6 py-2.5 rounded-2xl bg-[var(--pink-strong)] text-white text-xs font-semibold hover:bg-[var(--pink-deep)] shadow-sm hover:shadow-md cursor-pointer transition-all"
                   >
-                    Confirm & Redeem ♡
+                    I&apos;ll claim this one ♡
                   </button>
                 </div>
               </form>

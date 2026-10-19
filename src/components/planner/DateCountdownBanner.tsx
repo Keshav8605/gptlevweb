@@ -88,7 +88,7 @@ export function DateCountdownBanner({
         <div className="max-w-lg mx-auto space-y-3">
           <span className="text-3xl inline-block animate-pulse-soft">✨</span>
           <h3 className="font-serif text-xl sm:text-2xl font-semibold text-[var(--text-primary)]">
-            No upcoming date planned yet ♡
+            Our next date
           </h3>
           <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed">
             Every great memory begins with a tiny spark. Explore our date ideas or assemble the perfect itinerary together!
@@ -124,9 +124,9 @@ export function DateCountdownBanner({
       <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
         {/* Left: Event Details */}
         <div className="text-center md:text-left space-y-2 max-w-md">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 border border-[var(--pink-primary)]/30 text-xs font-semibold text-[var(--pink-strong)] shadow-xs">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-white/90 border border-[var(--pink-primary)]/40 text-xs font-semibold text-[var(--pink-strong)] shadow-xs">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>CONFIRMED ADVENTURE</span>
+            <span>It&apos;s a date! ♡</span>
           </div>
 
           <h3 className="font-serif text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">
@@ -155,7 +155,7 @@ export function DateCountdownBanner({
               ? "Our adventure is today! ♡"
               : timeLeft.isPast
               ? "Adventure completed! Save your memories ♡"
-              : `Only ${timeLeft.days} days until our next adventure ♡`}
+              : "Until our next little adventure"}
           </p>
 
           {!timeLeft.isPast && (
@@ -184,10 +184,10 @@ export function DateCountdownBanner({
           {onViewEvent && (
             <button
               onClick={() => onViewEvent(proposal)}
-              className="mt-1 px-4 py-1.5 rounded-full text-xs font-semibold text-[var(--pink-deep)] bg-white border border-[var(--border-subtle)] hover:bg-[var(--pale-rose)] transition-colors cursor-pointer shadow-2xs inline-flex items-center gap-1.5"
+              className="mt-1 px-5 py-2 rounded-full text-xs font-semibold text-[var(--pink-deep)] bg-white border border-[var(--border-subtle)] hover:bg-[var(--pale-rose)] transition-colors cursor-pointer shadow-2xs inline-flex items-center gap-1.5"
             >
               <span>📋</span>
-              <span>View Itinerary & Checklist</span>
+              <span>Our plan for the day</span>
             </button>
           )}
         </div>

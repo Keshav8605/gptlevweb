@@ -1,5 +1,6 @@
 "use client";
 
+<<<<<<< HEAD
 import { useState, useEffect } from "react";
 import { defaultGiftConfig } from "@/lib/gift-data";
 import { FloatingHearts } from "@/components/FloatingHearts";
@@ -24,14 +25,17 @@ import { CreatorStudio } from "@/components/creator/CreatorStudio";
 import { ParticipantAccessModal } from "@/components/auth/ParticipantAccessModal";
 import { StorySceneProvider } from "@/context/StorySceneContext";
 import { StorySceneContainer, SceneDefinition } from "@/components/scenes/StorySceneContainer";
+=======
+import { useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+>>>>>>> d158bf5f03c3f4e4709a5dd17b3510469507a888
 
-export default function Home() {
-  const [, setHasStartedExploring] = useState(false);
-  const [isCreatorStudioOpen, setIsCreatorStudioOpen] = useState(false);
-  const [isAccessModalOpen, setIsAccessModalOpen] = useState(false);
+function HomeRedirect() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
-  // Auto-detect ?invite= parameter for seamless recipient authorization
   useEffect(() => {
+<<<<<<< HEAD
     if (typeof window === "undefined") return;
     const params = new URLSearchParams(window.location.search);
     const invite = params.get("invite");
@@ -207,5 +211,23 @@ export default function Home() {
       />
     </main>
     </StorySceneProvider>
+=======
+    const qs = searchParams.toString();
+    router.replace(`/story/welcome${qs ? `?${qs}` : ""}`);
+  }, [router, searchParams]);
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-[var(--bg-main)] text-[var(--pink-strong)] font-handwritten text-2xl">
+      Opening our love story... ♡
+    </div>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={null}>
+      <HomeRedirect />
+    </Suspense>
+>>>>>>> d158bf5f03c3f4e4709a5dd17b3510469507a888
   );
 }

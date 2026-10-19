@@ -5,7 +5,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import type { GiftRecord } from "@/lib/server-db";
 import { defaultGiftConfig } from "@/lib/gift-data";
-import { FloatingHearts } from "@/components/FloatingHearts";
 import { CursorHeartTrail } from "@/components/CursorHeartTrail";
 import { GiftNavigation } from "@/components/GiftNavigation";
 import { WelcomeExperience } from "@/components/sections/WelcomeExperience";
@@ -121,7 +120,6 @@ function GiftRecipientContent({
   if (errorStatus) {
     return (
       <div className="min-h-screen bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
-        <FloatingHearts />
         <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-[var(--border-subtle)] shadow-xl space-y-5 relative z-10">
           <div className="w-16 h-16 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center text-3xl mx-auto">
             🎀
@@ -161,7 +159,6 @@ function GiftRecipientContent({
   if (isLocked) {
     return (
       <div className="min-h-screen bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
-        <FloatingHearts />
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -418,10 +415,14 @@ function GiftRecipientContent({
   });
 
   return (
+<<<<<<< HEAD
     <StorySceneProvider>
       <main className="relative min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)]">
       {/* Floating hearts ambience */}
       <FloatingHearts />
+=======
+    <main className="relative min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)]">
+>>>>>>> d158bf5f03c3f4e4709a5dd17b3510469507a888
       {/* Delightful cursor heart trail */}
       <CursorHeartTrail />
 
@@ -444,8 +445,147 @@ function GiftRecipientContent({
         </div>
       )}
 
+<<<<<<< HEAD
       {/* Romantic Scene-By-Scene Story Container */}
       <StorySceneContainer scenes={storyScenes} />
+=======
+      {/* Chapter 1: Welcome Envelope Surprise */}
+      {enabledSet.has("welcome") && (
+        <WelcomeExperience
+          recipientNickname={gift.recipientNickname || defaultGiftConfig.recipientNickname}
+          title={gift.welcomeTitle || defaultGiftConfig.welcomeTitle}
+          subtitle={gift.welcomeSubtitle || defaultGiftConfig.welcomeSubtitle}
+          message={gift.welcomeMessage || defaultGiftConfig.welcomeMessage}
+          polaroids={gift.welcomePolaroids || defaultGiftConfig.welcomePolaroids}
+          onEnter={handleEnterWorld}
+        />
+      )}
+
+      {/* Dynamic Ordered Sections Flow */}
+      <div className="relative z-10">
+        {sectionOrder.map((sectionId) => {
+          if (!enabledSet.has(sectionId) || sectionId === "welcome") return null;
+
+          switch (sectionId) {
+            case "observations":
+              return (
+                <ObservationsSection
+                  key="observations"
+                  observations={gift.customObservations || defaultGiftConfig.observations}
+                />
+              );
+
+            case "memories":
+              return (
+                <MemoriesSection
+                  key="memories"
+                  memories={gift.customMemories || defaultGiftConfig.memories}
+                />
+              );
+
+            case "secretWorld":
+              return (
+                <SecretWorldSection
+                  key="secretWorld"
+                  initialHint={gift.secretHint || defaultGiftConfig.secretHint}
+                />
+              );
+
+            case "deluluMode":
+              return <DeluluSection key="deluluMode" />;
+
+            case "quiz":
+              return <QuizSection key="quiz" />;
+
+            case "letters":
+              return (
+                <LettersSection
+                  key="letters"
+                  letters={gift.customLetters || defaultGiftConfig.letters}
+                />
+              );
+
+            case "notebook":
+              return (
+                <NotebookSection
+                  key="notebook"
+                  onOpenAccessModal={() => setIsAccessModalOpen(true)}
+                />
+              );
+
+            case "voice":
+              return (
+                <VoiceMessageSection
+                  key="voice"
+                  onOpenAccessModal={() => setIsAccessModalOpen(true)}
+                />
+              );
+
+            case "datePlanner":
+              return (
+                <DatePlannerSection
+                  key="datePlanner"
+                  onOpenAccessModal={() => setIsAccessModalOpen(true)}
+                />
+              );
+
+            case "openWhenLetters":
+              return (
+                <OpenWhenSection
+                  key="openWhenLetters"
+                  letters={gift.customOpenWhenLetters || defaultGiftConfig.openWhenLetters}
+                />
+              );
+
+            case "littleReasons":
+              return (
+                <LittleReasonsSection
+                  key="littleReasons"
+                  reasons={gift.customLittleReasons || defaultGiftConfig.littleReasons}
+                />
+              );
+
+            case "digitalGifts":
+              return (
+                <DigitalGiftsSection
+                  key="digitalGifts"
+                  gifts={gift.customDigitalGifts || defaultGiftConfig.digitalGifts}
+                />
+              );
+
+            case "ourSong":
+              const songToUse = {
+                title: gift.featuredSong?.title || defaultGiftConfig.featuredSong?.title || "Our Song",
+                artist: gift.featuredSong?.artist || defaultGiftConfig.featuredSong?.artist || "Artist",
+                dedication: gift.featuredSong?.dedication || defaultGiftConfig.featuredSong?.dedication || "For you",
+                whyItMatters: gift.featuredSong?.whyItMatters || defaultGiftConfig.featuredSong?.whyItMatters || "Because it's ours",
+              };
+              return (
+                <OurSongSection
+                  key="ourSong"
+                  featuredSong={songToUse}
+                  additionalSongs={defaultGiftConfig.additionalSongs}
+                />
+              );
+
+            case "finalHeart":
+              return (
+                <FinalHeartSection
+                  key="finalHeart"
+                  startDate={gift.dateOfficialCouple || gift.dateFirstMet || "2023-08-20"}
+                  milestones={gift.customMilestones || defaultGiftConfig.customMilestones}
+                  finalLetter={gift.finalLetter || defaultGiftConfig.finalLetter}
+                  finalMessage={gift.finalMessage || defaultGiftConfig.finalMessage}
+                  senderName={gift.senderNickname || gift.senderName || "Your Love"}
+                />
+              );
+
+            default:
+              return null;
+          }
+        })}
+      </div>
+>>>>>>> d158bf5f03c3f4e4709a5dd17b3510469507a888
 
       {/* Recipient Footer */}
       <footer className="py-14 px-6 text-center border-t border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs text-[var(--text-muted)] relative z-10">

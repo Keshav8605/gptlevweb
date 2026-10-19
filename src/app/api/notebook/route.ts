@@ -2,9 +2,12 @@ import { NextResponse } from "next/server";
 import {
   getJournalEntries,
   addJournalEntry,
-  addJournalReply,
-  toggleJournalReaction,
+  updateJournalEntry,
   deleteJournalEntry,
+  addJournalReply,
+  updateJournalReply,
+  deleteJournalReply,
+  toggleJournalReaction,
   verifyAccess,
 } from "@/lib/server-db";
 
@@ -60,18 +63,86 @@ export async function POST(request: Request) {
   }
 }
 
+export async function PUT(request: Request) {
+  try {
+    const body = await request.json();
+    const token = body.token || "";
+    const auth = verifyAccess(token);
+
+    const role = auth.authorized ? auth.role : (body.role || "recipient");
+    const name = auth.authorized ? auth.name : (body.name || (role === "creator" ? "Babe" : "Baby"));
+
+    // Action: update a reply
+    if (body.action === "updateReply") {
+      if (!body.entryId || !body.replyId || !body.content?.trim()) {
+        return NextResponse.json({ error: "Missing entryId, replyId, or content" }, { status: 400 });
+      }
+
+      const reply = updateJournalReply(
+        body.entryId,
+        body.replyId,
+        body.content,
+        role as "creator" | "recipient",
+        name
+      );
+
+      if (!reply) {
+        return NextResponse.json({ error: "Unauthorized or reply not found" }, { status: 403 });
+      }
+
+      return NextResponse.json({ success: true, reply });
+    }
+
+    // Default action: update main entry
+    if (!body.id || !body.content?.trim()) {
+      return NextResponse.json({ error: "Missing entry ID or content" }, { status: 400 });
+    }
+
+    const updated = updateJournalEntry(
+      body.id,
+      {
+        title: body.title,
+        content: body.content,
+        prompt: body.prompt,
+        moodEmoji: body.moodEmoji,
+      },
+      role as "creator" | "recipient",
+      name
+    );
+
+    if (!updated) {
+      return NextResponse.json({ error: "Unauthorized or entry not found" }, { status: 403 });
+    }
+
+    return NextResponse.json({ success: true, entry: updated });
+  } catch {
+    return NextResponse.json({ error: "Failed to update entry" }, { status: 400 });
+  }
+}
+
 export async function DELETE(request: Request) {
   try {
     const url = new URL(request.url);
     const id = url.searchParams.get("id");
+    const replyId = url.searchParams.get("replyId");
     const token = url.searchParams.get("token") || "";
+
+    const auth = verifyAccess(token);
+    const role = auth.authorized ? auth.role : (url.searchParams.get("role") || "recipient");
+    const name = auth.authorized ? auth.name : (url.searchParams.get("name") || (role === "creator" ? "Babe" : "Baby"));
+
+    // Delete reply if replyId provided
+    if (replyId && id) {
+      const deleted = deleteJournalReply(id, replyId, role as "creator" | "recipient", name);
+      if (!deleted) {
+        return NextResponse.json({ error: "Unauthorized or reply not found" }, { status: 403 });
+      }
+      return NextResponse.json({ success: true });
+    }
 
     if (!id) return NextResponse.json({ error: "Entry ID required" }, { status: 400 });
 
-    const auth = verifyAccess(token);
-    const role = auth.authorized ? auth.role : "recipient";
-
-    const deleted = deleteJournalEntry(id, role as "creator" | "recipient");
+    const deleted = deleteJournalEntry(id, role as "creator" | "recipient", name);
     if (!deleted) {
       return NextResponse.json({ error: "Unauthorized or entry not found" }, { status: 403 });
     }

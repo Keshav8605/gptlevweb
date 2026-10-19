@@ -302,13 +302,14 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
   return (
     <SectionWrapper
       id="voice"
-      title="Voice Notes Just For Us"
-      subtitle="Because sometimes text isn't enough. Leave little voice messages, bedtime goodnights, laugh-out-loud thoughts, or sweet whispers that can be replayed forever."
+      eyebrowLabel="A LITTLE PIECE OF ME"
+      title="Voice Notes, Just for Us"
+      subtitle="For the days when a voice feels closer than a message. Save a laugh, a little story, or a goodnight for later."
       emoji="🎙️"
       bgVariant="default"
-      chapterNumber={8}
+      chapterNumber={9}
       nextSectionId="datePlanner"
-      nextSectionLabel="Plan Our Next Adventure"
+      nextSectionLabel="Let's Make a Day of It ♡"
       nextSectionEmoji="🗺️"
     >
       <div className="max-w-4xl mx-auto">
@@ -352,11 +353,11 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[var(--pink-strong)] animate-pulse" />
               <h3 className="font-serif text-lg font-bold text-[var(--text-primary)]">
-                Record a Whisper
+                Leave me a whisper
               </h3>
             </div>
             <span className="text-xs text-[var(--text-muted)]">
-              Private 2-Way Audio
+              Just between us
             </span>
           </div>
 
@@ -396,10 +397,10 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
                 <span className="text-3xl">🎙️</span>
               </div>
               <h4 className="font-serif text-xl font-bold text-[var(--text-primary)] mb-2">
-                Press to record your voice
+                Leave me a whisper
               </h4>
               <p className="text-xs sm:text-sm text-[var(--text-secondary)] max-w-sm mx-auto mb-6">
-                Tell them how your day went, sing a line from your song, or just say goodnight.
+                Tell me about your day, share a little thought, or just say goodnight.
               </p>
               <button
                 onClick={startRecording}
@@ -407,7 +408,7 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-[var(--pink-strong)] to-[var(--pink-hover)] text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all cursor-pointer transform hover:scale-[1.02]"
               >
                 <span>🎙️</span>
-                <span>Start Recording</span>
+                <span>Record a voice note</span>
               </button>
             </div>
           )}
@@ -443,7 +444,7 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
               </div>
 
               <div className="inline-block px-4 py-1.5 rounded-full bg-red-50 border border-red-200 text-red-600 font-mono text-base font-bold mb-6">
-                Recording... {formatSeconds(recordingSeconds)}
+                I&apos;m listening… {formatSeconds(recordingSeconds)}
               </div>
 
               <div className="flex items-center justify-center gap-3">
@@ -452,13 +453,13 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
                   id="btn-stop-voice-recording"
                   className="px-6 py-2.5 rounded-full bg-red-500 text-white font-semibold text-sm shadow-md hover:bg-red-600 transition-all cursor-pointer"
                 >
-                  ⏹️ Done Recording
+                  ⏹️ Finish recording
                 </button>
                 <button
                   onClick={cancelRecording}
                   className="px-4 py-2.5 rounded-full bg-[var(--pale-rose)] text-[var(--text-secondary)] font-semibold text-sm hover:bg-zinc-200 transition-all cursor-pointer"
                 >
-                  Discard
+                  Start again
                 </button>
               </div>
             </div>
@@ -469,7 +470,7 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
             <div className="py-4">
               <div className="p-4 rounded-2xl bg-[var(--pale-rose)]/50 border border-[var(--border-subtle)] mb-6">
                 <div className="flex items-center justify-between mb-3 text-xs font-semibold text-[var(--text-secondary)]">
-                  <span>🎧 Preview Your Recording</span>
+                  <span>🎧 Listen to your note</span>
                   <span className="font-mono">{formatSeconds(recordingSeconds)}</span>
                 </div>
 
@@ -488,7 +489,7 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
                   disabled={isUploading}
                   className="px-4 py-2 rounded-full border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-secondary)] hover:bg-zinc-100 cursor-pointer disabled:opacity-50"
                 >
-                  Discard & Retry
+                  Start again
                 </button>
                 <button
                   onClick={sendVoiceNote}
@@ -504,7 +505,7 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
                   ) : (
                     <>
                       <span>💌</span>
-                      <span>Send Voice Note</span>
+                      <span>Send this little whisper ♡</span>
                     </>
                   )}
                 </button>
@@ -517,13 +518,13 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
         <div>
           <div className="flex items-center justify-between mb-6">
             <h3 className="font-serif text-2xl font-bold text-[var(--text-primary)]">
-              Shared Voice Archive ({messages.length})
+              Our voice-note collection ({messages.length})
             </h3>
             <button
               onClick={fetchMessages}
               className="text-xs text-[var(--pink-strong)] font-semibold hover:underline cursor-pointer"
             >
-              🔄 Check for new notes
+              🔄 Refresh voice notes
             </button>
           </div>
 
@@ -536,10 +537,10 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
             <div className="text-center py-14 p-8 rounded-3xl bg-white/70 border border-dashed border-[var(--border-subtle)]">
               <span className="text-4xl mb-3 block">🕊️</span>
               <h4 className="font-serif text-lg font-bold text-[var(--text-primary)] mb-1">
-                No voice whispers exchanged yet
+                No whispers here just yet
               </h4>
               <p className="text-xs text-[var(--text-secondary)] max-w-sm mx-auto">
-                Be the first to record a warm voice message above. It will appear here for both of you to listen to whenever you miss each other.
+                Leave the first one whenever you&apos;re ready. It&apos;ll be here to revisit when we miss each other.
               </p>
             </div>
           ) : (

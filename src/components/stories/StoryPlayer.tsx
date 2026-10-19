@@ -1,0 +1,320 @@
+"use client";
+
+import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
+import type { Story } from "@/lib/stories-data";
+
+interface StoryPlayerProps {
+  story: Story;
+  initialSceneIndex?: number;
+  onBackToStories: () => void;
+  onSceneChange?: (sceneIndex: number) => void;
+}
+
+interface PlayerTheme {
+  badgeClass: string;
+  badgeEmoji: string;
+  containerClass: string;
+  fallbackGradient: string;
+  fallbackEmoji: string;
+  storyTitleClass: string;
+  dotActiveColor: string;
+  dotPassedColor: string;
+  actionButtonClass: string;
+}
+
+const PLAYER_THEMES: Record<Story["id"], PlayerTheme> = {
+  "mafia-romance": {
+    badgeClass: "bg-rose-950/70 border-rose-600/40 text-rose-200",
+    badgeEmoji: "🥀",
+    containerClass: "border-rose-900/40 bg-[#12070e]/90 shadow-[0_20px_50px_rgba(190,18,60,0.18)]",
+    fallbackGradient: "radial-gradient(circle at 50% 50%, #300813 0%, #0d0407 100%)",
+    fallbackEmoji: "🥀",
+    storyTitleClass: "text-rose-400",
+    dotActiveColor: "#f43f5e",
+    dotPassedColor: "rgba(244, 63, 94, 0.4)",
+    actionButtonClass: "bg-gradient-to-r from-rose-700 to-rose-500 hover:from-rose-600 hover:to-rose-400 shadow-rose-950/60",
+  },
+  "enemies-to-lovers": {
+    badgeClass: "bg-sky-950/70 border-sky-600/40 text-sky-200",
+    badgeEmoji: "✨",
+    containerClass: "border-sky-900/40 bg-[#07131d]/90 shadow-[0_20px_50px_rgba(14,165,233,0.18)]",
+    fallbackGradient: "radial-gradient(circle at 50% 50%, #08283a 0%, #050d14 100%)",
+    fallbackEmoji: "🌧️",
+    storyTitleClass: "text-sky-400",
+    dotActiveColor: "#38bdf8",
+    dotPassedColor: "rgba(56, 189, 248, 0.4)",
+    actionButtonClass: "bg-gradient-to-r from-sky-700 to-sky-500 hover:from-sky-600 hover:to-sky-400 shadow-sky-950/60",
+  },
+  "fantasy-romance": {
+    badgeClass: "bg-purple-950/70 border-purple-600/40 text-purple-200",
+    badgeEmoji: "🔮",
+    containerClass: "border-purple-900/40 bg-[#10071a]/90 shadow-[0_20px_50px_rgba(139,92,246,0.20)]",
+    fallbackGradient: "radial-gradient(circle at 50% 50%, #2e1065 0%, #090314 100%)",
+    fallbackEmoji: "👑",
+    storyTitleClass: "text-purple-400",
+    dotActiveColor: "#a855f7",
+    dotPassedColor: "rgba(168, 85, 247, 0.4)",
+    actionButtonClass: "bg-gradient-to-r from-purple-700 to-purple-500 hover:from-purple-600 hover:to-purple-400 shadow-purple-950/60",
+  },
+  "campus-romance": {
+    badgeClass: "bg-amber-950/70 border-amber-600/40 text-amber-200",
+    badgeEmoji: "☕",
+    containerClass: "border-amber-900/40 bg-[#160c04]/90 shadow-[0_20px_50px_rgba(217,119,6,0.20)]",
+    fallbackGradient: "radial-gradient(circle at 50% 50%, #451a03 0%, #0f0702 100%)",
+    fallbackEmoji: "🍂",
+    storyTitleClass: "text-amber-400",
+    dotActiveColor: "#f59e0b",
+    dotPassedColor: "rgba(245, 158, 11, 0.4)",
+    actionButtonClass: "bg-gradient-to-r from-amber-600 to-amber-500 hover:from-amber-500 hover:to-amber-400 shadow-amber-950/60",
+  },
+  "celebrity-romance": {
+    badgeClass: "bg-fuchsia-950/70 border-fuchsia-600/40 text-fuchsia-200",
+    badgeEmoji: "🎤",
+    containerClass: "border-fuchsia-900/40 bg-[#160517]/90 shadow-[0_20px_50px_rgba(192,38,211,0.20)]",
+    fallbackGradient: "radial-gradient(circle at 50% 50%, #4a044e 0%, #0d010e 100%)",
+    fallbackEmoji: "✨",
+    storyTitleClass: "text-fuchsia-400",
+    dotActiveColor: "#e879f9",
+    dotPassedColor: "rgba(232, 121, 249, 0.4)",
+    actionButtonClass: "bg-gradient-to-r from-fuchsia-700 to-fuchsia-500 hover:from-fuchsia-600 hover:to-fuchsia-400 shadow-fuchsia-950/60",
+  },
+  "supernatural-mystery": {
+    badgeClass: "bg-cyan-950/70 border-cyan-600/40 text-cyan-200",
+    badgeEmoji: "🗝️",
+    containerClass: "border-cyan-900/40 bg-[#041318]/90 shadow-[0_20px_50px_rgba(6,182,212,0.20)]",
+    fallbackGradient: "radial-gradient(circle at 50% 50%, #083344 0%, #020b0f 100%)",
+    fallbackEmoji: "🕰️",
+    storyTitleClass: "text-cyan-400",
+    dotActiveColor: "#22d3ee",
+    dotPassedColor: "rgba(34, 211, 238, 0.4)",
+    actionButtonClass: "bg-gradient-to-r from-cyan-700 to-cyan-500 hover:from-cyan-600 hover:to-cyan-400 shadow-cyan-950/60",
+  },
+};
+
+export function StoryPlayer({
+  story,
+  initialSceneIndex = 0,
+  onBackToStories,
+  onSceneChange,
+}: StoryPlayerProps) {
+  const [currentSceneIndex, setCurrentSceneIndex] = useState(initialSceneIndex);
+  const [imageError, setImageError] = useState(false);
+
+  const theme = PLAYER_THEMES[story.id] || PLAYER_THEMES["mafia-romance"];
+  const totalScenes = story.scenes.length;
+  const currentScene = story.scenes[currentSceneIndex] || story.scenes[0];
+  const isFirstScene = currentSceneIndex === 0;
+  const isLastScene = currentSceneIndex === totalScenes - 1;
+
+  const handleNext = useCallback(() => {
+    if (currentSceneIndex < totalScenes - 1) {
+      const nextIndex = currentSceneIndex + 1;
+      setCurrentSceneIndex(nextIndex);
+      setImageError(false);
+      onSceneChange?.(nextIndex);
+      // Scroll smoothly to top of player content
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [currentSceneIndex, totalScenes, onSceneChange]);
+
+  const handlePrev = useCallback(() => {
+    if (currentSceneIndex > 0) {
+      const prevIndex = currentSceneIndex - 1;
+      setCurrentSceneIndex(prevIndex);
+      setImageError(false);
+      onSceneChange?.(prevIndex);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }, [currentSceneIndex, onSceneChange]);
+
+  // Keyboard navigation support: ArrowRight/Next, ArrowLeft/Prev, Escape/Back
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "ArrowRight") {
+        if (!isLastScene) handleNext();
+      } else if (e.key === "ArrowLeft") {
+        if (!isFirstScene) handlePrev();
+      } else if (e.key === "Escape") {
+        onBackToStories();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [handleNext, handlePrev, isLastScene, isFirstScene, onBackToStories]);
+
+  return (
+    <div className="w-full max-w-4xl mx-auto px-4 py-6 sm:py-10">
+      {/* Top Header Bar: Back to Stories & Story Metadata */}
+      <div className="flex items-center justify-between gap-4 mb-6 sm:mb-8 pb-4 border-b border-white/10">
+        <button
+          onClick={onBackToStories}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all cursor-pointer"
+          id="btn-back-to-stories"
+        >
+          <span>←</span>
+          <span>Back to Stories</span>
+        </button>
+
+        <div className="flex items-center gap-3">
+          <span
+            className={`hidden sm:inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wider backdrop-blur-md border ${theme.badgeClass}`}
+          >
+            {theme.badgeEmoji} {story.genre}
+          </span>
+          <span className="text-xs sm:text-sm font-semibold tracking-wide text-zinc-300 px-3 py-1 rounded-full bg-white/5 border border-white/10">
+            Scene {currentSceneIndex + 1} of {totalScenes}
+          </span>
+        </div>
+      </div>
+
+      {/* Main Scene Presentation Container */}
+      <div
+        className={`rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 border ${theme.containerClass}`}
+      >
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={currentScene.id}
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -15 }}
+            transition={{ duration: 0.35, ease: "easeInOut" }}
+            className="flex flex-col"
+          >
+            {/* Scene Artwork Area */}
+            <div className="relative w-full aspect-[16/9] sm:aspect-[21/9] max-h-[420px] overflow-hidden bg-black/60">
+              {!imageError ? (
+                <Image
+                  src={currentScene.image}
+                  alt={currentScene.imageAlt}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 896px"
+                  className="object-cover object-center transition-all duration-700"
+                  onError={() => setImageError(true)}
+                  priority
+                />
+              ) : (
+                /* Polished Genre-Appropriate Fallback */
+                <div
+                  className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center"
+                  style={{
+                    background: theme.fallbackGradient,
+                  }}
+                >
+                  <span className="text-4xl sm:text-5xl mb-2">{theme.fallbackEmoji}</span>
+                  <p className="font-serif italic text-base sm:text-lg text-rose-100/90">
+                    {currentScene.title}
+                  </p>
+                </div>
+              )}
+
+              {/* Ambient Cinematic Vignette Overlay */}
+              <div className="absolute inset-0 bg-gradient-to-t from-[#12070e] via-transparent to-black/40 pointer-events-none" />
+
+              {/* Bottom Scene Indicator Badge on Image */}
+              <div className="absolute bottom-4 left-4 sm:left-6 z-10">
+                <span className="inline-block px-3 py-1 rounded-full text-[11px] font-semibold tracking-wider uppercase bg-black/60 backdrop-blur-md border border-white/10 text-white/90">
+                  Scene {currentScene.sceneNumber}
+                </span>
+              </div>
+            </div>
+
+            {/* Scene Text & Content Body */}
+            <div className="p-6 sm:p-10 md:p-12 space-y-6">
+              {/* Scene Title */}
+              <div>
+                <span
+                  className={`text-xs font-semibold uppercase tracking-widest ${theme.storyTitleClass}`}
+                >
+                  {story.title}
+                </span>
+                <h2 className="font-serif text-2xl sm:text-3xl md:text-4xl font-bold text-zinc-100 mt-2 tracking-tight leading-tight">
+                  {currentScene.title}
+                </h2>
+              </div>
+
+              {/* Ornamental Divider */}
+              <div className="flex items-center gap-3 opacity-40">
+                <div className="h-px w-16 bg-gradient-to-r from-transparent to-zinc-400" />
+                <span className="text-xs text-zinc-400">❖</span>
+                <div className="h-px flex-1 bg-gradient-to-r from-zinc-400 to-transparent" />
+              </div>
+
+              {/* Complete Scene Narrative Text */}
+              <div className="prose prose-invert max-w-none">
+                <p className="font-serif text-base sm:text-lg md:text-xl text-zinc-200/95 leading-relaxed tracking-normal selection:bg-rose-950 selection:text-rose-100">
+                  {currentScene.text}
+                </p>
+              </div>
+
+              {/* Progress Dots Indicator */}
+              <div className="pt-4 flex items-center justify-center gap-2">
+                {story.scenes.map((s, idx) => (
+                  <button
+                    key={s.id}
+                    onClick={() => {
+                      setCurrentSceneIndex(idx);
+                      setImageError(false);
+                      onSceneChange?.(idx);
+                    }}
+                    className="h-1.5 rounded-full transition-all duration-300 cursor-pointer"
+                    style={{
+                      width: idx === currentSceneIndex ? "2rem" : "0.5rem",
+                      background:
+                        idx === currentSceneIndex
+                          ? theme.dotActiveColor
+                          : idx < currentSceneIndex
+                          ? theme.dotPassedColor
+                          : "rgba(255, 255, 255, 0.15)",
+                    }}
+                    aria-label={`Jump to scene ${idx + 1}`}
+                  />
+                ))}
+              </div>
+
+              {/* Scene Navigation Controls */}
+              <div className="pt-6 border-t border-white/10 flex items-center justify-between gap-4">
+                {/* Previous Button */}
+                <button
+                  onClick={handlePrev}
+                  disabled={isFirstScene}
+                  className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all ${
+                    isFirstScene
+                      ? "opacity-30 cursor-not-allowed text-zinc-500 border border-transparent"
+                      : "text-zinc-200 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 cursor-pointer"
+                  }`}
+                  aria-label="Previous Scene"
+                  id="btn-scene-prev"
+                >
+                  ← Previous
+                </button>
+
+                {/* Next / Completion Button */}
+                {isLastScene ? (
+                  <button
+                    onClick={onBackToStories}
+                    className={`px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wide text-white shadow-lg cursor-pointer transition-all flex items-center gap-2 ${theme.actionButtonClass}`}
+                    id="btn-scene-complete"
+                  >
+                    <span>Story Complete ♡ Back to Stories</span>
+                    <span>→</span>
+                  </button>
+                ) : (
+                  <button
+                    onClick={handleNext}
+                    className={`px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wide text-white shadow-lg cursor-pointer transition-all flex items-center gap-2 ${theme.actionButtonClass}`}
+                    id="btn-scene-next"
+                  >
+                    <span>Next Scene</span>
+                    <span>→</span>
+                  </button>
+                )}
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}

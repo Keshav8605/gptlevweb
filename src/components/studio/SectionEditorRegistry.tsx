@@ -18,7 +18,7 @@ const sectionMetadata: Record<
   voice: { label: "Voice Message Whispers", emoji: "🎙️", description: "Recorded audio notes with playback and dedicated chimes", chapter: "Chapter 9" },
   datePlanner: { label: "Plan Our Next Adventure ♡", emoji: "🗺️", description: "Collaborative date ideas, proposals, calendar & countdown", chapter: "Chapter 10" },
   openWhenLetters: { label: "Open When... Envelopes", emoji: "✉️", description: "Special letters sealed until the exact moment arrives", chapter: "Chapter 11" },
-  littleReasons: { label: "A Hundred Little Reasons", emoji: "💗", description: "Dynamic appreciation cards with favorites bookmarking", chapter: "Chapter 12" },
+  littleReasons: { label: "Little Reasons I Love You", emoji: "💗", description: "Dynamic appreciation cards with favorites bookmarking", chapter: "Chapter 12" },
   digitalGifts: { label: "Little Gifts I Owe You", emoji: "🎁", description: "Redeemable digital vouchers with claim verification", chapter: "Chapter 13" },
   ourSong: { label: "Our Song Dedicated Melody", emoji: "🎵", description: "Spinning vinyl record and audio pentatonic chimes", chapter: "Chapter 14" },
   finalHeart: { label: "Forever & Always", emoji: "❤️", description: "Milestone anniversary counter and final love celebration", chapter: "Chapter 15" },
@@ -203,7 +203,7 @@ export function SectionEditorRegistry({
         <div className="space-y-4 text-xs text-[var(--text-primary)]">
           {/* 1. WELCOME SURPRISE */}
           {selectedSectionId === "welcome" && (
-            <div className="space-y-3">
+            <div className="space-y-4">
               <div className="space-y-1">
                 <label className="font-semibold block">Envelope Headline</label>
                 <input
@@ -230,6 +230,130 @@ export function SectionEditorRegistry({
                   onChange={(e) => onChange({ welcomeMessage: e.target.value })}
                   className="w-full p-3 rounded-2xl border border-[var(--border-subtle)] text-xs resize-none leading-relaxed"
                 />
+              </div>
+
+              {/* 4 Floating Story Photo Cards */}
+              <div className="pt-3 border-t border-[var(--border-subtle)] space-y-3">
+                <div className="flex items-center justify-between">
+                  <label className="font-semibold text-xs flex items-center gap-1.5 text-[var(--pink-strong)]">
+                    <span>📸</span> 4 Floating Photo Cards (Solo, Couple or Any Photo)
+                  </label>
+                  <span className="text-[10px] text-[var(--text-muted)]">
+                    Universal Romantic Captions
+                  </span>
+                </div>
+                <p className="text-[11px] text-[var(--text-secondary)] leading-relaxed">
+                  These 4 floating photo cards surround the &quot;You &amp; Me&quot; title on the welcome screen. The quotes are specially crafted to look impressive and heartfelt whether you put a solo photo of your partner, yourself, or both of you together.
+                </p>
+
+                <div className="space-y-3">
+                  {[0, 1, 2, 3].map((idx) => {
+                    const defaultLabels = [
+                      "Card 1 · Top-Left",
+                      "Card 2 · Top-Right",
+                      "Card 3 · Bottom-Left",
+                      "Card 4 · Bottom-Right",
+                    ];
+                    const defaultCaptions = [
+                      "A moment I'd choose a thousand times ♡",
+                      "The sweetest view in the whole world ✨",
+                      "Right here is where my heart belongs ♡",
+                      "The best part of every single day ✨",
+                    ];
+                    const defaultPhotos = [
+                      "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80",
+                      "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=600&q=80",
+                      "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80",
+                      "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=600&q=80",
+                    ];
+
+                    const currentPolaroid = (gift.welcomePolaroids && gift.welcomePolaroids[idx]) || {
+                      src: defaultPhotos[idx],
+                      caption: defaultCaptions[idx],
+                    };
+
+                    const updatePolaroid = (field: "src" | "caption", val: string) => {
+                      const updated = [
+                        ...(gift.welcomePolaroids || [
+                          { src: defaultPhotos[0], caption: defaultCaptions[0] },
+                          { src: defaultPhotos[1], caption: defaultCaptions[1] },
+                          { src: defaultPhotos[2], caption: defaultCaptions[2] },
+                          { src: defaultPhotos[3], caption: defaultCaptions[3] },
+                        ]),
+                      ];
+                      updated[idx] = {
+                        ...updated[idx],
+                        [field]: val,
+                      };
+                      onChange({ welcomePolaroids: updated });
+                    };
+
+                    return (
+                      <div
+                        key={idx}
+                        className="p-3 bg-white/70 rounded-xl border border-[var(--border-subtle)] space-y-2 shadow-2xs"
+                      >
+                        <div className="flex items-center justify-between text-[11px] font-semibold text-[var(--text-primary)]">
+                          <span>{defaultLabels[idx]}</span>
+                          <span className="text-[10px] text-[var(--pink-deep)] font-normal font-handwritten">
+                            {currentPolaroid.caption || defaultCaptions[idx]}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          <div>
+                            <div className="flex items-center justify-between mb-0.5">
+                              <label className="text-[10px] text-[var(--text-muted)] block">Photo URL</label>
+                              <button
+                                type="button"
+                                onClick={() => onOpenMediaLibrary((url) => updatePolaroid("src", url))}
+                                className="text-[10px] text-[var(--pink-primary)] hover:underline cursor-pointer"
+                              >
+                                Pick Media ↗
+                              </button>
+                            </div>
+                            <input
+                              type="text"
+                              value={currentPolaroid.src || ""}
+                              onChange={(e) => updatePolaroid("src", e.target.value)}
+                              placeholder="Image URL..."
+                              className="w-full p-2 rounded-lg border border-[var(--border-subtle)] text-xs"
+                            />
+                          </div>
+                          <div>
+                            <label className="text-[10px] text-[var(--text-muted)] block mb-0.5">Card Caption</label>
+                            <input
+                              type="text"
+                              value={currentPolaroid.caption || ""}
+                              onChange={(e) => updatePolaroid("caption", e.target.value)}
+                              placeholder={defaultCaptions[idx]}
+                              className="w-full p-2 rounded-lg border border-[var(--border-subtle)] text-xs"
+                            />
+                          </div>
+                        </div>
+
+                        {/* Quick preset suggestions */}
+                        <div className="flex flex-wrap gap-1 pt-1">
+                          {[
+                            defaultCaptions[idx],
+                            "My favourite human in existence ♡",
+                            "Pure magic in a single frame ✨",
+                            "The reason behind my biggest smile ✨",
+                            "Endlessly loved, today & always ♡",
+                          ].slice(0, 3).map((suggestion, sIdx) => (
+                            <button
+                              key={sIdx}
+                              type="button"
+                              onClick={() => updatePolaroid("caption", suggestion)}
+                              className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--soft-pink)] hover:bg-[var(--pink-light)] text-[var(--pink-deep)] transition-colors cursor-pointer"
+                            >
+                              + &quot;{suggestion}&quot;
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
             </div>
           )}

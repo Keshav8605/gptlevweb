@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 import { SectionWrapper } from "../SectionWrapper";
 import { RomanticCharacter } from "../RomanticCharacter";
 import type { DeluluScenario } from "@/lib/gift-data";
@@ -9,27 +10,26 @@ import type { DeluluScenario } from "@/lib/gift-data";
 export const defaultDeluluScenarios: DeluluScenario[] = [
   {
     id: "ds1",
-    title: "We get caught in the torrential rain together",
-    situation:
-      "A sudden summer downpour catches us miles from home. Neither of us has an umbrella, and our clothes are getting drenched within seconds. What happens next?",
+    title: "Caught in the Rain",
+    situation: "We get caught in a sudden downpour together. What do we do?",
     options: [
       {
         id: "ds1_o1",
-        text: "Pull me by the hands and dance in the middle of the empty street",
+        text: "Grab your hands and dance right there in the rain. Who needs an umbrella?",
         response:
-          "Main character energy! 🌧️💃 You spin me around until we're both breathless and laughing like idiots. That's the exact moment a stranger looks out their window and thinks 'I want what they have.'",
+          "Of course you would. Five minutes in the rain with you would become one of my favorite memories. ♡",
       },
       {
         id: "ds1_o2",
-        text: "Sprint for the nearest café awning and squeeze under my jacket together",
+        text: "Run for the nearest café and share the tiniest corner under my jacket.",
         response:
-          "Maximum cozy romance. We're shivering, shivering, looking into each other's eyes while dripping wet, and I end up kissing your wet nose. We buy two hot chocolates and refuse to leave for hours. ☕💕",
+          "Maximum cozy romance. Squeezing close while shivering and laughing... I wouldn't trade that for anything. ☕💕",
       },
       {
         id: "ds1_o3",
-        text: "Give up completely and have a puddle-splashing war",
+        text: "Declare it a puddle-splashing championship. Winner gets a kiss. ♡",
         response:
-          "Chaotic evil, but I respect it. You deliberately splash me, so I scoop you up and spin you straight into the biggest puddle. We both catch colds, but it was 100% worth it. 💦😂",
+          "Chaotic and adorable, exactly like you. Spoiler: either way, I'm making sure you get that kiss. 💦🥰",
       },
     ],
   },
@@ -161,6 +161,10 @@ export function DeluluSection({ scenarios = defaultDeluluScenarios }: DeluluSect
   const activeScenarios = scenarios.length > 0 ? scenarios : defaultDeluluScenarios;
 
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [returnParam] = useState<string>(() => {
+    if (typeof window === "undefined") return "/#deluluMode";
+    return window.location.pathname + (window.location.search || "") + "#deluluMode";
+  });
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>(() => {
     if (typeof window === "undefined") return {};
     try {
@@ -170,6 +174,41 @@ export function DeluluSection({ scenarios = defaultDeluluScenarios }: DeluluSect
       return {};
     }
   });
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const performScrollToDelulu = () => {
+      const isDeluluTarget =
+        window.location.hash === "#deluluMode" ||
+        sessionStorage.getItem("scroll_to_delulu_on_load") === "true";
+
+      if (isDeluluTarget) {
+        sessionStorage.removeItem("scroll_to_delulu_on_load");
+        const el = document.getElementById("deluluMode");
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "start" });
+        }
+      }
+    };
+
+    // Trigger scroll restoration on mount and layout settle
+    performScrollToDelulu();
+    const t1 = setTimeout(performScrollToDelulu, 80);
+    const t2 = setTimeout(performScrollToDelulu, 250);
+    const t3 = setTimeout(performScrollToDelulu, 600);
+
+    window.addEventListener("hashchange", performScrollToDelulu);
+    window.addEventListener("popstate", performScrollToDelulu);
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      window.removeEventListener("hashchange", performScrollToDelulu);
+      window.removeEventListener("popstate", performScrollToDelulu);
+    };
+  }, []);
 
   const currentScenario = activeScenarios[currentIndex];
   const selectedOptionId = selectedAnswers[currentScenario?.id];
@@ -205,13 +244,14 @@ export function DeluluSection({ scenarios = defaultDeluluScenarios }: DeluluSect
   return (
     <SectionWrapper
       id="deluluMode"
-      title="Delulu Mode"
-      subtitle="Playful relationship scenarios — pick your path, discover my reaction 🦋"
+      eyebrowLabel="OUR IMAGINATION HAS NO CHILL"
+      title="Delulu Mode ♡"
+      subtitle="A few imaginary situations. One very real favorite person."
       emoji="🦋"
       bgVariant="blush"
-      chapterNumber={4}
+      chapterNumber={5}
       nextSectionId="quiz"
-      nextSectionLabel="Do You Love Me?"
+      nextSectionLabel="Answer one tiny question 💗"
       nextSectionEmoji="💖"
     >
       <div className="max-w-2xl mx-auto">
@@ -225,27 +265,6 @@ export function DeluluSection({ scenarios = defaultDeluluScenarios }: DeluluSect
           />
         </div>
 
-        {/* Progress Dots */}
-        <div className="flex items-center justify-center gap-2 mb-8">
-          {activeScenarios.map((_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentIndex(i)}
-              className="h-2 rounded-full transition-all duration-300 cursor-pointer"
-              style={{
-                width: i === currentIndex ? "2.2rem" : "0.5rem",
-                background:
-                  i === currentIndex
-                    ? "var(--pink-strong)"
-                    : selectedAnswers[activeScenarios[i].id]
-                    ? "var(--pink-primary)"
-                    : "var(--border-subtle)",
-              }}
-              aria-label={`Jump to scenario ${i + 1}`}
-            />
-          ))}
-        </div>
-
         {/* Current Scenario Card */}
         <AnimatePresence mode="wait">
           <motion.div
@@ -257,10 +276,10 @@ export function DeluluSection({ scenarios = defaultDeluluScenarios }: DeluluSect
             className="space-y-6"
           >
             <div className="bg-white rounded-3xl p-6 sm:p-10 border border-[var(--border-subtle)] shadow-[0_8px_30px_var(--shadow-pink)]">
-              {/* Category chip */}
+              {/* Single Scenario Progress Indicator */}
               <div className="text-center mb-6">
-                <span className="text-xs font-semibold uppercase tracking-wider px-3.5 py-1.5 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] inline-block">
-                  Scenario {currentIndex + 1} of {activeScenarios.length}
+                <span className="text-xs font-semibold uppercase tracking-wider px-4 py-1.5 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] inline-block font-rounded border border-[var(--border-subtle)] shadow-2xs">
+                  DAYDREAM {String(currentIndex + 1).padStart(2, "0")} OF {String(activeScenarios.length).padStart(2, "0")}
                 </span>
                 <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-[var(--text-primary)] mt-3">
                   {currentScenario.title}
@@ -285,7 +304,7 @@ export function DeluluSection({ scenarios = defaultDeluluScenarios }: DeluluSect
                       onClick={() => handleSelectOption(opt.id)}
                       className={`w-full text-left p-4 sm:p-5 rounded-2xl text-xs sm:text-sm font-medium transition-all cursor-pointer border flex items-center justify-between gap-3 ${
                         isChosen
-                          ? "bg-gradient-to-r from-[var(--pale-rose)] to-[var(--bg-blush)] border-[var(--pink-strong)] shadow-xs"
+                          ? "bg-gradient-to-r from-[var(--pale-rose)] to-[var(--bg-blush)] border-[var(--pink-strong)] shadow-xs ring-2 ring-[var(--pink-light)]"
                           : "bg-[var(--bg-main)] hover:bg-[var(--bg-surface)] border-[var(--border-subtle)] text-[var(--text-primary)]"
                       }`}
                     >
@@ -302,8 +321,34 @@ export function DeluluSection({ scenarios = defaultDeluluScenarios }: DeluluSect
                   );
                 })}
               </div>
-            </div>
 
+              {/* Playful Reaction Reveal */}
+              <AnimatePresence mode="wait">
+                {selectedOption && (
+                  <motion.div
+                    key={selectedOption.id}
+                    initial={{ opacity: 0, y: 12, height: 0 }}
+                    animate={{ opacity: 1, y: 0, height: "auto" }}
+                    exit={{ opacity: 0, y: -6, height: 0 }}
+                    transition={{ duration: 0.35, ease: "easeOut" }}
+                    className="mt-6 p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[var(--warm-cream)] via-[#FFF0F5] to-[var(--soft-pink)]/60 border border-[var(--border-medium)] shadow-xs text-left"
+                  >
+                    <div className="flex items-start gap-3">
+                      <span className="text-2xl mt-0.5">💭</span>
+                      <div className="flex-1">
+                        <p className="text-[11px] font-bold text-[var(--pink-strong)] uppercase tracking-wider font-rounded mb-1 flex items-center gap-1.5">
+                          <span>My Reaction</span>
+                          <span>♡</span>
+                        </p>
+                        <p className="font-serif italic text-sm sm:text-base text-[var(--romantic-plum)] leading-relaxed">
+                          &ldquo;{selectedOption.response}&rdquo;
+                        </p>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
 
             {/* Navigation buttons */}
             <div className="flex items-center justify-between pt-2">
@@ -312,7 +357,7 @@ export function DeluluSection({ scenarios = defaultDeluluScenarios }: DeluluSect
                 disabled={currentIndex === 0}
                 className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-[var(--text-secondary)] hover:text-[var(--text-primary)] disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer transition-colors"
               >
-                ← Previous
+                ← Previous daydream
               </button>
 
               <div className="flex items-center gap-3">
@@ -321,20 +366,53 @@ export function DeluluSection({ scenarios = defaultDeluluScenarios }: DeluluSect
                     onClick={handleRestart}
                     className="px-5 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-[var(--pale-rose)] text-[var(--pink-strong)] hover:bg-[var(--bg-blush)] cursor-pointer transition-colors"
                   >
-                    ↺ Replay Scenarios
+                    ↺ Replay daydreams
                   </button>
                 ) : (
                   <button
                     onClick={handleNext}
                     className="px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-[var(--pink-strong)] text-white hover:bg-[var(--pink-deep)] shadow-sm hover:shadow-md cursor-pointer transition-all"
                   >
-                    Next Scenario →
+                    Next daydream →
                   </button>
                 )}
               </div>
             </div>
           </motion.div>
         </AnimatePresence>
+
+        {/* Story Universe Promotional Entry Card */}
+        <div className="mt-8 bg-white/90 backdrop-blur-xs rounded-3xl p-6 sm:p-7 border border-[var(--border-subtle)] shadow-[0_6px_25px_var(--shadow-pink)] text-center">
+          <div className="flex items-center justify-center gap-2 mb-1.5">
+            <span className="text-xs text-[var(--pink-primary)] select-none">✨</span>
+            <h4 className="font-serif italic leading-tight">
+              <span className="text-lg sm:text-xl text-[#855870] font-medium mr-1.5">
+                One click.
+              </span>
+              <span className="text-xl sm:text-2xl text-[var(--pink-primary)] font-bold">
+                Endless worlds.
+              </span>
+            </h4>
+            <span className="text-xs text-[var(--pink-primary)] select-none">♡</span>
+          </div>
+
+          <p className="font-serif italic text-xs sm:text-sm text-[#987589] mb-4">
+            Stories made for your kind of delulu.
+          </p>
+
+          <Link
+            href={`/story-universe?from=${encodeURIComponent(returnParam)}`}
+            onClick={() => {
+              if (typeof window !== "undefined") {
+                sessionStorage.setItem("story_universe_return_to", returnParam);
+              }
+            }}
+            className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold bg-[var(--pink-strong)] text-white hover:bg-[var(--pink-deep)] shadow-sm hover:shadow-md cursor-pointer transition-all"
+            id="btn-explore-story-universe"
+          >
+            Dream up another scenario ↗
+          </Link>
+        </div>
       </div>
     </SectionWrapper>
   );

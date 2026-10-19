@@ -27,17 +27,19 @@ export function OpenWhenSection({ letters }: OpenWhenSectionProps) {
   return (
     <SectionWrapper
       id="openWhenLetters"
-      title="Open When..."
-      subtitle="Little letters waiting for the right moment"
+      eyebrowLabel="FOR WHATEVER TODAY FEELS LIKE"
+      title="Open When…"
+      subtitle="Little letters for the moments when you need a little extra love."
       emoji="✉️"
       bgVariant="lavender"
-      chapterNumber={10}
+      chapterNumber={11}
       nextSectionId="littleReasons"
-      nextSectionLabel="Why I Love You"
+      nextSectionLabel="Discover the reasons I love you ♡"
+      nextSectionSubtitle="There are more reasons than I could ever fit into one letter. So I started a list."
       nextSectionEmoji="💗"
     >
       {/* Cozy envelope companion */}
-      <div className="flex justify-center -mt-3 mb-6">
+      <div className="flex justify-center -mt-3 mb-4">
         <RomanticCharacter
           character="cozyCouple"
           size={180}
@@ -45,6 +47,10 @@ export function OpenWhenSection({ letters }: OpenWhenSectionProps) {
           sparkles
         />
       </div>
+
+      <p className="text-center font-rounded text-xs sm:text-sm text-[var(--pink-strong)] font-medium -mt-1 mb-6">
+        Choose the letter you need today.
+      </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
         {letters.map((letter, i) => (
@@ -111,8 +117,8 @@ function EnvelopeCard({
           {letter.emoji}
         </span>
         {wasOpened && (
-          <span className="text-xs px-2 py-0.5 rounded-full" style={{ background: "var(--pale-rose)", color: "var(--pink-strong)" }}>
-            Opened ♡
+          <span className="text-xs px-2.5 py-0.5 rounded-full font-medium" style={{ background: "var(--pale-rose)", color: "var(--pink-strong)" }}>
+            Read and kept close
           </span>
         )}
       </div>
@@ -124,8 +130,8 @@ function EnvelopeCard({
         {letter.title}
       </h3>
 
-      <p className="mt-2 text-xs" style={{ color: "var(--text-muted)" }}>
-        Tap to read →
+      <p className="mt-2 text-xs font-medium" style={{ color: "var(--pink-strong)" }}>
+        Open this letter ♡
       </p>
 
       {/* Corner fold */}
@@ -146,6 +152,24 @@ function OpenLetterOverlay({
   letter: OpenWhenLetter;
   onClose: () => void;
 }) {
+  const [isSavedNearby, setIsSavedNearby] = useState(() => {
+    if (typeof window === "undefined") return false;
+    try {
+      const saved = localStorage.getItem(`gift_saved_letter_${letter.id}`);
+      return saved === "true";
+    } catch {
+      return false;
+    }
+  });
+
+  const handleToggleSaveNearby = () => {
+    const next = !isSavedNearby;
+    setIsSavedNearby(next);
+    try {
+      localStorage.setItem(`gift_saved_letter_${letter.id}`, String(next));
+    } catch {}
+  };
+
   return (
     <>
       {/* Backdrop */}
@@ -181,12 +205,19 @@ function OpenLetterOverlay({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <span className="text-3xl">{letter.emoji}</span>
-              <h3
-                className="font-serif text-2xl md:text-3xl font-semibold"
-                style={{ color: "var(--text-primary)" }}
-              >
-                {letter.title}
-              </h3>
+              <div>
+                <h3
+                  className="font-serif text-2xl md:text-3xl font-semibold"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  {letter.title}
+                </h3>
+                {letter.heading && (
+                  <p className="font-handwritten text-lg text-[var(--pink-strong)] mt-0.5">
+                    {letter.heading}
+                  </p>
+                )}
+              </div>
             </div>
             <button
               onClick={onClose}
@@ -194,7 +225,8 @@ function OpenLetterOverlay({
               style={{ background: "var(--pale-rose)", color: "var(--pink-strong)" }}
               onMouseEnter={(e) => { e.currentTarget.style.background = "var(--bg-blush)"; }}
               onMouseLeave={(e) => { e.currentTarget.style.background = "var(--pale-rose)"; }}
-              aria-label="Close letter"
+              aria-label="Fold it for later"
+              title="Fold it for later"
             >
               ✕
             </button>
@@ -207,21 +239,27 @@ function OpenLetterOverlay({
 
         {/* Letter content */}
         <div className="px-6 md:px-10 pb-8 space-y-5">
-          {letter.content.split("\n\n").map((paragraph, i) => (
-            <motion.p
-              key={i}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 + i * 0.12 }}
-              className="text-base md:text-lg font-serif italic leading-relaxed"
-              style={{
-                color: "var(--text-primary)",
-                lineHeight: 1.9,
-              }}
-            >
-              {paragraph}
-            </motion.p>
-          ))}
+          {!letter.content || letter.content.trim() === "" ? (
+            <p className="text-base md:text-lg font-serif italic text-center text-[var(--text-muted)] py-10">
+              This little letter is still being written.
+            </p>
+          ) : (
+            letter.content.split("\n\n").map((paragraph, i) => (
+              <motion.p
+                key={i}
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 + i * 0.12 }}
+                className="text-base md:text-lg font-serif italic leading-relaxed"
+                style={{
+                  color: "var(--text-primary)",
+                  lineHeight: 1.9,
+                }}
+              >
+                {paragraph}
+              </motion.p>
+            ))
+          )}
 
           {/* Sweet companion alongside revealed letter message */}
           <div className="flex justify-center pt-2 pb-2">
@@ -233,13 +271,37 @@ function OpenLetterOverlay({
             />
           </div>
 
+          {/* Action Row: Save Nearby & Fold for Later */}
+          <div className="flex flex-wrap items-center justify-between gap-3 pt-3 border-t border-[var(--border-subtle)]">
+            <button
+              type="button"
+              onClick={handleToggleSaveNearby}
+              className={`px-4 py-2 rounded-full text-xs font-rounded font-semibold cursor-pointer transition-all inline-flex items-center gap-1.5 ${
+                isSavedNearby
+                  ? "bg-[var(--pink-primary)] text-white shadow-xs"
+                  : "bg-[var(--pale-rose)] text-[var(--pink-strong)] hover:bg-[var(--bg-blush)]"
+              }`}
+            >
+              <span>{isSavedNearby ? "📌" : "♡"}</span>
+              <span>{isSavedNearby ? "Kept nearby ♡" : "Keep this letter nearby"}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2 rounded-full bg-white border border-[var(--border-subtle)] hover:bg-[var(--pale-rose)] text-xs font-rounded font-semibold text-[var(--text-secondary)] hover:text-[var(--pink-strong)] cursor-pointer transition-colors inline-flex items-center gap-1.5"
+            >
+              <span>Fold it for later</span>
+            </button>
+          </div>
+
           {/* Signature */}
           {letter.signature && (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ delay: 1.2 }}
-              className="pt-4 text-right"
+              className="pt-2 text-right"
             >
               <p
                 className="font-script text-xl md:text-2xl"

@@ -1,3 +1,11 @@
+import { hundredReasonsList } from "./reasons-data";
+
+export interface HeroPolaroidConfig {
+  id?: string;
+  src?: string;
+  caption?: string;
+}
+
 // Gift data types and configuration
 export interface GiftConfig {
   // People
@@ -10,6 +18,7 @@ export interface GiftConfig {
   welcomeTitle: string;
   welcomeSubtitle: string;
   welcomeMessage: string;
+  welcomePolaroids?: HeroPolaroidConfig[];
   
   // Relationship dates
   dateFirstMet?: string;
@@ -78,6 +87,8 @@ export interface Letter {
 export interface OpenWhenLetter {
   id: string;
   title: string;
+  heading?: string;
+  opening?: string;
   emoji: string;
   content: string;
   photo?: string;
@@ -96,6 +107,8 @@ export interface ObservationCard {
 
 export interface LittleReason {
   id: string;
+  title?: string;
+  supportingText?: string;
   text: string;
   emoji?: string;
 }
@@ -130,6 +143,8 @@ export interface DigitalGift {
   image?: string;
   isClaimed?: boolean;
   claimedAt?: string;
+  isFulfilled?: boolean;
+  fulfilledAt?: string;
 }
 
 export interface BucketListItem {
@@ -188,8 +203,30 @@ export const defaultGiftConfig: GiftConfig = {
   recipientNickname: "Baby",
   
   welcomeTitle: "You & Me",
-  welcomeSubtitle: "A little world, just for us ✨",
-  welcomeMessage: "Because you deserve to know how special you are to me. Every pixel on this page holds a piece of my heart. Take your time exploring — this is all for you.",
+  welcomeSubtitle: "A little world made from my favorite person, our little moments, and all the things I sometimes struggle to put into words.",
+  welcomeMessage: "“Of all the stories life could give me, you're the one I'd choose to keep living.”",
+  welcomePolaroids: [
+    {
+      id: "p1",
+      src: "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80",
+      caption: "A moment I'd choose all over again.",
+    },
+    {
+      id: "p2",
+      src: "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=600&q=80",
+      caption: "Somehow, my heart always finds its way back to you.",
+    },
+    {
+      id: "p3",
+      src: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80",
+      caption: "The world feels softer when I share it with you.",
+    },
+    {
+      id: "p4",
+      src: "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=600&q=80",
+      caption: "My favorite person, in a thousand little ways.",
+    },
+  ],
   
   dateFirstMet: "2023-06-15",
   dateOfficialCouple: "2023-08-20",
@@ -261,59 +298,104 @@ export const defaultGiftConfig: GiftConfig = {
     {
       id: "l1",
       title: "What I Don't Say Enough",
-      content: "I don't say it enough, but you have changed my life in ways I never imagined possible. Before you, I didn't know that love could feel this safe, this exciting, this warm all at once.\n\nYou make the ordinary extraordinary. The way you laugh at your own jokes, the way you hold my hand a little tighter when you're nervous, the way you always remember the little things — these are the details that make my heart overflow.\n\nI promise to keep choosing you. Every single day. In every mood, every season, every version of us that's yet to come.\n\nYou are my favorite story. And I never want it to end.",
-      signature: "Forever yours",
+      content: "My love,\n\nI don't think I tell you often enough how much you mean to me.\n\nYou have a way of making ordinary days feel special. It's in the way you laugh, the little things you remember, and the comfort I feel just knowing you're there.\n\nI love the big moments we share, but I think I love the little ones just as much. The random conversations, the silly jokes, the quiet moments when we don't need to say much at all.\n\nI can't promise that every day will be perfect. But I can promise to keep showing up, to keep learning you, to listen when you need me, and to keep choosing us through all the versions of life still waiting for us.\n\nI hope you never have to wonder whether you matter to me. You do. In more ways than I can fit into one letter.\n\nAnd if I ever forget to say it out loud, I hope you can come back here and feel it again.",
+      signature: "All my love, always. ♡",
     },
     {
       id: "l2",
-      title: "The Things I Notice",
-      content: "I notice when you push your hair behind your ear when you're concentrating. I notice the way your eyes light up when you talk about something you love. I notice how you always check if I'm okay, even when you're the one having a hard day.\n\nI notice everything. And every little thing makes me fall deeper.",
-      signature: "Your biggest admirer",
+      title: "The Little Things I Notice",
+      content: "My sweetheart,\n\nI notice when you push your hair behind your ear when you're concentrating. I notice the way your eyes light up when you talk about something you love. I notice how you always check if I'm okay, even when you're the one having a hard day.\n\nI notice the way you hum softly without realizing it, how your fingers find mine in the dark, and how the simplest things make you smile.\n\nI notice everything. And every little thing makes me fall for you all over again.",
+      signature: "Your biggest admirer ♡",
+    },
+    {
+      id: "l3",
+      title: "For the Days You Forget How Loved You Are",
+      content: "My dearest,\n\nOn the days when everything feels heavy and you're being too hard on yourself, take a deep breath.\n\nYou don't have to carry the whole world on your shoulders. You don't have to be perfect to deserve the gentlest love.\n\nI love you when you're laughing, and I love you when you're quiet and tired. You are so deeply cherished, exactly as you are.",
+      signature: "Always in your corner. ♡",
     },
   ],
   
   openWhenLetters: [
     {
       id: "ow1",
-      title: "Open When You're Sad",
-      emoji: "🥺",
-      content: "Hey beautiful,\n\nI know today feels heavy. I know the world seems a bit too loud and everything feels a bit too much. But I need you to know something:\n\nYou are not alone in this. Not now, not ever.\n\nWhatever is making you sad right now, it will pass. And when it does, I'll still be right here — ready to make you laugh, hold you close, and remind you of all the reasons you are incredible.\n\nClose your eyes. Take a deep breath. And remember that somewhere in this world, there's someone whose whole day gets better just by thinking of you.\n\nThat someone is me. Always.",
-      signature: "I love you more than you know",
+      title: "Open when you're feeling low",
+      heading: "A gentle reminder that it's okay to slow down",
+      opening: "My love,",
+      emoji: "🌧️",
+      content: "My love,\n\nSometimes the world is just heavy, and you don't even have to have a clear reason why. If today feels quiet or gray, please don't force yourself to carry more than you can handle.\n\nYou don't need to put on a brave face with me. It is completely okay to take off the armor, let your shoulders drop, and just take things one slow breath at a time. Be gentle with yourself today.\n\nWhenever you need a quiet corner or a listening ear, I'm here. Drink a glass of water, wrap yourself in warmth, and remember this day will pass.\n\nHolding you close, always. ♡",
+      signature: "Holding you close, always. ♡",
     },
     {
       id: "ow2",
-      title: "Open When You Miss Me",
+      title: "Open when you miss me",
+      heading: "When the distance feels a little too loud",
+      opening: "My sweet love,",
       emoji: "💭",
-      content: "If you're reading this, you miss me. And honestly? That makes me smile.\n\nBecause I probably miss you too. Right now, wherever I am, there's a little ache in my chest that's shaped exactly like you.\n\nBut here's what I want you to remember: distance and time are just details. What we have? That's the real thing. And real things don't weaken — they grow.\n\nSo until we're together again, hold onto this: you are the first thing I think about in the morning and the last thought before I sleep. No amount of miles could change that.\n\nSee you soon, my love.",
-      signature: "Counting the moments ❤️",
+      content: "My sweet love,\n\nI know that quiet ache when you wish we could just reach out and hold each other. If you're missing me right now, know with certainty that I'm carrying you in my thoughts too.\n\nDistance and busy hours can keep us in different rooms, but they don't change how tightly my heart belongs to you. Close your eyes for three seconds and imagine my arms around you, because that's where I want to be.\n\nWe will be together again soon, catching up on every little detail and laughing until our sides hurt. Until then, hold onto this whisper: you are loved across every mile.\n\nCounting down the moments until I see you. ♡",
+      signature: "Counting down the moments until I see you. ♡",
     },
     {
       id: "ow3",
-      title: "Open When You Doubt Yourself",
-      emoji: "💪",
-      content: "Stop right there.\n\nI know what you're doing. You're being way too hard on yourself again. So let me be your mirror for a moment:\n\nYou are brilliant. You are capable. You are so much stronger than you give yourself credit for.\n\nRemember that time you thought you couldn't do it? You did it. Remember when you were terrified? You showed up anyway. That's not luck — that's YOU.\n\nI believe in you with my whole heart. And I need you to believe in yourself even half as much as I do. Because if you did? You'd be unstoppable.\n\nNow go show the world what I already know.",
-      signature: "Your biggest cheerleader 🌟",
+      title: "Open when you doubt yourself",
+      heading: "For the days you forget how wonderful you are",
+      opening: "My love,",
+      emoji: "🌱",
+      content: "My love,\n\nI wish you could see yourself through my eyes for just a moment. Not because you need to become someone else, or because you need to prove anything, but because I hope you'd recognize how much good is already in you.\n\nYou don't have to get everything right today. You don't have to be the strongest person in every room. You are allowed to rest, to learn, to feel unsure, and to begin again.\n\nWhatever today looks like, I hope you remember this: one difficult day doesn't define you, and one mistake can never erase all the beautiful things that make you who you are.\n\nI'm cheering for you, always. ♡",
+      signature: "I'm cheering for you, always. ♡",
     },
     {
       id: "ow4",
-      title: "Open When You Can't Sleep",
+      title: "Open when you can't sleep",
+      heading: "A quiet lullaby for a wandering mind",
+      opening: "My darling,",
       emoji: "🌙",
-      content: "Can't sleep, huh? \n\nThat's okay. Some nights are like that. So instead of counting sheep, let me give you better things to think about:\n\nThink about our first date and how nervous we both were.\nThink about that time we couldn't stop laughing at absolutely nothing.\nThink about all the adventures we still haven't had.\nThink about how loved you are right at this very second.\n\nNow close your eyes and imagine I'm right there with you. My arms around you, your head on my chest, just breathing together.\n\nSweet dreams, my love. Tomorrow is a new day, and it already loves you.",
-      signature: "Goodnight, beautiful ✨",
+      content: "My darling,\n\nLate nights have a way of echoing every little thought. If your mind is running in circles right now, let this be your permission to set tomorrow down.\n\nWhatever didn't get done today can wait. You don't have to solve your whole life before midnight. You did enough, and right now, your only job is to rest.\n\nTake a slow, deep breath in, and let it out. Imagine the rhythm of the rain or a warm room where you feel completely safe. I am thinking of you, wishing you the sweetest dreams and the gentlest rest.\n\nSleep peacefully, my favorite person. ♡",
+      signature: "Sleep peacefully, my favorite person. ♡",
     },
     {
       id: "ow5",
-      title: "Open When You Need a Smile",
+      title: "Open when you need a smile",
+      heading: "A tiny spark of joy, just for you",
+      opening: "Hey you,",
       emoji: "😊",
-      content: "HI!!! 👋\n\nDid it work? Are you smiling yet?\n\nNo? Okay, let me try harder:\n\nRemember that time I tried to be romantic and completely embarrassed myself? Yeah. That was peak comedy and you know it.\n\nWhat about the time we tried to take a nice photo together and made the most ridiculous faces instead? Those are still my favorites.\n\nYou have the most beautiful smile I have ever seen. And the world genuinely gets a little brighter every time you use it.\n\nSo please, smile for me? 🥺\n\nThere it is. That's the one. That's my favorite view in the whole world.",
-      signature: "Forever making you smile 💕",
+      content: "Hey you,\n\nIf today has been dull, serious, or just a little draining, I hope this little note brings a grin to that gorgeous face of yours.\n\nRemember that ridiculous moment when we couldn't stop laughing at something completely silly? The world is full of little surprises waiting to make us laugh, and having you by my side makes life a hundred times more joyful.\n\nYou have a smile that lights up entire rooms, and I consider it my life's mission to keep that smile safe. Go on, let yourself chuckle. You deserve every ounce of sweetness today.\n\nYour personal goofball and biggest fan. ♡",
+      signature: "Your personal goofball and biggest fan. ♡",
     },
     {
       id: "ow6",
-      title: "Open When You Want to Feel Loved",
+      title: "Open when you need a reminder of how loved you are",
+      heading: "For when the world feels too quiet",
+      opening: "My whole heart,",
       emoji: "❤️",
-      content: "You want to feel loved? Come here.\n\nLet me tell you something: You are the most lovable person I have ever known. Not because you're perfect — because you're perfectly you.\n\nI love the way you care too much about everything. I love your random midnight thoughts. I love how you get excited about the smallest things. I love your voice, your laugh, your warmth.\n\nI love you on your best days and your worst days. I love you when you're confident and when you're uncertain. I love you at sunrise and sunset and every single moment in between.\n\nYou are so deeply, completely, impossibly loved.\n\nNever forget that.",
-      signature: "Yours, completely ♾️",
+      content: "My whole heart,\n\nIf you ever wonder whether you are cherished, let this letter answer you without a single doubt: you are loved beyond words.\n\nI love you for your bright moments and your tired ones. I love the quiet kindness you give to the world, the funny little expressions you make, and the sincere warmth you bring into my life every single day.\n\nYou are not hard to love; loving you is the most natural, effortless thing my heart has ever learned. You matter to me deeply, today and through every tomorrow.\n\nForever and always yours. ♡",
+      signature: "Forever and always yours. ♡",
+    },
+    {
+      id: "ow7",
+      title: "Open when you're stressed or overwhelmed",
+      heading: "Take a deep breath and let the world pause for a moment",
+      opening: "My sweet love,",
+      emoji: "🌿",
+      content: "My sweet love,\n\nI know how hard you push yourself, and how easy it is for tasks, expectations, and noise to pile up until your chest feels tight. If everything feels like too much all at once right now, stop for just sixty seconds.\n\nDrop your shoulders. Unclench your jaw. You do not have to solve every problem before the sun sets. The world can wait while you take three quiet, deep breaths.\n\nYou have handled hard days before, and you will navigate this one too—not by doing everything perfectly, but simply by taking it one gentle step at a time. And remember: you are never alone in this. I'm right here beside you, ready to help carry whatever you need.\n\nRest your mind for a moment. You are doing so much better than you give yourself credit for.\n\nAlways right by your side. ♡",
+      signature: "Always right by your side. ♡",
+    },
+    {
+      id: "ow8",
+      title: "Open when we've had a disagreement",
+      heading: "A reminder that we are always on the same team",
+      opening: "My favorite person,",
+      emoji: "🕊️",
+      content: "My favorite person,\n\nIf we're hurting or feeling distant after a misunderstanding, please read this and remember: no argument, no frustration, and no bad day could ever shake my love for you.\n\nDisagreements happen because we care, but you and I are never on opposite sides. It is always you and me together against the problem, never you against me. Even when words get tangled or emotions run high, my heart stays anchored to yours.\n\nI care so much more about understanding your heart and keeping us close than about who is right. Whenever you're ready, let's talk softly, listen to each other, and share a long, warm embrace. I love you, through every sunny day and every bumpy road.\n\nLoving you through everything. ♡",
+      signature: "Loving you through everything. ♡",
+    },
+    {
+      id: "ow9",
+      title: "Open when you have something to celebrate",
+      heading: "I am so ridiculously proud of you today",
+      opening: "My superstar,",
+      emoji: "✨",
+      content: "My superstar,\n\nYou did it! Whatever milestone, breakthrough, or tiny personal victory you reached today, I want you to soak in every single ounce of pride and happiness you feel right now.\n\nI see all the quiet work you put in when nobody else is watching—the late nights, the determination, and the heart you pour into everything you care about. Seeing you succeed makes my own heart burst with joy.\n\nCelebrate yourself today. Treat yourself to something sweet, do a little happy dance, and let yourself smile without holding back. I am so lucky to have a front-row seat to your brilliance, and I'll always be your loudest, proudest cheerleader.\n\nCelebrating you with all my heart! ♡",
+      signature: "Celebrating you with all my heart! ♡",
     },
   ],
   
@@ -321,80 +403,70 @@ export const defaultGiftConfig: GiftConfig = {
     {
       id: "o1",
       title: "Your laugh",
-      content: "That real, uncontrollable laugh — not the polite one. The one where you throw your head back and your whole face lights up. That's my favorite sound in the entire universe.",
+      content: "The kind of laugh that makes me forget what I was worrying about. Sometimes I fall in love with you all over again just watching you be happy.",
       emoji: "😄",
-      category: "things I adore",
+      category: "01 · THE THINGS YOU DO",
     },
     {
       id: "o2",
-      title: "How you care",
-      content: "You remember the tiniest details about people. Their coffee order, their allergies, their dog's name. You make everyone feel seen, and you don't even realize how rare that is.",
+      title: "Your thoughtful heart",
+      content: "You remember the little things. You notice when someone needs kindness, even when they don't ask for it. I hope you know how special that is.",
       emoji: "🤍",
-      category: "what makes you special",
+      category: "02 · THE WAY YOU LOVE",
     },
     {
       id: "o3",
       title: "Your sleepy voice",
-      content: "When you just wake up and your voice is all soft and raspy, asking for five more minutes... I would give you five more lifetimes.",
-      emoji: "😴",
-      category: "tiny moments",
+      content: "There's something about your sleepy little voice that makes me want to stay on the phone just a little longer, even when neither of us has anything left to say.",
+      emoji: "🌙",
+      category: "03 · THE MOMENTS ONLY I GET",
     },
     {
       id: "o4",
       title: "Your determination",
       content: "When you set your mind to something, nothing can stop you. I've watched you overcome things that would break most people, and you did it with grace. You are so much stronger than you know.",
       emoji: "🔥",
-      category: "what I admire",
+      category: "04 · WHAT I ADMIRE",
     },
     {
       id: "o5",
       title: "How you hold my hand",
       content: "You always reach for my hand first. In crowds, during movies, in the car, while walking. It's such a small thing but it tells me everything about how you feel.",
       emoji: "🤝",
-      category: "tiny moments",
+      category: "05 · THE LITTLE MOMENTS",
     },
     {
       id: "o6",
       title: "Your taste in music",
       content: "Your playlists are honestly perfect. You always find the right song for every mood, and every time you say 'you HAVE to listen to this,' I know I'm about to fall in love with a new song.",
       emoji: "🎵",
-      category: "things I adore",
+      category: "06 · THE SWEET HARMONY",
     },
   ],
   
-  littleReasons: [
-    { id: "r1", text: "The way you say my name", emoji: "💕" },
-    { id: "r2", text: "Your terrible but adorable puns", emoji: "😂" },
-    { id: "r3", text: "How you always steal my fries", emoji: "🍟" },
-    { id: "r4", text: "The way you look at me when you think I'm not watching", emoji: "👀" },
-    { id: "r5", text: "Your random midnight texts about life", emoji: "🌙" },
-    { id: "r6", text: "How you make even boring errands an adventure", emoji: "🛒" },
-    { id: "r7", text: "The warmth of your hugs", emoji: "🤗" },
-    { id: "r8", text: "Your passion for the things you love", emoji: "🔥" },
-    { id: "r9", text: "How safe I feel with you", emoji: "🏠" },
-    { id: "r10", text: "Your smile — it still makes my heart skip", emoji: "😊" },
-    { id: "r11", text: "The way you always know what I need", emoji: "✨" },
-    { id: "r12", text: "Your laugh when something really gets you", emoji: "😆" },
-    { id: "r13", text: "How you defend the people you love", emoji: "🛡️" },
-    { id: "r14", text: "Your voice notes — I replay them all the time", emoji: "🎤" },
-    { id: "r15", text: "The faces you make when you're concentrating", emoji: "🤔" },
-    { id: "r16", text: "How you always say exactly what I need to hear", emoji: "💬" },
-    { id: "r17", text: "Your kindness — even to strangers", emoji: "🤍" },
-    { id: "r18", text: "The silly nicknames you give everything", emoji: "🏷️" },
-    { id: "r19", text: "How you make me want to be a better person", emoji: "🌱" },
-    { id: "r20", text: "Simply because you're you, and I'm lucky to love you", emoji: "💗" },
-  ],
+  littleReasons: hundredReasonsList.slice(0, 5),
   
   deluluScenarios: [
     {
       id: "d1",
-      title: "We get caught in the rain together",
-      situation: "We're walking home and suddenly the sky opens up. No umbrella, no shelter nearby, just us and the downpour. What do you do?",
+      title: "Caught in the Rain",
+      situation: "We get caught in a sudden downpour together. What do we do?",
       options: [
-        { id: "d1a", text: "Run and scream dramatically 🏃‍♀️", response: "I KNEW IT. You'd be yelling and sprinting and I'd be right behind you, laughing so hard I can barely breathe. We'd burst through the door soaking wet and laughing like maniacs. Best. Rainy day. Ever." },
-        { id: "d1b", text: "Pull me close and dance 💃", response: "You romantic disaster. We'd look ridiculous dancing in the rain with no music, completely drenched. But honestly? It would be the most perfect moment. I'd hold you there forever." },
-        { id: "d1c", text: "Take shelter and people-watch ☕", response: "We'd find the tiniest café, order hot chocolate, and spend an hour watching everyone scramble. You'd narrate their stories and I'd fall in love with your imagination all over again." },
-        { id: "d1d", text: "Just keep walking, who cares 🌧️", response: "That's so us. We'd just keep talking like nothing happened, getting completely soaked, not caring at all. You'd look at me with wet hair and I'd think 'yep, this is my person.'" },
+        {
+          id: "d1a",
+          text: "Grab your hands and dance right there in the rain. Who needs an umbrella?",
+          response: "Of course you would. Five minutes in the rain with you would become one of my favorite memories. ♡",
+        },
+        {
+          id: "d1b",
+          text: "Run for the nearest café and share the tiniest corner under my jacket.",
+          response: "Maximum cozy romance. Squeezing close while shivering and laughing... I wouldn't trade that for anything. ☕💕",
+        },
+        {
+          id: "d1c",
+          text: "Declare it a puddle-splashing championship. Winner gets a kiss. ♡",
+          response: "Chaotic and adorable, exactly like you. Spoiler: either way, I'm making sure you get that kiss. 💦🥰",
+        },
       ],
     },
     {
@@ -478,14 +550,15 @@ export const defaultGiftConfig: GiftConfig = {
   ],
   
   digitalGifts: [
-    { id: "g1", title: "One Long Hug", description: "Redeemable anytime, anywhere. Minimum duration: until you feel better. No upper limit.", emoji: "🤗" },
-    { id: "g2", title: "Movie Night of Your Choice", description: "You pick everything — the movie, the snacks, the blanket arrangement. Zero complaints from me, guaranteed.", emoji: "🎬" },
-    { id: "g3", title: "Your Favorite Treat", description: "Whatever you're craving. Ice cream at 2 AM? Fancy coffee? That specific snack from that one place? Done.", emoji: "🍰" },
-    { id: "g4", title: "A Day Planned Entirely By You", description: "You're the boss. Whatever you want to do, wherever you want to go. I'm just along for the ride (and I'll love every second).", emoji: "👑" },
-    { id: "g5", title: "Uninterrupted Us Time", description: "Phones down, world off. Just us, no distractions, for as long as you want. Quality time, fully charged.", emoji: "📵" },
-    { id: "g6", title: "A Surprise Date", description: "Leave everything to me. I'll plan it, organize it, and make sure it's something you'll remember. Just show up and trust me.", emoji: "🎁" },
-    { id: "g7", title: "Breakfast in Bed", description: "You stay cozy. I handle everything — your favorite food, coffee exactly how you like it, served with a side of morning kisses.", emoji: "🥞" },
-    { id: "g8", title: "A Slow Dance", description: "Right there in the living room. Your favorite song, low lights, just us swaying. No dance skills required.", emoji: "💃" },
+    { id: "g1", title: "One really good hug", description: "Available whenever you need one. No rushing, no clock-watching. Just a hug until you feel a little better.", emoji: "🤗" },
+    { id: "g2", title: "A movie night, your way", description: "You choose the movie, the snacks, and the blanket arrangement. I'll try not to complain about your choice. Much.", emoji: "🎬" },
+    { id: "g3", title: "Your favorite treat", description: "That one snack or dessert you've been craving? Consider it a little mission for me.", emoji: "🧁" },
+    { id: "g4", title: "A day planned entirely for you", description: "You tell me what kind of day your heart wants. I'll take care of the little details.", emoji: "👑" },
+    { id: "g5", title: "An uninterrupted us day", description: "Phones away, distractions down, and time to be together without rushing anywhere.", emoji: "📵" },
+    { id: "g6", title: "A surprise date", description: "Give me a little hint about your mood, and let me plan something thoughtful for us.", emoji: "🎁" },
+    { id: "g7", title: "Breakfast in bed", description: "Your favorite breakfast, made with love and served with a side of morning kisses.", emoji: "🥞" },
+    { id: "g8", title: "One slow dance", description: "Our favorite song, a little space in the living room, and absolutely no need to know how to dance.", emoji: "💃" },
+    { id: "g9", title: "A relaxing massage", description: "Dim lights, soothing music, and as long as you need to let every bit of stress and tension melt away.", emoji: "💆" },
   ],
   
   bucketListItems: [
@@ -514,10 +587,10 @@ export const defaultGiftConfig: GiftConfig = {
   ],
   
   featuredSong: {
-    title: "Your favorite song",
-    artist: "That artist you love",
-    dedication: "This song is ours. Every time I hear it, I'm right back in that moment with you.",
-    whyItMatters: "Because it was playing the first time I realized I was falling for you.",
+    title: "Until I Found You",
+    artist: "Stephen Sanchez",
+    dedication: "Every time I hear this, I think of you. Of the moments we've shared, the ones still waiting for us, and all the feelings that are somehow easier to hear in a song.",
+    whyItMatters: "Because some songs feel like home the second they start playing.",
   },
   
   secretPassword: "iloveyou",

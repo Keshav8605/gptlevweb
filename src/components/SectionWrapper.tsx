@@ -4,16 +4,24 @@ import { motion } from "framer-motion";
 import { ReactNode, useRef, useState } from "react";
 import { useInView } from "framer-motion";
 import { scrollToChapter } from "@/lib/motion";
+<<<<<<< HEAD
 import { useStoryScene } from "@/context/StorySceneContext";
+=======
+import { useStoryTransitionSafe } from "@/context/StoryTransitionContext";
+import { sectionIdToSlug, getChapterById, getChapterBySlug } from "@/lib/story-routes";
+>>>>>>> d158bf5f03c3f4e4709a5dd17b3510469507a888
 
 interface SectionWrapperProps {
   id: string;
-  title: string;
+  title?: string;
   subtitle?: string;
+  eyebrowLabel?: string;
+  introduction?: string;
   emoji?: string;
   chapterNumber?: number | string;
   nextSectionId?: string;
   nextSectionLabel?: string;
+  nextSectionSubtitle?: string;
   nextSectionEmoji?: string;
   children: ReactNode;
   className?: string;
@@ -32,10 +40,13 @@ export function SectionWrapper({
   id,
   title,
   subtitle,
+  eyebrowLabel,
+  introduction,
   emoji,
   chapterNumber,
   nextSectionId,
   nextSectionLabel,
+  nextSectionSubtitle,
   nextSectionEmoji = "♡",
   children,
   className = "",
@@ -43,6 +54,7 @@ export function SectionWrapper({
 }: SectionWrapperProps) {
   const ref = useRef<HTMLElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" });
+<<<<<<< HEAD
   const [isLocalTransitioning, setIsLocalTransitioning] = useState(false);
 
   let sceneContext: ReturnType<typeof useStoryScene> | null = null;
@@ -52,10 +64,27 @@ export function SectionWrapper({
   } catch {
     sceneContext = null;
   }
+=======
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const storyCtx = useStoryTransitionSafe();
+
+  const canonicalChapter = getChapterById(id) || getChapterBySlug(id) || (storyCtx ? storyCtx.currentChapter : undefined);
+  const resolvedChapterNumber = canonicalChapter ? canonicalChapter.chapterNumber : chapterNumber;
+  const resolvedTitle = title || (canonicalChapter ? canonicalChapter.title : undefined);
+  const resolvedSubtitle = subtitle !== undefined ? subtitle : (canonicalChapter ? canonicalChapter.subtitle : undefined);
+  const resolvedEmoji = emoji || (canonicalChapter ? canonicalChapter.emoji : undefined);
+  const resolvedEyebrow =
+    eyebrowLabel ||
+    canonicalChapter?.eyebrowLabel ||
+    (resolvedChapterNumber !== undefined
+      ? `CHAPTER ${String(resolvedChapterNumber).padStart(2, "0")}`
+      : undefined);
+>>>>>>> d158bf5f03c3f4e4709a5dd17b3510469507a888
 
   const handleContinueNext = () => {
     if (!nextSectionId) return;
 
+<<<<<<< HEAD
     if (sceneContext) {
       if (sceneContext.isTransitioning) return;
       sceneContext.goToChapter(nextSectionId);
@@ -64,6 +93,18 @@ export function SectionWrapper({
 
     if (isLocalTransitioning) return;
     setIsLocalTransitioning(true);
+=======
+    // Multi-page emotion transition if within StoryTransitionContext
+    if (storyCtx) {
+      const slug = sectionIdToSlug(nextSectionId);
+      storyCtx.navigateWithTransition(slug);
+      return;
+    }
+
+    // Single-page fallback
+    if (isTransitioning) return;
+    setIsTransitioning(true);
+>>>>>>> d158bf5f03c3f4e4709a5dd17b3510469507a888
     scrollToChapter(nextSectionId, () => {
       setTimeout(() => setIsLocalTransitioning(false), 900);
     });
@@ -78,15 +119,15 @@ export function SectionWrapper({
     >
       <div className="max-w-5xl mx-auto">
         {/* Section header (if title or chapterNumber is provided) */}
-        {(title || chapterNumber) && (
+        {(resolvedTitle || resolvedChapterNumber !== undefined || resolvedEyebrow) && (
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className={`text-center ${title ? "mb-10 md:mb-14" : "mb-6"}`}
+            className={`text-center ${resolvedTitle ? "mb-10 md:mb-14" : "mb-6"}`}
           >
             {/* Chapter eyebrow badge */}
-            {chapterNumber && (
+            {resolvedEyebrow && (
               <motion.div
                 initial={{ opacity: 0, scale: 0.85 }}
                 animate={isInView ? { opacity: 1, scale: 1 } : {}}
@@ -94,12 +135,12 @@ export function SectionWrapper({
                 className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-white/80 backdrop-blur-xs border border-[var(--border-subtle)] shadow-2xs mb-3 text-[10px] sm:text-[11px] font-bold tracking-widest uppercase font-rounded text-[var(--pink-strong)]"
               >
                 <span>✨</span>
-                <span>CHAPTER {chapterNumber}</span>
+                <span>{resolvedEyebrow}</span>
                 <span>✨</span>
               </motion.div>
             )}
 
-            {emoji && title && (
+            {resolvedEmoji && resolvedTitle && (
               <div>
                 <motion.span
                   className="text-3xl md:text-4xl inline-block mb-3"
@@ -107,20 +148,26 @@ export function SectionWrapper({
                   animate={isInView ? { scale: 1, rotate: 0 } : {}}
                   transition={{ delay: 0.2, type: "spring", stiffness: 220, damping: 14 }}
                 >
-                  {emoji}
+                  {resolvedEmoji}
                 </motion.span>
               </div>
             )}
 
-            {title && (
+            {resolvedTitle && (
               <h2 className="font-rounded cute-love-stroke text-3xl md:text-4xl lg:text-5xl font-bold text-[var(--romantic-plum)] tracking-tight select-none">
-                {title}
+                {resolvedTitle}
               </h2>
             )}
 
-            {subtitle && (
+            {resolvedSubtitle && (
               <p className="mt-2.5 font-handwritten text-lg sm:text-xl md:text-2xl text-[var(--text-secondary)] max-w-xl mx-auto">
-                {subtitle}
+                {resolvedSubtitle}
+              </p>
+            )}
+
+            {introduction && (
+              <p className="mt-3.5 text-sm sm:text-base md:text-lg text-[var(--text-secondary)] max-w-xl mx-auto leading-relaxed">
+                {introduction}
               </p>
             )}
 
@@ -142,14 +189,20 @@ export function SectionWrapper({
           {children}
         </motion.div>
 
+<<<<<<< HEAD
         {/* Cinematic Chapter Transition Cue (Bottom of Section) */}
         {(nextSectionId || sceneContext?.canGoPrev) && (
+=======
+        {/* Cinematic Chapter Transition Cue (Bottom of Section - single page fallback) */}
+        {nextSectionId && nextSectionLabel && !storyCtx && (
+>>>>>>> d158bf5f03c3f4e4709a5dd17b3510469507a888
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={isInView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.6, delay: 0.4 }}
             className="mt-14 sm:mt-16 pt-8 border-t border-[var(--border-subtle)]/70 flex flex-col items-center text-center"
           >
+<<<<<<< HEAD
             <p className="text-[11px] font-rounded font-semibold uppercase tracking-widest text-[var(--text-muted)] mb-4">
               Turn the page of our storybook
             </p>
@@ -184,6 +237,29 @@ export function SectionWrapper({
                 </button>
               )}
             </div>
+=======
+            <p className="text-[11px] font-rounded font-semibold uppercase tracking-widest text-[var(--text-muted)] mb-2">
+              Ready for the next moment?
+            </p>
+            {nextSectionSubtitle && (
+              <p className="font-handwritten text-base sm:text-lg text-[var(--text-secondary)] mb-3.5 max-w-md">
+                {nextSectionSubtitle}
+              </p>
+            )}
+            <button
+              onClick={handleContinueNext}
+              disabled={isTransitioning}
+              className="group relative px-6 sm:px-8 py-2.5 sm:py-3 rounded-full bg-white/90 hover:bg-white border border-[var(--border-medium)] text-[var(--romantic-plum)] hover:text-[var(--pink-strong)] font-rounded font-bold text-xs sm:text-sm shadow-xs hover:shadow-lg hover:shadow-pink-200/50 hover:-translate-y-0.5 active:translate-y-0 active:scale-95 transition-all duration-300 flex items-center gap-2.5 cursor-pointer"
+            >
+              <span className="text-sm group-hover:rotate-12 transition-transform duration-300">
+                {nextSectionEmoji}
+              </span>
+              <span>Continue Our Story: {nextSectionLabel}</span>
+              <span className="text-xs group-hover:translate-y-0.5 transition-transform duration-300 text-[var(--pink-primary)]">
+                {nextSectionId === "welcome" ? "↑" : "↓"}
+              </span>
+            </button>
+>>>>>>> d158bf5f03c3f4e4709a5dd17b3510469507a888
           </motion.div>
         )}
       </div>

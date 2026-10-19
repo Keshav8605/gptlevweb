@@ -17,11 +17,12 @@ export function LettersSection({ letters }: LettersSectionProps) {
   return (
     <SectionWrapper
       id="letters"
-      title="Letters I Don't Say Enough"
-      subtitle="Words I carry in my heart — now written down for you"
+      eyebrowLabel="WORDS FROM MY HEART"
+      title="Love Letters"
+      subtitle="For the things I feel deeply, even when I don't always say them well."
       emoji="💌"
       bgVariant="cream"
-      chapterNumber={6}
+      chapterNumber={7}
       nextSectionId="notebook"
       nextSectionLabel="Our Little Notebook"
       nextSectionEmoji="📖"
@@ -103,11 +104,9 @@ function LetterCard({
               >
                 {letter.title}
               </h3>
-              {letter.date && (
-                <p className="text-xs mt-1" style={{ color: "var(--text-muted)" }}>
-                  {letter.date}
-                </p>
-              )}
+              <p className="text-xs font-rounded font-semibold text-[var(--pink-strong)] mt-1 flex items-center gap-1">
+                <span>{isOpen ? "Reading now ♡" : "Read this letter ♡"}</span>
+              </p>
             </div>
           </div>
 
@@ -183,6 +182,22 @@ function LetterCard({
                   </p>
                 </motion.div>
               )}
+
+              {/* Fold letter action */}
+              <div className="mt-8 flex justify-center">
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onToggle();
+                  }}
+                  className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-[var(--pale-rose)]/80 hover:bg-[var(--pale-rose)] border border-[var(--border-subtle)] text-[var(--pink-strong)] hover:text-[var(--pink-deep)] font-rounded text-xs sm:text-sm font-semibold transition-all duration-200 shadow-2xs hover:shadow-xs hover:scale-102 active:scale-98 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
+                  aria-label="Fold the letter"
+                >
+                  <span>Fold the letter</span>
+                  <span className="text-sm">💌</span>
+                </button>
+              </div>
 
               {/* Shared Persistent Reactions & Comments */}
               <div className="mt-8 pt-4 border-t border-[var(--border-subtle)]">

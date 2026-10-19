@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { FloatingHearts } from "@/components/FloatingHearts";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -73,6 +74,7 @@ export default function RootLayout({
         suppressHydrationWarning
         className="min-h-full flex flex-col bg-[var(--bg-main)] text-[var(--text-primary)] font-sans selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)]"
       >
+        <FloatingHearts />
         {children}
       </body>
     </html>

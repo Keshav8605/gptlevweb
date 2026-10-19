@@ -43,6 +43,7 @@ export interface JournalReply {
   author: "creator" | "recipient";
   authorName: string;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export interface JournalEntry {
@@ -54,6 +55,7 @@ export interface JournalEntry {
   author: "creator" | "recipient";
   authorName: string;
   createdAt: string;
+  updatedAt?: string;
   reactions: Record<string, string[]>; // emoji -> author names
   replies: JournalReply[];
   isViewedByCreator: boolean;
@@ -264,6 +266,7 @@ export interface GiftRecord {
   welcomeTitle: string;
   welcomeSubtitle: string;
   welcomeMessage: string;
+  welcomePolaroids?: { id?: string; src?: string; caption?: string }[];
   enabledSections: string[];
   sectionOrder: string[];
   customMilestones?: { id: string; label: string; date: string }[];
@@ -335,470 +338,518 @@ export interface RelationshipDatabase {
 
 export const defaultDateIdeas: DateIdea[] = [
   {
-    id: "idea_sunset_picnic",
-    title: "Sunset Picnic at the Overlook",
-    description: "Pack a wicker basket with our favorite artisan cheeses, fresh strawberries, and chilled sparkling cider. We'll spread out a soft blanket and watch the sky melt into lavender and gold.",
-    coverPhoto: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
-    category: "outdoor_adventures",
-    costRange: "low",
-    costEstimateText: "$15 - $25 (Snacks & cider)",
-    estimatedDuration: "2 hours",
-    estimatedDurationMinutes: 120,
-    environment: "outdoor",
-    location: "Scenic Ridge Overlook",
-    practicalNotes: "Bring an extra warm cardigan or throw blanket for when the sun dips below the hills.",
-    accessibilityNotes: "Paved gentle pathway to the picnic knoll with wooden benches nearby.",
-    author: "creator",
-    authorName: "Babe",
-    createdAt: "2026-10-10T12:00:00.000Z",
-    isHidden: false,
-    sortOrder: 1,
-    isCustom: false,
+    "id": "idea_sunset_picnic",
+    "title": "Sunset Picnic",
+    "description": "Pack a wicker basket with our favorite artisan cheeses, fresh strawberries, and chilled sparkling cider. We'll spread out a soft blanket and watch the sky melt into lavender and gold.",
+    "coverPhoto": "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+    "category": "outdoor_adventures",
+    "costRange": "low",
+    "costEstimateText": "$15 - $25 (Snacks & cider)",
+    "estimatedDuration": "2 hours",
+    "estimatedDurationMinutes": 120,
+    "environment": "outdoor",
+    "location": "Scenic Ridge Overlook",
+    "practicalNotes": "Bring an extra warm cardigan or throw blanket for when the sun dips below the hills.",
+    "accessibilityNotes": "Paved gentle pathway to the picnic knoll with wooden benches nearby.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 1,
+    "isCustom": false
   },
   {
-    id: "idea_cafe_hopping",
-    title: "Artisanal Café Hopping & Pastry Crawl",
-    description: "Spend a slow afternoon trying three distinct cozy neighborhood cafés. We'll order one specialty beverage and one warm pastry at each spot and score them in our little notebook.",
-    coverPhoto: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80",
-    category: "food_cafes",
-    costRange: "low",
-    costEstimateText: "$20 - $35",
-    estimatedDuration: "2.5 hours",
-    estimatedDurationMinutes: 150,
-    environment: "indoor",
-    location: "Old Town Cobblestone Quarter",
-    practicalNotes: "Come with an appetite for matcha lattes, cardamom buns, and deep conversations.",
-    accessibilityNotes: "Level street entrances with comfortable indoor seating.",
-    author: "creator",
-    authorName: "Babe",
-    createdAt: "2026-10-10T12:00:00.000Z",
-    isHidden: false,
-    sortOrder: 2,
-    isCustom: false,
+    "id": "idea_cafe_hopping",
+    "title": "Café Date",
+    "description": "Spend a slow afternoon trying three distinct cozy neighborhood cafés. We'll order one specialty beverage and one warm pastry at each spot and score them in our little notebook.",
+    "coverPhoto": "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=800&q=80",
+    "category": "food_cafes",
+    "costRange": "low",
+    "costEstimateText": "$20 - $35",
+    "estimatedDuration": "2.5 hours",
+    "estimatedDurationMinutes": 150,
+    "environment": "indoor",
+    "location": "Old Town Cobblestone Quarter",
+    "practicalNotes": "Come with an appetite for matcha lattes, cardamom buns, and deep conversations.",
+    "accessibilityNotes": "Level street entrances with comfortable indoor seating.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 2,
+    "isCustom": false
   },
   {
-    id: "idea_blanket_fort",
-    title: "Living Room Blanket Fort & Film Marathon",
-    description: "Construct a palace out of every soft blanket and fairy light in the apartment. Squeeze inside with warm stove-popped caramel popcorn and binge our favorite films.",
-    coverPhoto: "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80",
-    category: "cozy_home",
-    costRange: "free",
-    costEstimateText: "Free (Zero cost)",
-    estimatedDuration: "3 hours",
-    estimatedDurationMinutes: 180,
-    environment: "indoor",
-    location: "Our Living Room",
-    practicalNotes: "Fairy lights, giant cushions, and pajamas required.",
-    accessibilityNotes: "Ultra relaxed home floor and couch setting.",
-    author: "creator",
-    authorName: "Babe",
-    createdAt: "2026-10-10T12:00:00.000Z",
-    isHidden: false,
-    sortOrder: 3,
-    isCustom: false,
+    "id": "idea_blanket_fort",
+    "title": "Movie Night at Home",
+    "description": "Construct a palace out of every soft blanket and fairy light in the apartment. Squeeze inside with warm stove-popped caramel popcorn and binge our favorite films.",
+    "coverPhoto": "https://images.unsplash.com/photo-1517604931442-7e0c8ed2963c?auto=format&fit=crop&w=800&q=80",
+    "category": "cozy_home",
+    "costRange": "free",
+    "costEstimateText": "Free (Zero cost)",
+    "estimatedDuration": "3 hours",
+    "estimatedDurationMinutes": 180,
+    "environment": "indoor",
+    "location": "Our Living Room",
+    "practicalNotes": "Fairy lights, giant cushions, and pajamas required.",
+    "accessibilityNotes": "Ultra relaxed home floor and couch setting.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 3,
+    "isCustom": false
   },
   {
-    id: "idea_scenic_drive",
-    title: "Scenic Long Drive with Our Roadtrip Playlist",
-    description: "No strict destination in mind. We roll the windows down, blast the songs we both know every single lyric to, and stop whenever an interesting roadside fruit stand or lookout appears.",
-    coverPhoto: "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80",
-    category: "spontaneous_adventures",
-    costRange: "low",
-    costEstimateText: "$15 - $25 (Fuel & treats)",
-    estimatedDuration: "3 hours",
-    estimatedDurationMinutes: 180,
-    environment: "both",
-    location: "Pine Valley & Coastal Highway",
-    practicalNotes: "Charge phones, download our roadtrip playlist, and pack gummy candies.",
-    accessibilityNotes: "Comfortable car ride with accessible viewpoints.",
-    author: "creator",
-    authorName: "Babe",
-    createdAt: "2026-10-10T12:00:00.000Z",
-    isHidden: false,
-    sortOrder: 4,
-    isCustom: false,
+    "id": "idea_scenic_drive",
+    "title": "Go for a Drive",
+    "description": "No strict destination in mind. We roll the windows down, blast the songs we both know every single lyric to, and stop whenever an interesting roadside fruit stand or lookout appears.",
+    "coverPhoto": "https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?auto=format&fit=crop&w=800&q=80",
+    "category": "spontaneous_adventures",
+    "costRange": "low",
+    "costEstimateText": "$15 - $25 (Fuel & treats)",
+    "estimatedDuration": "3 hours",
+    "estimatedDurationMinutes": 180,
+    "environment": "both",
+    "location": "Pine Valley & Coastal Highway",
+    "practicalNotes": "Charge phones, download our roadtrip playlist, and pack gummy candies.",
+    "accessibilityNotes": "Comfortable car ride with accessible viewpoints.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 4,
+    "isCustom": false
   },
   {
-    id: "idea_cooking_pasta",
-    title: "Homemade Pasta & Candlelight Cooking",
-    description: "We tie our aprons on, put on soft acoustic jazz, and roll out fresh tagliatelle dough from scratch. Complete with simmering browned-butter sage sauce, freshly grated parmesan, and wine.",
-    coverPhoto: "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80",
-    category: "cozy_home",
-    costRange: "low",
-    costEstimateText: "$20 - $30 (Ingredients & wine)",
-    estimatedDuration: "2.5 hours",
-    estimatedDurationMinutes: 150,
-    environment: "indoor",
-    location: "Our Kitchen",
-    practicalNotes: "Expect a little dusting of flour on our noses!",
-    accessibilityNotes: "Kitchen workspace with counter stools.",
-    author: "creator",
-    authorName: "Babe",
-    createdAt: "2026-10-10T12:00:00.000Z",
-    isHidden: false,
-    sortOrder: 5,
-    isCustom: false,
+    "id": "idea_cooking_pasta",
+    "title": "Cook Dinner Together",
+    "description": "We tie our aprons on, put on soft acoustic jazz, and roll out fresh tagliatelle dough from scratch. Complete with simmering browned-butter sage sauce, freshly grated parmesan, and wine.",
+    "coverPhoto": "https://images.unsplash.com/photo-1556910103-1c02745aae4d?auto=format&fit=crop&w=800&q=80",
+    "category": "cozy_home",
+    "costRange": "low",
+    "costEstimateText": "$20 - $30 (Ingredients & wine)",
+    "estimatedDuration": "2.5 hours",
+    "estimatedDurationMinutes": 150,
+    "environment": "indoor",
+    "location": "Our Kitchen",
+    "practicalNotes": "Expect a little dusting of flour on our noses!",
+    "accessibilityNotes": "Kitchen workspace with counter stools.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 5,
+    "isCustom": false
   },
   {
-    id: "idea_pottery_painting",
-    title: "Pottery Sculpting or Canvas Painting",
-    description: "Sit side-by-side behind the potter's wheel or in front of twin easels. We'll sculpt or paint something inspired by each other—no artistic skills required, just pure fun and giggles.",
-    coverPhoto: "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=80",
-    category: "creative_activities",
-    costRange: "medium",
-    costEstimateText: "$45 - $65 (Studio pass & clay)",
-    estimatedDuration: "2 hours",
-    estimatedDurationMinutes: 120,
-    environment: "indoor",
-    location: "The Artisan Studio",
-    practicalNotes: "Wear clothes you wouldn't mind getting a tiny smudge of clay or paint on.",
-    accessibilityNotes: "Seated ceramic studio stations with accessible wash basins.",
-    author: "creator",
-    authorName: "Babe",
-    createdAt: "2026-10-10T12:00:00.000Z",
-    isHidden: false,
-    sortOrder: 6,
-    isCustom: false,
+    "id": "idea_pottery_painting",
+    "title": "Painting or Pottery",
+    "description": "Sit side-by-side behind the potter's wheel or in front of twin easels. We'll sculpt or paint something inspired by each other—no artistic skills required, just pure fun and giggles.",
+    "coverPhoto": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?auto=format&fit=crop&w=800&q=80",
+    "category": "creative_activities",
+    "costRange": "medium",
+    "costEstimateText": "$45 - $65 (Studio pass & clay)",
+    "estimatedDuration": "2 hours",
+    "estimatedDurationMinutes": 120,
+    "environment": "indoor",
+    "location": "The Artisan Studio",
+    "practicalNotes": "Wear clothes you wouldn't mind getting a tiny smudge of clay or paint on.",
+    "accessibilityNotes": "Seated ceramic studio stations with accessible wash basins.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 6,
+    "isCustom": false
   },
   {
-    id: "idea_arcade_bowling",
-    title: "Retro Arcade & Glow Bowling Showdown",
-    description: "Skeeball, air hockey, and cosmic glow bowling. Winner gets to pick the midnight snack and gets a victory kiss.",
-    coverPhoto: "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80",
-    category: "spontaneous_adventures",
-    costRange: "low",
-    costEstimateText: "$25 - $40",
-    estimatedDuration: "2.5 hours",
-    estimatedDurationMinutes: 150,
-    environment: "indoor",
-    location: "Neon Strike Lanes & Arcade",
-    practicalNotes: "Bring your competitive spirit!",
-    accessibilityNotes: "Wheelchair accessible bowling ramps and wide arcade aisles.",
-    author: "creator",
-    authorName: "Babe",
-    createdAt: "2026-10-10T12:00:00.000Z",
-    isHidden: false,
-    sortOrder: 7,
-    isCustom: false,
+    "id": "idea_arcade_bowling",
+    "title": "Arcade or Bowling Night",
+    "description": "Skeeball, air hockey, and cosmic glow bowling. Winner gets to pick the midnight snack and gets a victory kiss.",
+    "coverPhoto": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=800&q=80",
+    "category": "spontaneous_adventures",
+    "costRange": "low",
+    "costEstimateText": "$25 - $40",
+    "estimatedDuration": "2.5 hours",
+    "estimatedDurationMinutes": 150,
+    "environment": "indoor",
+    "location": "Neon Strike Lanes & Arcade",
+    "practicalNotes": "Bring your competitive spirit!",
+    "accessibilityNotes": "Wheelchair accessible bowling ramps and wide arcade aisles.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 7,
+    "isCustom": false
   },
   {
-    id: "idea_midnight_stargazing",
-    title: "Midnight Stargazing Under the Constellations",
-    description: "Drive away from city lights, lay back on the hood or a thick wool blanket, and gaze up at the Milky Way. We'll identify constellations and make wishes on shooting stars.",
-    coverPhoto: "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=800&q=80",
-    category: "romantic_evenings",
-    costRange: "free",
-    costEstimateText: "Free (Zero cost)",
-    estimatedDuration: "2 hours",
-    estimatedDurationMinutes: 120,
-    environment: "outdoor",
-    location: "Dark Sky Nature Preserve Hill",
-    practicalNotes: "Thermos of hot chocolate, thick jackets, and star-map app.",
-    accessibilityNotes: "Open clearing right next to scenic vehicle pull-off.",
-    author: "creator",
-    authorName: "Babe",
-    createdAt: "2026-10-10T12:00:00.000Z",
-    isHidden: false,
-    sortOrder: 8,
-    isCustom: false,
+    "id": "idea_midnight_stargazing",
+    "title": "Stargazing",
+    "description": "Drive away from city lights, lay back on the hood or a thick wool blanket, and gaze up at the Milky Way. We'll identify constellations and make wishes on shooting stars.",
+    "coverPhoto": "https://images.unsplash.com/photo-1506703719100-a0f3a48c0f86?auto=format&fit=crop&w=800&q=80",
+    "category": "romantic_evenings",
+    "costRange": "free",
+    "costEstimateText": "Free (Zero cost)",
+    "estimatedDuration": "2 hours",
+    "estimatedDurationMinutes": 120,
+    "environment": "outdoor",
+    "location": "Dark Sky Nature Preserve Hill",
+    "practicalNotes": "Thermos of hot chocolate, thick jackets, and star-map app.",
+    "accessibilityNotes": "Open clearing right next to scenic vehicle pull-off.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 8,
+    "isCustom": false
   },
   {
-    id: "idea_recreating_first_date",
-    title: "Recreating Our Very First Date",
-    description: "Walk the exact steps, sit at the same corner table, and reminisce about how butterflies were fluttering in our chests the first time our eyes met.",
-    coverPhoto: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80",
-    category: "special_occasions",
-    costRange: "medium",
-    costEstimateText: "$50 - $80",
-    estimatedDuration: "3.5 hours",
-    estimatedDurationMinutes: 210,
-    environment: "both",
-    location: "Where Our Story Started",
-    practicalNotes: "Bonus points for wearing similar outfits or colors from that magical day.",
-    accessibilityNotes: "Full accessibility according to original venue.",
-    author: "creator",
-    authorName: "Babe",
-    createdAt: "2026-10-10T12:00:00.000Z",
-    isHidden: false,
-    sortOrder: 9,
-    isCustom: false,
+    "id": "idea_recreating_first_date",
+    "title": "Revisit Our First Date",
+    "description": "Walk the exact steps, sit at the same corner table, and reminisce about how butterflies were fluttering in our chests the first time our eyes met.",
+    "coverPhoto": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?auto=format&fit=crop&w=800&q=80",
+    "category": "special_occasions",
+    "costRange": "medium",
+    "costEstimateText": "$50 - $80",
+    "estimatedDuration": "3.5 hours",
+    "estimatedDurationMinutes": 210,
+    "environment": "both",
+    "location": "Where Our Story Started",
+    "practicalNotes": "Bonus points for wearing similar outfits or colors from that magical day.",
+    "accessibilityNotes": "Full accessibility according to original venue.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 9,
+    "isCustom": false
   },
   {
-    id: "idea_secret_tasting_menu",
-    title: "Secret Tasting Menu at a New Restaurant",
-    description: "Dress to the nines and indulge in a romantic multi-course culinary adventure. Dim lights, soft music, and exquisite desserts.",
-    coverPhoto: "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=800&q=80",
-    category: "romantic_evenings",
-    costRange: "high",
-    costEstimateText: "$80 - $140",
-    estimatedDuration: "2.5 hours",
-    estimatedDurationMinutes: 150,
-    environment: "indoor",
-    location: "Boutique Candlelit Dining Room",
-    practicalNotes: "Semi-formal romantic attire recommended.",
-    accessibilityNotes: "Ground-floor entrance, elevator, spacious dining area.",
-    author: "creator",
-    authorName: "Babe",
-    createdAt: "2026-10-10T12:00:00.000Z",
-    isHidden: false,
-    sortOrder: 10,
-    isCustom: false,
+    "id": "idea_secret_tasting_menu",
+    "title": "Try a New Restaurant",
+    "description": "Dress to the nines and indulge in a romantic multi-course culinary adventure. Dim lights, soft music, and exquisite desserts.",
+    "coverPhoto": "https://images.unsplash.com/photo-1550966871-3ed3cdb5ed0c?auto=format&fit=crop&w=800&q=80",
+    "category": "romantic_evenings",
+    "costRange": "high",
+    "costEstimateText": "$80 - $140",
+    "estimatedDuration": "2.5 hours",
+    "estimatedDurationMinutes": 150,
+    "environment": "indoor",
+    "location": "Boutique Candlelit Dining Room",
+    "practicalNotes": "Semi-formal romantic attire recommended.",
+    "accessibilityNotes": "Ground-floor entrance, elevator, spacious dining area.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 10,
+    "isCustom": false
   },
   {
-    id: "idea_old_bookstore",
-    title: "Quiet Afternoon in an Old Bookstore",
-    description: "Get lost between tall mahogany shelves. We each pick one book or poetry piece that reminds us of each other, tuck a secret note inside, and read our favorite paragraphs together in a quiet corner.",
-    coverPhoto: "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80",
-    category: "budget_friendly",
-    costRange: "free",
-    costEstimateText: "Free / Under $15 (Coffee & book)",
-    estimatedDuration: "2 hours",
-    estimatedDurationMinutes: 120,
-    environment: "indoor",
-    location: "The Whispering Pages Bookshop",
-    practicalNotes: "Perfect for a slow rainy afternoon.",
-    accessibilityNotes: "Ramps available and cushioned reading armchairs.",
-    author: "creator",
-    authorName: "Babe",
-    createdAt: "2026-10-10T12:00:00.000Z",
-    isHidden: false,
-    sortOrder: 11,
-    isCustom: false,
+    "id": "idea_old_bookstore",
+    "title": "Bookstore Date",
+    "description": "Get lost between tall mahogany shelves. We each pick one book or poetry piece that reminds us of each other, tuck a secret note inside, and read our favorite paragraphs together in a quiet corner.",
+    "coverPhoto": "https://images.unsplash.com/photo-1521587760476-6c12a4b040da?auto=format&fit=crop&w=800&q=80",
+    "category": "budget_friendly",
+    "costRange": "free",
+    "costEstimateText": "Free / Under $15 (Coffee & book)",
+    "estimatedDuration": "2 hours",
+    "estimatedDurationMinutes": 120,
+    "environment": "indoor",
+    "location": "The Whispering Pages Bookshop",
+    "practicalNotes": "Perfect for a slow rainy afternoon.",
+    "accessibilityNotes": "Ramps available and cushioned reading armchairs.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 11,
+    "isCustom": false
   },
   {
-    id: "idea_sunrise_pastries",
-    title: "Watching the Sunrise with Warm Pastries",
-    description: "Wake up before the rest of the world, slip into oversized hoodies, pick up fresh morning croissants right as the bakery ovens open, and watch the ocean turn gold.",
-    coverPhoto: "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=800&q=80",
-    category: "outdoor_adventures",
-    costRange: "low",
-    costEstimateText: "$10 - $20",
-    estimatedDuration: "2 hours",
-    estimatedDurationMinutes: 120,
-    environment: "outdoor",
-    location: "East Shore Wooden Pier",
-    practicalNotes: "Set an early alarm and bundle up warm.",
-    accessibilityNotes: "Boardwalk path with railing and benches.",
-    author: "creator",
-    authorName: "Babe",
-    createdAt: "2026-10-10T12:00:00.000Z",
-    isHidden: false,
-    sortOrder: 12,
-    isCustom: false,
+    "id": "idea_sunrise_pastries",
+    "title": "Watch the Sunrise",
+    "description": "Wake up before the rest of the world, slip into oversized hoodies, pick up fresh morning croissants right as the bakery ovens open, and watch the ocean turn gold.",
+    "coverPhoto": "https://images.unsplash.com/photo-1502082553048-f009c37129b9?auto=format&fit=crop&w=800&q=80",
+    "category": "outdoor_adventures",
+    "costRange": "low",
+    "costEstimateText": "$10 - $20",
+    "estimatedDuration": "2 hours",
+    "estimatedDurationMinutes": 120,
+    "environment": "outdoor",
+    "location": "East Shore Wooden Pier",
+    "practicalNotes": "Set an early alarm and bundle up warm.",
+    "accessibilityNotes": "Boardwalk path with railing and benches.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 12,
+    "isCustom": false
   },
   {
-    id: "idea_botanical_garden",
-    title: "Exploring a Botanical Haven & Secret Garden",
-    description: "Wander hand-in-hand through lush tropical glasshouses, blooming orchid corridors, and hidden stone archways. A tranquil paradise filled with floral scent.",
-    coverPhoto: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80",
-    category: "outdoor_adventures",
-    costRange: "low",
-    costEstimateText: "$20 - $30",
-    estimatedDuration: "3 hours",
-    estimatedDurationMinutes: 180,
-    environment: "both",
-    location: "Glasshouse Conservatory & Gardens",
-    practicalNotes: "Wear comfortable walking shoes and bring a camera for portraits.",
-    accessibilityNotes: "Paved ADA-compliant garden pathways throughout.",
-    author: "creator",
-    authorName: "Babe",
-    createdAt: "2026-10-10T12:00:00.000Z",
-    isHidden: false,
-    sortOrder: 13,
-    isCustom: false,
+    "id": "idea_botanical_garden",
+    "title": "Walk Through a Garden",
+    "description": "Wander hand-in-hand through lush tropical glasshouses, blooming orchid corridors, and hidden stone archways. A tranquil paradise filled with floral scent.",
+    "coverPhoto": "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=800&q=80",
+    "category": "outdoor_adventures",
+    "costRange": "low",
+    "costEstimateText": "$20 - $30",
+    "estimatedDuration": "3 hours",
+    "estimatedDurationMinutes": 180,
+    "environment": "both",
+    "location": "Glasshouse Conservatory & Gardens",
+    "practicalNotes": "Wear comfortable walking shoes and bring a camera for portraits.",
+    "accessibilityNotes": "Paved ADA-compliant garden pathways throughout.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 13,
+    "isCustom": false
   },
   {
-    id: "idea_surprise_mystery_date",
-    title: "A Romantic Mystery Date Planned by Me",
-    description: "A curated surprise where every stop is carefully kept secret until we arrive. All you need to do is show up, relax, and let yourself be spoiled.",
-    coverPhoto: "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=800&q=80",
-    category: "special_occasions",
-    costRange: "medium",
-    costEstimateText: "$40 - $70",
-    estimatedDuration: "3.5 hours",
-    estimatedDurationMinutes: 210,
-    environment: "both",
-    location: "Classified Destination 🤫",
-    practicalNotes: "Wear your favorite comfortable yet cute outfit; all logistics are handled.",
-    accessibilityNotes: "Tailored to be comfortable and relaxing.",
-    author: "creator",
-    authorName: "Babe",
-    createdAt: "2026-10-10T12:00:00.000Z",
-    isHidden: false,
-    sortOrder: 14,
-    isCustom: false,
+    "id": "idea_surprise_mystery_date",
+    "title": "Surprise Date",
+    "description": "A curated surprise where every stop is carefully kept secret until we arrive. All you need to do is show up, relax, and let yourself be spoiled.",
+    "coverPhoto": "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=800&q=80",
+    "category": "special_occasions",
+    "costRange": "medium",
+    "costEstimateText": "$40 - $70",
+    "estimatedDuration": "3.5 hours",
+    "estimatedDurationMinutes": 210,
+    "environment": "both",
+    "location": "Classified Destination 🤫",
+    "practicalNotes": "Wear your favorite comfortable yet cute outfit; all logistics are handled.",
+    "accessibilityNotes": "Tailored to be comfortable and relaxing.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 14,
+    "isCustom": false
   },
+  {
+    "id": "idea_bowling_night",
+    "title": "Bowling Night",
+    "description": "Lace up the goofy shoes, grab some nachos, and see who gets the first strike. Loser buys milkshakes!",
+    "coverPhoto": "https://images.unsplash.com/photo-1538388149542-5e24932d11a8?auto=format&fit=crop&w=800&q=80",
+    "category": "spontaneous_adventures",
+    "costRange": "low",
+    "costEstimateText": "About  - ",
+    "estimatedDuration": "About 1.5–2 hours",
+    "estimatedDurationMinutes": 105,
+    "environment": "indoor",
+    "location": "Local bowling alley & arcade lounge.",
+    "practicalNotes": "Wear comfortable socks for the bowling shoes!",
+    "accessibilityNotes": "Ramps to bowling lanes and lightweight balls available.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 15,
+    "isCustom": false
+  },
+  {
+    "id": "idea_movie_theater",
+    "title": "Movie Theater Date",
+    "description": "Catch the latest release on the big screen, share an oversized buttered popcorn, and whisper during the trailers.",
+    "coverPhoto": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=800&q=80",
+    "category": "romantic_evenings",
+    "costRange": "low",
+    "costEstimateText": "About  - ",
+    "estimatedDuration": "About 2–2.5 hours",
+    "estimatedDurationMinutes": 135,
+    "environment": "indoor",
+    "location": "Local cinema or indie movie theater.",
+    "practicalNotes": "Book seats in the back row center for the best view and cozy cuddling.",
+    "accessibilityNotes": "Step-free theater access with companion seating.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 16,
+    "isCustom": false
+  },
+  {
+    "id": "idea_mini_golf",
+    "title": "Mini Golf",
+    "description": "Playful rivalry around windmills and obstacles. Silly trick shots, gentle teasing, and celebratory high-fives.",
+    "coverPhoto": "https://images.unsplash.com/photo-1535131749006-b7f58c99034b?auto=format&fit=crop&w=800&q=80",
+    "category": "outdoor_adventures",
+    "costRange": "low",
+    "costEstimateText": "About  - ",
+    "estimatedDuration": "About 1.5 hours",
+    "estimatedDurationMinutes": 90,
+    "environment": "both",
+    "location": "Outdoor or glow-in-the-dark mini golf course.",
+    "practicalNotes": "Winner gets to pick where we get ice cream or snacks afterwards!",
+    "accessibilityNotes": "Gradual paved paths between holes.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 17,
+    "isCustom": false
+  },
+  {
+    "id": "idea_aquarium_visit",
+    "title": "Visit an Aquarium",
+    "description": "Wander hand-in-hand under glowing blue underwater arches, watching sea turtles, gliding rays, and jellyfish.",
+    "coverPhoto": "https://images.unsplash.com/photo-1544551763-46a013bb70d5?auto=format&fit=crop&w=800&q=80",
+    "category": "creative_activities",
+    "costRange": "medium",
+    "costEstimateText": "About  - ",
+    "estimatedDuration": "About 2–3 hours",
+    "estimatedDurationMinutes": 150,
+    "environment": "indoor",
+    "location": "City aquarium or oceanarium.",
+    "practicalNotes": "Visit during late afternoon feeding times for the best views.",
+    "accessibilityNotes": "Fully accessible ramps and elevators throughout the aquarium exhibits.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 18,
+    "isCustom": false
+  },
+  {
+    "id": "idea_ice_cream_run",
+    "title": "Ice Cream Date",
+    "description": "A spontaneous evening trip for our favorite scoops, trying each other's flavors, and walking under streetlights.",
+    "coverPhoto": "https://images.unsplash.com/photo-1501443762994-82bd5dace89a?auto=format&fit=crop&w=800&q=80",
+    "category": "food_cafes",
+    "costRange": "low",
+    "costEstimateText": "Under ",
+    "estimatedDuration": "About 45–60 minutes",
+    "estimatedDurationMinutes": 45,
+    "environment": "both",
+    "location": "Our favorite local gelato or ice cream parlor.",
+    "practicalNotes": "Get waffle cones and try at least one new wildcard flavor!",
+    "accessibilityNotes": "Street level entrance with outdoor sidewalk tables.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 19,
+    "isCustom": false
+  },
+  {
+    "id": "idea_farmers_market",
+    "title": "Farmers Market Date",
+    "description": "Morning coffees in hand, browsing fresh fruit stalls, artisan bakery pastries, and picking out fresh flowers.",
+    "coverPhoto": "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=800&q=80",
+    "category": "outdoor_adventures",
+    "costRange": "low",
+    "costEstimateText": "Under ",
+    "estimatedDuration": "About 1.5–2 hours",
+    "estimatedDurationMinutes": 100,
+    "environment": "outdoor",
+    "location": "Weekend downtown farmers market square.",
+    "practicalNotes": "Go early in the morning for the freshest warm pastries and coffee.",
+    "accessibilityNotes": "Open pedestrian street area with curb ramps.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 20,
+    "isCustom": false
+  },
+  {
+    "id": "idea_ice_skating",
+    "title": "Ice Skating",
+    "description": "Hold onto each other on the ice, laugh when we wobble, and warm up after with rich hot cocoa and marshmallows.",
+    "coverPhoto": "https://images.unsplash.com/photo-1487803836022-91054ca05fdd?auto=format&fit=crop&w=800&q=80",
+    "category": "romantic_evenings",
+    "costRange": "low",
+    "costEstimateText": "About  - ",
+    "estimatedDuration": "About 1.5–2 hours",
+    "estimatedDurationMinutes": 105,
+    "environment": "both",
+    "location": "Seasonal outdoor or indoor ice rink.",
+    "practicalNotes": "Wear warm thick socks, gloves, and a soft scarf.",
+    "accessibilityNotes": "Wheelchair ice sledges and spectator warming benches available.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 21,
+    "isCustom": false
+  },
+  {
+    "id": "idea_board_game_cafe",
+    "title": "Board Game Date",
+    "description": "Order warm lattes and spend hours challenging each other to hilarious party games and cozy strategy favorites.",
+    "coverPhoto": "https://images.unsplash.com/photo-1610890716171-6b1bb98ffd09?auto=format&fit=crop&w=800&q=80",
+    "category": "cozy_home",
+    "costRange": "low",
+    "costEstimateText": "About  - ",
+    "estimatedDuration": "About 2–3 hours",
+    "estimatedDurationMinutes": 150,
+    "environment": "indoor",
+    "location": "Board game lounge or cozy café corner.",
+    "practicalNotes": "Ask the staff for beginner-friendly two-player game recommendations.",
+    "accessibilityNotes": "Standard table heights and spacious aisle seating.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 22,
+    "isCustom": false
+  },
+  {
+    "id": "idea_thrift_challenge",
+    "title": "Thrift Store Date",
+    "description": "Browse quirky vintage racks, pick surprise outfits for each other to try on, and hunt for hidden treasures.",
+    "coverPhoto": "https://images.unsplash.com/photo-1558769132-cb1aea458c5e?auto=format&fit=crop&w=800&q=80",
+    "category": "budget_friendly",
+    "costRange": "low",
+    "costEstimateText": "Under ",
+    "estimatedDuration": "About 1.5–2 hours",
+    "estimatedDurationMinutes": 100,
+    "environment": "indoor",
+    "location": "Local vintage boutique or thrift marketplace.",
+    "practicalNotes": "Set a fun challenge limit for the most unique item found!",
+    "accessibilityNotes": "Wide shopping aisles with fitting room access.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 23,
+    "isCustom": false
+  },
+  {
+    "id": "idea_amusement_park",
+    "title": "Amusement Park Date",
+    "description": "Ride the fun rollercoasters, share sweet cotton candy, win a prize, and share a sweet moment at the top of the Ferris wheel.",
+    "coverPhoto": "https://images.unsplash.com/photo-1513889961551-628c1e5e2ee9?auto=format&fit=crop&w=800&q=80",
+    "category": "special_occasions",
+    "costRange": "medium",
+    "costEstimateText": "About  - ",
+    "estimatedDuration": "About 3–4 hours",
+    "estimatedDurationMinutes": 210,
+    "environment": "outdoor",
+    "location": "Local theme park, carnival, or seaside boardwalk.",
+    "practicalNotes": "Catch the Ferris wheel right as golden hour begins for gorgeous sunset views.",
+    "accessibilityNotes": "Paved park paths with ride accessibility passes available.",
+    "author": "creator",
+    "authorName": "Babe",
+    "createdAt": "2026-10-10T12:00:00.000Z",
+    "isHidden": false,
+    "sortOrder": 24,
+    "isCustom": false
+  }
 ];
 
-// Helper to compute dynamic future date (e.g. 3 days from now)
-function getFutureDateString(daysFromNow: number): string {
-  const d = new Date();
-  d.setDate(d.getDate() + daysFromNow);
-  return d.toISOString().split("T")[0];
-}
+export const defaultDateProposals: DateProposal[] = [];
 
 function getPastDateString(daysAgo: number): string {
   const d = new Date();
   d.setDate(d.getDate() - daysAgo);
   return d.toISOString().split("T")[0];
 }
-
-export const defaultDateProposals: DateProposal[] = [
-  {
-    id: "prop_demo_confirmed",
-    title: "Sunset Picnic & Stargazing Adventure",
-    description: "An evening dedicated to sweet treats, glowing twilight, and constellations.",
-    isSurprise: false,
-    surpriseRevealed: true,
-    itinerary: [
-      {
-        id: "stop_1",
-        ideaId: "idea_sunset_picnic",
-        title: "Sunset Picnic at the Overlook",
-        location: "Panoramic Hill Park",
-        estimatedDurationMinutes: 120,
-        estimatedCostText: "$25",
-        notes: "I'll pack the checkered blanket, strawberries, and sparkling cider.",
-        travelOrBreakMinutesAfter: 20,
-        travelNotes: "Gentle 15-minute scenic drive up to the preserve summit.",
-      },
-      {
-        id: "stop_2",
-        ideaId: "idea_midnight_stargazing",
-        title: "Midnight Stargazing Under the Constellations",
-        location: "Dark Sky Meadow Ridge",
-        estimatedDurationMinutes: 90,
-        estimatedCostText: "Free",
-        notes: "Bring thermos of hot cocoa.",
-      },
-    ],
-    proposedDate: getFutureDateString(3),
-    proposedStartTime: "17:30",
-    timeZone: "America/New_York",
-    totalEstimatedDurationMinutes: 230,
-    estimatedTotalBudget: "$25 - $35",
-    proposerRole: "creator",
-    proposerName: "Babe",
-    targetPartnerRole: "recipient",
-    targetPartnerName: "Baby",
-    personalMessage: "I cannot wait to watch the sun go down with you wrapped in my arms. Wear your favorite cozy cardigan! ♡",
-    status: "confirmed",
-    confirmedAt: new Date(Date.now() - 86400000).toISOString(),
-    history: [
-      {
-        id: "hist_1",
-        timestamp: new Date(Date.now() - 172800000).toISOString(),
-        authorRole: "creator",
-        authorName: "Babe",
-        action: "proposed",
-        message: "Created date proposal.",
-      },
-      {
-        id: "hist_2",
-        timestamp: new Date(Date.now() - 86400000).toISOString(),
-        authorRole: "recipient",
-        authorName: "Baby",
-        action: "accepted",
-        message: "Yes yes yes! I'm bringing the homemade cookies! 🍪💕",
-      },
-    ],
-    checklist: [
-      {
-        id: "chk_1",
-        task: "Pack the picnic blanket & cute wicker basket",
-        isCompleted: true,
-        completedBy: "Babe",
-        assignedTo: "creator",
-        notes: "Checkered pink one",
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: "chk_2",
-        task: "Pick up fresh strawberries & bakery baguettes",
-        isCompleted: false,
-        assignedTo: "both",
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: "chk_3",
-        task: "Fill thermos with warm marshmallow hot cocoa",
-        isCompleted: false,
-        assignedTo: "recipient",
-        createdAt: new Date().toISOString(),
-      },
-      {
-        id: "chk_4",
-        task: "Bring camera and download stargazing constellation app",
-        isCompleted: false,
-        assignedTo: "creator",
-        createdAt: new Date().toISOString(),
-      },
-    ],
-    createdAt: new Date(Date.now() - 172800000).toISOString(),
-    updatedAt: new Date(Date.now() - 86400000).toISOString(),
-  },
-  {
-    id: "prop_demo_pending",
-    title: "Artisanal Café Hopping & Bookstore Crawl",
-    description: "A slow Sunday exploring cobblestone bookshops and rating matcha pastries.",
-    isSurprise: false,
-    surpriseRevealed: true,
-    itinerary: [
-      {
-        id: "stop_p1",
-        ideaId: "idea_cafe_hopping",
-        title: "Artisanal Café Hopping & Pastry Crawl",
-        location: "Historic Arts District",
-        estimatedDurationMinutes: 120,
-        estimatedCostText: "$25",
-        notes: "Try the lavender honey latte!",
-        travelOrBreakMinutesAfter: 15,
-        travelNotes: "Stroll across the square.",
-      },
-      {
-        id: "stop_p2",
-        ideaId: "idea_old_bookstore",
-        title: "Quiet Afternoon in an Old Bookstore",
-        location: "The Whispering Pages Bookshop",
-        estimatedDurationMinutes: 90,
-        estimatedCostText: "Free",
-        notes: "We find a book for each other.",
-      },
-    ],
-    proposedDate: getFutureDateString(7),
-    proposedStartTime: "14:00",
-    timeZone: "America/New_York",
-    totalEstimatedDurationMinutes: 225,
-    estimatedTotalBudget: "$30 - $40",
-    proposerRole: "creator",
-    proposerName: "Babe",
-    targetPartnerRole: "recipient",
-    targetPartnerName: "Baby",
-    personalMessage: "What do you think about next weekend for this? We can take our time and read together! ☕📖",
-    status: "proposed",
-    history: [
-      {
-        id: "hist_p1",
-        timestamp: new Date().toISOString(),
-        authorRole: "creator",
-        authorName: "Babe",
-        action: "proposed",
-        message: "Proposed date for next Sunday afternoon.",
-      },
-    ],
-    checklist: [
-      {
-        id: "chk_p1",
-        task: "Charge e-reader or bring notebook",
-        isCompleted: false,
-        assignedTo: "both",
-        createdAt: new Date().toISOString(),
-      },
-    ],
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
 
 export const defaultDateMemories: DateMemory[] = [
   {
@@ -822,28 +873,7 @@ export const defaultDateMemories: DateMemory[] = [
   },
 ];
 
-export const defaultDateNotifications: DateNotification[] = [
-  {
-    id: "notif_demo_1",
-    type: "new_proposal",
-    title: "New Date Proposal! 💌",
-    message: "Babe proposed 'Artisanal Café Hopping & Bookstore Crawl' for next Sunday at 2:00 PM.",
-    proposalId: "prop_demo_pending",
-    targetRole: "recipient",
-    isRead: false,
-    createdAt: new Date().toISOString(),
-  },
-  {
-    id: "notif_demo_2",
-    type: "proposal_accepted",
-    title: "Adventure Confirmed! 🎉",
-    message: "Baby accepted 'Sunset Picnic & Stargazing Adventure'! Countdown has begun ♡",
-    proposalId: "prop_demo_confirmed",
-    targetRole: "both",
-    isRead: true,
-    createdAt: new Date(Date.now() - 86400000).toISOString(),
-  },
-];
+export const defaultDateNotifications: DateNotification[] = [];
 
 export const defaultNotificationSettings: NotificationSettings = {
   upcomingReminders: true,
@@ -1005,7 +1035,7 @@ const defaultDb: RelationshipDatabase = {
       id: "jn_demo_1",
       title: "The day you smiled at me like that",
       content:
-        "I was thinking about the moment we were sitting in that little corner café, and you started laughing so hard your eyes crinkled. I remember whispering to myself: this is where I want to stay forever.",
+        "I was thinking about the moment we were sitting in that little corner café, and you started laughing so hard your eyes crinkled. I remember wishing I could pause the whole afternoon, just to stay in that moment a little longer.",
       prompt: "A memory I never want to forget",
       moodEmoji: "☕",
       author: "creator",
@@ -1358,16 +1388,114 @@ export function toggleJournalReaction(
   return entry.reactions;
 }
 
-export function deleteJournalEntry(id: string, role: "creator" | "recipient") {
+export function updateJournalEntry(
+  id: string,
+  updates: {
+    title?: string;
+    content: string;
+    prompt?: string;
+    moodEmoji?: string;
+  },
+  role: "creator" | "recipient",
+  authorName?: string
+) {
+  const db = loadDatabase();
+  const entry = db.journalEntries.find((j) => j.id === id);
+  if (!entry) return null;
+
+  const isMatch =
+    role === "creator" ||
+    entry.author === role ||
+    Boolean(authorName && entry.authorName?.trim().toLowerCase() === authorName.trim().toLowerCase());
+
+  if (!isMatch) {
+    return null;
+  }
+
+  if (updates.title !== undefined) entry.title = updates.title.trim() || undefined;
+  if (updates.content !== undefined) entry.content = updates.content.trim();
+  if (updates.prompt !== undefined) entry.prompt = updates.prompt.trim() || undefined;
+  if (updates.moodEmoji !== undefined) entry.moodEmoji = updates.moodEmoji;
+  entry.updatedAt = new Date().toISOString();
+
+  saveDatabase(db);
+  return entry;
+}
+
+export function deleteJournalEntry(id: string, role: "creator" | "recipient", authorName?: string) {
   const db = loadDatabase();
   const idx = db.journalEntries.findIndex((j) => j.id === id);
   if (idx === -1) return false;
 
-  if (role !== "creator" && db.journalEntries[idx].author !== role) {
+  const entry = db.journalEntries[idx];
+  const isMatch =
+    role === "creator" ||
+    entry.author === role ||
+    Boolean(authorName && entry.authorName?.trim().toLowerCase() === authorName.trim().toLowerCase());
+
+  if (!isMatch) {
     return false;
   }
 
   db.journalEntries.splice(idx, 1);
+  saveDatabase(db);
+  return true;
+}
+
+export function updateJournalReply(
+  entryId: string,
+  replyId: string,
+  content: string,
+  role: "creator" | "recipient",
+  authorName?: string
+) {
+  const db = loadDatabase();
+  const entry = db.journalEntries.find((j) => j.id === entryId);
+  if (!entry) return null;
+
+  const reply = entry.replies.find((r) => r.id === replyId);
+  if (!reply) return null;
+
+  const isMatch =
+    role === "creator" ||
+    reply.author === role ||
+    Boolean(authorName && reply.authorName?.trim().toLowerCase() === authorName.trim().toLowerCase());
+
+  if (!isMatch) {
+    return null;
+  }
+
+  reply.content = content.trim();
+  reply.updatedAt = new Date().toISOString();
+
+  saveDatabase(db);
+  return reply;
+}
+
+export function deleteJournalReply(
+  entryId: string,
+  replyId: string,
+  role: "creator" | "recipient",
+  authorName?: string
+) {
+  const db = loadDatabase();
+  const entry = db.journalEntries.find((j) => j.id === entryId);
+  if (!entry) return false;
+
+  const rIdx = entry.replies.findIndex((r) => r.id === replyId);
+  if (rIdx === -1) return false;
+
+  const reply = entry.replies[rIdx];
+  const isMatch =
+    role === "creator" ||
+    reply.author === role ||
+    Boolean(authorName && reply.authorName?.trim().toLowerCase() === authorName.trim().toLowerCase());
+
+  if (!isMatch) {
+    return false;
+  }
+
+  entry.replies.splice(rIdx, 1);
   saveDatabase(db);
   return true;
 }

@@ -229,7 +229,7 @@ export function DateItineraryBuilder({
 
         {shortlistedIdeas.length === 0 ? (
           <p className="text-xs text-[var(--text-muted)] italic">
-            You haven&apos;t shortlisted any ideas yet. Click &ldquo;Add to Shortlist&rdquo; on any date idea in the catalog to easily insert it here!
+            You haven&apos;t shortlisted any ideas yet. Click &ldquo;Save for us ♡&rdquo; on any date idea in the catalog to easily insert it here!
           </p>
         ) : (
           <div className="flex items-center gap-2.5 overflow-x-auto pb-1 scrollbar-none">
