@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
 
 export interface BorderPhotoConfig {
   id: string;
@@ -1817,7 +1816,6 @@ export function FramedPhotoCollage({
   centralPhoto,
   borderPhotos,
 }: FramedPhotoCollageProps) {
-  const [hoveredPhoto, setHoveredPhoto] = useState<BorderPhotoConfig | null>(null);
 
   // Default romantic couple central photograph
   const heroSrc =
@@ -1924,8 +1922,6 @@ export function FramedPhotoCollage({
                 rotate: 0,
                 boxShadow: "0 10px 28px rgba(81, 36, 63, 0.35)",
               }}
-              onMouseEnter={() => setHoveredPhoto(photo)}
-              onMouseLeave={() => setHoveredPhoto(null)}
               className="absolute p-0.5 sm:p-1 bg-white border border-white rounded-[2px] sm:rounded-[3px] shadow-[0_2px_8px_rgba(40,20,30,0.22)] cursor-pointer transition-shadow duration-200"
               style={{
                 top: `${photo.top}%`,
@@ -1957,21 +1953,11 @@ export function FramedPhotoCollage({
         </div>
       </div>
 
-      {/* Hover Caption Toast floating underneath the framed collage */}
+      {/* Universal Loving Caption underneath the framed collage */}
       <div className="h-10 mt-5 flex items-center justify-center text-center">
-        {hoveredPhoto ? (
-          <motion.div
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="px-5 py-1.5 rounded-full bg-white/95 border border-[var(--border-subtle)] shadow-md text-xs font-handwritten text-xl sm:text-2xl text-[var(--pink-strong)]"
-          >
-            {hoveredPhoto.caption}
-          </motion.div>
-        ) : (
-          <p className="font-handwritten text-xl sm:text-2xl text-[var(--text-secondary)]">
-            Every little moment, one beautiful story ♡
-          </p>
-        )}
+        <div className="px-5 py-1.5 rounded-full bg-white/95 border border-[var(--border-subtle)] shadow-sm font-handwritten text-xl sm:text-2xl text-[var(--pink-strong)]">
+          {heroCaption}
+        </div>
       </div>
     </div>
   );

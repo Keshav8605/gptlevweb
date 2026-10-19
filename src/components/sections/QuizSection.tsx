@@ -545,25 +545,61 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
                 {/* Navigation Buttons & Romantic Completion Guide */}
                 <div className="pt-3 border-t border-[var(--border-subtle)]">
                   {isLastQuestion ? (
-                    <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-                      {/* Previous button always kept on the left */}
-                      <button
-                        type="button"
-                        onClick={() => setCurrentQ((prev) => Math.max(0, prev - 1))}
-                        className="px-4 py-2 text-xs sm:text-sm font-rounded font-medium text-[var(--text-secondary)] hover:text-[var(--pink-strong)] cursor-pointer self-start sm:self-center"
-                      >
-                        ← Previous
-                      </button>
-
-                      {/* Right side: NO faded next button! When answered, show cutest love message + guide to next section */}
-                      {isAnswered ? (
-                        <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto justify-end">
-                          <div className="text-center sm:text-right space-y-0.5">
-                            <p className="font-rounded font-bold text-xs sm:text-sm text-[var(--pink-strong)] flex items-center justify-center sm:justify-end gap-1">
+                    isAnswered ? (
+                      <>
+                        {/* Mobile layout (< sm): sweet message centered on top, navigation buttons side-by-side below */}
+                        <div className="flex flex-col gap-3 sm:hidden w-full">
+                          <div className="text-center space-y-0.5">
+                            <p className="font-rounded font-bold text-xs text-[var(--pink-strong)] flex items-center justify-center gap-1">
                               <span>Aww, you answered all our questions!</span>
                               <span>🥰</span>
                             </p>
-                            <p className="font-handwritten text-xs sm:text-sm text-[var(--text-secondary)]">
+                            <p className="font-handwritten text-xs text-[var(--text-secondary)]">
+                              You know my whole heart so well 💕
+                            </p>
+                          </div>
+
+                          <div className="flex items-center justify-between gap-3 w-full">
+                            <button
+                              type="button"
+                              onClick={() => setCurrentQ((prev) => Math.max(0, prev - 1))}
+                              className="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-rounded font-medium text-[var(--text-secondary)] hover:text-[var(--pink-strong)] cursor-pointer whitespace-nowrap shrink-0 transition-colors"
+                            >
+                              <span>←</span>
+                              <span>Previous</span>
+                            </button>
+
+                            <button
+                              type="button"
+                              onClick={handleProceedToNextSection}
+                              className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-2xl bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs font-rounded font-bold shadow-md shadow-pink-300/40 hover:shadow-lg hover:shadow-pink-400/50 hover:scale-105 active:scale-95 cursor-pointer whitespace-nowrap shrink-0 transition-all duration-300 group"
+                            >
+                              <span>Read My Love Letters</span>
+                              <span className="inline-flex items-center gap-1 text-sm group-hover:scale-110 transition-transform duration-300 whitespace-nowrap">
+                                <span>💌</span>
+                                <span>→</span>
+                              </span>
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* Desktop / Tablet layout (>= sm): All three aligned perfectly in a single row */}
+                        <div className="hidden sm:flex items-center justify-between gap-3 w-full">
+                          <button
+                            type="button"
+                            onClick={() => setCurrentQ((prev) => Math.max(0, prev - 1))}
+                            className="inline-flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-rounded font-medium text-[var(--text-secondary)] hover:text-[var(--pink-strong)] cursor-pointer whitespace-nowrap shrink-0 transition-colors"
+                          >
+                            <span>←</span>
+                            <span>Previous</span>
+                          </button>
+
+                          <div className="text-center space-y-0.5 px-2">
+                            <p className="font-rounded font-bold text-xs sm:text-sm text-[var(--pink-strong)] flex items-center justify-center gap-1 whitespace-nowrap">
+                              <span>Aww, you answered all our questions!</span>
+                              <span>🥰</span>
+                            </p>
+                            <p className="font-handwritten text-xs sm:text-sm text-[var(--text-secondary)] whitespace-nowrap">
                               You know my whole heart so well 💕
                             </p>
                           </div>
@@ -571,20 +607,31 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
                           <button
                             type="button"
                             onClick={handleProceedToNextSection}
-                            className="w-full sm:w-auto px-6 py-2.5 rounded-2xl bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs sm:text-sm font-rounded font-bold shadow-md shadow-pink-300/40 hover:shadow-lg hover:shadow-pink-400/50 hover:scale-105 active:scale-95 cursor-pointer transition-all duration-300 flex items-center justify-center gap-2 group"
+                            className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs sm:text-sm font-rounded font-bold shadow-md shadow-pink-300/40 hover:shadow-lg hover:shadow-pink-400/50 hover:scale-105 active:scale-95 cursor-pointer whitespace-nowrap shrink-0 transition-all duration-300 group"
                           >
                             <span>Read My Love Letters</span>
-                            <span className="text-base group-hover:scale-125 transition-transform duration-300">
-                              💌 →
+                            <span className="inline-flex items-center gap-1 text-sm sm:text-base group-hover:scale-110 transition-transform duration-300 whitespace-nowrap">
+                              <span>💌</span>
+                              <span>→</span>
                             </span>
                           </button>
                         </div>
-                      ) : (
+                      </>
+                    ) : (
+                      <div className="flex items-center justify-between">
+                        <button
+                          type="button"
+                          onClick={() => setCurrentQ((prev) => Math.max(0, prev - 1))}
+                          className="px-4 py-2 text-xs sm:text-sm font-rounded font-medium text-[var(--text-secondary)] hover:text-[var(--pink-strong)] cursor-pointer"
+                        >
+                          ← Previous
+                        </button>
+
                         <span className="text-xs text-[var(--text-muted)] italic font-rounded text-right">
                           Last question of our quiz ♡ Lock in your answer above! ✨
                         </span>
-                      )}
-                    </div>
+                      </div>
+                    )
                   ) : (
                     <div className="flex items-center justify-between">
                       <button

@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { RomanticCharacter } from "../RomanticCharacter";
-import type { JournalEntry } from "@/lib/server-db";
+import type { JournalEntry, JournalReply } from "@/lib/server-db";
 
 const notebookPrompts = [
   "Something that made me think of you today",
@@ -51,6 +51,19 @@ export function NotebookSection({
   // Active reply input state: entryId -> text
   const [replyDrafts, setReplyDrafts] = useState<Record<string, string>>({});
   const [activeReplyId, setActiveReplyId] = useState<string | null>(null);
+
+  // Edit states for main entries
+  const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
+  const [editTitle, setEditTitle] = useState("");
+  const [editContent, setEditContent] = useState("");
+  const [editMood, setEditMood] = useState("🤍");
+  const [editPrompt, setEditPrompt] = useState<string | null>(null);
+  const [isSavingEdit, setIsSavingEdit] = useState(false);
+
+  // Edit states for replies
+  const [editingReplyId, setEditingReplyId] = useState<string | null>(null);
+  const [editReplyContent, setEditReplyContent] = useState("");
+  const [isSavingReplyEdit, setIsSavingReplyEdit] = useState(false);
 
   useEffect(() => {
     const handleStorage = () => {
@@ -113,6 +126,138 @@ export function NotebookSection({
     }
   };
 
+  const handleStartEditEntry = (entry: JournalEntry) => {
+    setEditingEntryId(entry.id);
+    setEditTitle(entry.title || "");
+    setEditContent(entry.content || "");
+    setEditMood(entry.moodEmoji || "🤍");
+    setEditPrompt(entry.prompt || null);
+  };
+
+  const handleCancelEditEntry = () => {
+    setEditingEntryId(null);
+    setEditTitle("");
+    setEditContent("");
+    setEditMood("🤍");
+    setEditPrompt(null);
+  };
+
+  const handleSaveEditEntry = async (entryId: string) => {
+    if (!editContent.trim() || isSavingEdit) return;
+    setIsSavingEdit(true);
+
+    try {
+      const res = await fetch("/api/notebook", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: entryId,
+          title: editTitle.trim(),
+          content: editContent.trim(),
+          prompt: editPrompt || undefined,
+          moodEmoji: editMood,
+          role,
+          name,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.entry) {
+        setEntries((prev) =>
+          prev.map((item) => (item.id === entryId ? { ...item, ...data.entry } : item))
+        );
+        handleCancelEditEntry();
+      }
+    } catch {}
+    finally {
+      setIsSavingEdit(false);
+    }
+  };
+
+  const handleDeleteEntry = async (entryId: string) => {
+    if (!confirm("Are you sure you want to remove this sweet note from our notebook?")) return;
+    try {
+      const res = await fetch(
+        `/api/notebook?id=${entryId}&role=${role}&name=${encodeURIComponent(name)}`,
+        { method: "DELETE" }
+      );
+      if (res.ok) {
+        setEntries((prev) => prev.filter((item) => item.id !== entryId));
+        if (editingEntryId === entryId) handleCancelEditEntry();
+      }
+    } catch {}
+  };
+
+  const handleStartEditReply = (reply: JournalReply) => {
+    setEditingReplyId(reply.id);
+    setEditReplyContent(reply.content);
+  };
+
+  const handleCancelEditReply = () => {
+    setEditingReplyId(null);
+    setEditReplyContent("");
+  };
+
+  const handleSaveEditReply = async (entryId: string, replyId: string) => {
+    if (!editReplyContent.trim() || isSavingReplyEdit) return;
+    setIsSavingReplyEdit(true);
+
+    try {
+      const res = await fetch("/api/notebook", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "updateReply",
+          entryId,
+          replyId,
+          content: editReplyContent.trim(),
+          role,
+          name,
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.reply) {
+        setEntries((prev) =>
+          prev.map((item) =>
+            item.id === entryId
+              ? {
+                  ...item,
+                  replies: item.replies.map((r) =>
+                    r.id === replyId ? { ...r, ...data.reply } : r
+                  ),
+                }
+              : item
+          )
+        );
+        handleCancelEditReply();
+      }
+    } catch {}
+    finally {
+      setIsSavingReplyEdit(false);
+    }
+  };
+
+  const handleDeleteReply = async (entryId: string, replyId: string) => {
+    if (!confirm("Are you sure you want to remove this little note reply?")) return;
+    try {
+      const res = await fetch(
+        `/api/notebook?id=${entryId}&replyId=${replyId}&role=${role}&name=${encodeURIComponent(name)}`,
+        { method: "DELETE" }
+      );
+      if (res.ok) {
+        setEntries((prev) =>
+          prev.map((item) =>
+            item.id === entryId
+              ? { ...item, replies: item.replies.filter((r) => r.id !== replyId) }
+              : item
+          )
+        );
+        if (editingReplyId === replyId) handleCancelEditReply();
+      }
+    } catch {}
+  };
+
   const handleAddReply = async (entryId: string) => {
     const text = replyDrafts[entryId]?.trim();
     if (!text) return;
@@ -166,16 +311,6 @@ export function NotebookSection({
             item.id === entryId ? { ...item, reactions: data.reactions } : item
           )
         );
-      }
-    } catch {}
-  };
-
-  const handleDeleteEntry = async (entryId: string) => {
-    if (!confirm("Are you sure you want to remove this journal entry?")) return;
-    try {
-      const res = await fetch(`/api/notebook?id=${entryId}&role=${role}`, { method: "DELETE" });
-      if (res.ok) {
-        setEntries((prev) => prev.filter((item) => item.id !== entryId));
       }
     } catch {}
   };
@@ -373,7 +508,15 @@ export function NotebookSection({
             </div>
           ) : (
             entries.map((entry) => {
-              const isOwner = entry.author === currentUserRole || currentUserRole === "creator";
+              const isOwner =
+                role === "creator" ||
+                entry.author === role ||
+                Boolean(
+                  name &&
+                  entry.authorName &&
+                  entry.authorName.trim().toLowerCase() === name.trim().toLowerCase()
+                );
+              const isEditingThisEntry = editingEntryId === entry.id;
               const isReplying = activeReplyId === entry.id;
 
               return (
@@ -386,7 +529,7 @@ export function NotebookSection({
                   {/* Top Entry Metadata */}
                   <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-3">
                     <div className="flex items-center gap-2.5">
-                      <span className="text-2xl">{entry.moodEmoji || "🤍"}</span>
+                      <span className="text-2xl">{isEditingThisEntry ? editMood : (entry.moodEmoji || "🤍")}</span>
                       <div>
                         <span className="font-bold text-xs text-[var(--pink-deep)] block">
                           {entry.authorName} {entry.author === "creator" ? "✏️" : "♡"}
@@ -399,41 +542,149 @@ export function NotebookSection({
                             hour: "2-digit",
                             minute: "2-digit",
                           })}
+                          {entry.updatedAt && (
+                            <span className="italic ml-1 text-[var(--pink-strong)]">(edited)</span>
+                          )}
                         </span>
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2">
-                      {isOwner && (
+                    {/* Owner Action Buttons: Edit & Remove */}
+                    {isOwner && !isEditingThisEntry && (
+                      <div className="flex items-center gap-1.5">
                         <button
-                          onClick={() => handleDeleteEntry(entry.id)}
-                          title="Delete entry"
-                          className="text-xs text-[var(--text-muted)] hover:text-rose-500 cursor-pointer p-1"
+                          type="button"
+                          onClick={() => handleStartEditEntry(entry)}
+                          title="Edit this note"
+                          className="px-2.5 py-1 rounded-full text-xs font-rounded font-semibold text-[var(--pink-strong)] hover:text-[var(--pink-deep)] hover:bg-[var(--pale-rose)]/60 border border-pink-200/80 shadow-2xs transition-all flex items-center gap-1 cursor-pointer"
                         >
-                          ✕
+                          <span>✏️</span>
+                          <span className="hidden sm:inline">Edit</span>
                         </button>
-                      )}
-                    </div>
+
+                        <button
+                          type="button"
+                          onClick={() => handleDeleteEntry(entry.id)}
+                          title="Remove this note"
+                          className="px-2.5 py-1 rounded-full text-xs font-rounded font-semibold text-rose-500 hover:text-rose-700 hover:bg-rose-50 border border-rose-200/80 shadow-2xs transition-all flex items-center gap-1 cursor-pointer"
+                        >
+                          <span>🗑️</span>
+                          <span className="hidden sm:inline">Remove</span>
+                        </button>
+                      </div>
+                    )}
                   </div>
 
-                  {/* Optional Prompt Chip */}
-                  {entry.prompt && (
-                    <div className="inline-block px-3 py-1 rounded-full bg-[var(--warm-cream)] border border-[var(--border-subtle)] text-[11px] text-[var(--pink-strong)] italic">
-                      Prompt: {entry.prompt}
+                  {/* Main Entry Body: Edit Form OR Display View */}
+                  {isEditingThisEntry ? (
+                    <div className="space-y-4 pt-1">
+                      {/* Mood Emoji Picker */}
+                      <div>
+                        <label className="text-[11px] font-bold text-[var(--pink-deep)] uppercase tracking-wider block mb-1.5">
+                          Feeling / Mood:
+                        </label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {moodEmojis.map((emoji) => (
+                            <button
+                              key={emoji}
+                              type="button"
+                              onClick={() => setEditMood(emoji)}
+                              className={`w-9 h-9 rounded-xl text-lg flex items-center justify-center transition-all cursor-pointer ${
+                                editMood === emoji
+                                  ? "bg-[var(--pale-rose)] ring-2 ring-[var(--pink-strong)] scale-110 shadow-2xs"
+                                  : "bg-[var(--bg-surface)] hover:bg-[var(--pale-rose)]/50"
+                              }`}
+                            >
+                              {emoji}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Optional Prompt Tag */}
+                      {editPrompt && (
+                        <div className="flex items-center justify-between p-2 rounded-xl bg-[var(--warm-cream)] border border-[var(--border-subtle)] text-xs text-[var(--pink-strong)]">
+                          <span className="italic">Prompt: {editPrompt}</span>
+                          <button
+                            type="button"
+                            onClick={() => setEditPrompt(null)}
+                            className="text-[10px] text-[var(--text-muted)] hover:text-rose-500 font-bold ml-2 cursor-pointer"
+                            title="Remove prompt tag"
+                          >
+                            ✕ Remove prompt
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Title Input */}
+                      <div>
+                        <label className="text-[11px] font-bold text-[var(--pink-deep)] uppercase tracking-wider block mb-1">
+                          Title (optional):
+                        </label>
+                        <input
+                          type="text"
+                          value={editTitle}
+                          onChange={(e) => setEditTitle(e.target.value)}
+                          placeholder="Give this sweet note a title..."
+                          className="w-full text-sm font-semibold p-3 rounded-2xl border border-[var(--border-medium)] focus:border-[var(--pink-primary)] focus:outline-none bg-[var(--bg-main)] text-[var(--text-primary)]"
+                        />
+                      </div>
+
+                      {/* Content Textarea */}
+                      <div>
+                        <label className="text-[11px] font-bold text-[var(--pink-deep)] uppercase tracking-wider block mb-1">
+                          Your Note:
+                        </label>
+                        <textarea
+                          rows={4}
+                          value={editContent}
+                          onChange={(e) => setEditContent(e.target.value)}
+                          placeholder="Write your note here..."
+                          className="w-full text-xs sm:text-sm p-3.5 rounded-2xl border border-[var(--border-medium)] focus:border-[var(--pink-primary)] focus:outline-none bg-[var(--bg-main)] text-[var(--text-primary)] resize-none leading-relaxed"
+                        />
+                      </div>
+
+                      {/* Edit Actions */}
+                      <div className="flex items-center justify-end gap-2 pt-1">
+                        <button
+                          type="button"
+                          onClick={handleCancelEditEntry}
+                          className="px-4 py-2 rounded-xl text-xs font-rounded font-medium text-[var(--text-secondary)] hover:bg-slate-100 cursor-pointer transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => handleSaveEditEntry(entry.id)}
+                          disabled={!editContent.trim() || isSavingEdit}
+                          className="px-5 py-2 rounded-xl bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs font-rounded font-bold shadow-xs hover:scale-105 active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer transition-all flex items-center gap-1.5"
+                        >
+                          <span>{isSavingEdit ? "Saving..." : "Save Changes ♡"}</span>
+                        </button>
+                      </div>
                     </div>
-                  )}
+                  ) : (
+                    <>
+                      {/* Optional Prompt Chip */}
+                      {entry.prompt && (
+                        <div className="inline-block px-3 py-1 rounded-full bg-[var(--warm-cream)] border border-[var(--border-subtle)] text-[11px] text-[var(--pink-strong)] italic">
+                          Prompt: {entry.prompt}
+                        </div>
+                      )}
 
-                  {/* Title */}
-                  {entry.title && (
-                    <h4 className="font-serif text-xl sm:text-2xl font-bold text-[var(--text-primary)]">
-                      {entry.title}
-                    </h4>
-                  )}
+                      {/* Title */}
+                      {entry.title && (
+                        <h4 className="font-serif text-xl sm:text-2xl font-bold text-[var(--text-primary)]">
+                          {entry.title}
+                        </h4>
+                      )}
 
-                  {/* Content */}
-                  <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap">
-                    {entry.content}
-                  </p>
+                      {/* Content */}
+                      <p className="text-xs sm:text-sm text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap">
+                        {entry.content}
+                      </p>
+                    </>
+                  )}
 
                   {/* Reactions & Replies Bar */}
                   <div className="pt-3 border-t border-[var(--border-subtle)] flex items-center justify-between flex-wrap gap-2">
@@ -476,25 +727,95 @@ export function NotebookSection({
                   {/* Replies Thread */}
                   {entry.replies && entry.replies.length > 0 && (
                     <div className="space-y-2 pt-2 border-t border-[var(--border-subtle)]">
-                      {entry.replies.map((reply) => (
-                        <div
-                          key={reply.id}
-                          className="p-3.5 rounded-2xl bg-[var(--bg-surface)]/70 border border-[var(--border-subtle)] text-xs space-y-1"
-                        >
-                          <div className="flex items-center justify-between font-semibold text-[11px] text-[var(--pink-deep)]">
-                            <span>{reply.authorName} {reply.author === "creator" ? "✏️" : "♡"}</span>
-                            <span className="text-[10px] text-[var(--text-muted)] font-normal">
-                              {new Date(reply.createdAt).toLocaleDateString("en-US", {
-                                month: "short",
-                                day: "numeric",
-                              })}
-                            </span>
+                      {entry.replies.map((reply) => {
+                        const isReplyOwner =
+                          role === "creator" ||
+                          reply.author === role ||
+                          Boolean(
+                            name &&
+                            reply.authorName &&
+                            reply.authorName.trim().toLowerCase() === name.trim().toLowerCase()
+                          );
+                        const isEditingThisReply = editingReplyId === reply.id;
+
+                        return (
+                          <div
+                            key={reply.id}
+                            className="p-3.5 rounded-2xl bg-[var(--bg-surface)]/70 border border-[var(--border-subtle)] text-xs space-y-1.5"
+                          >
+                            <div className="flex items-center justify-between font-semibold text-[11px] text-[var(--pink-deep)]">
+                              <div className="flex items-center gap-1.5">
+                                <span>
+                                  {reply.authorName} {reply.author === "creator" ? "✏️" : "♡"}
+                                </span>
+                                <span className="text-[10px] text-[var(--text-muted)] font-normal">
+                                  • {new Date(reply.createdAt).toLocaleDateString("en-US", {
+                                    month: "short",
+                                    day: "numeric",
+                                  })}
+                                  {reply.updatedAt && (
+                                    <span className="italic ml-1 text-[var(--pink-strong)]">(edited)</span>
+                                  )}
+                                </span>
+                              </div>
+
+                              {isReplyOwner && !isEditingThisReply && (
+                                <div className="flex items-center gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={() => handleStartEditReply(reply)}
+                                    title="Edit reply"
+                                    className="text-[11px] font-semibold text-[var(--pink-strong)] hover:underline cursor-pointer"
+                                  >
+                                    Edit
+                                  </button>
+                                  <span className="text-[10px] text-[var(--text-muted)]">•</span>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleDeleteReply(entry.id, reply.id)}
+                                    title="Remove reply"
+                                    className="text-[11px] font-semibold text-rose-500 hover:underline cursor-pointer"
+                                  >
+                                    Remove
+                                  </button>
+                                </div>
+                              )}
+                            </div>
+
+                            {isEditingThisReply ? (
+                              <div className="space-y-2 pt-1">
+                                <input
+                                  type="text"
+                                  value={editReplyContent}
+                                  onChange={(e) => setEditReplyContent(e.target.value)}
+                                  className="w-full text-xs p-2.5 rounded-xl border border-[var(--border-medium)] focus:border-[var(--pink-primary)] focus:outline-none bg-[var(--bg-main)] text-[var(--text-primary)]"
+                                />
+                                <div className="flex items-center justify-end gap-1.5">
+                                  <button
+                                    type="button"
+                                    onClick={handleCancelEditReply}
+                                    className="px-2.5 py-1 text-[11px] rounded-lg text-[var(--text-muted)] hover:bg-slate-100 cursor-pointer"
+                                  >
+                                    Cancel
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleSaveEditReply(entry.id, reply.id)}
+                                    disabled={!editReplyContent.trim() || isSavingReplyEdit}
+                                    className="px-3 py-1 text-[11px] font-bold rounded-lg bg-[var(--pink-strong)] text-white hover:bg-[var(--pink-deep)] disabled:opacity-50 cursor-pointer"
+                                  >
+                                    {isSavingReplyEdit ? "Saving..." : "Save"}
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              <p className="text-[var(--text-primary)] italic leading-relaxed">
+                                &ldquo;{reply.content}&rdquo;
+                              </p>
+                            )}
                           </div>
-                          <p className="text-[var(--text-primary)] italic leading-relaxed">
-                            &ldquo;{reply.content}&rdquo;
-                          </p>
-                        </div>
-                      ))}
+                        );
+                      })}
                     </div>
                   )}
 
@@ -513,7 +834,7 @@ export function NotebookSection({
                           onChange={(e) =>
                             setReplyDrafts((prev) => ({ ...prev, [entry.id]: e.target.value }))
                           }
-                          placeholder={`Write a reply as ${currentUserName}...`}
+                          placeholder={`Write a reply as ${name}...`}
                           className="flex-1 text-xs p-3 rounded-2xl border border-[var(--border-medium)] focus:border-[var(--pink-primary)] focus:outline-none bg-[var(--bg-main)]"
                         />
                         <button

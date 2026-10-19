@@ -175,11 +175,11 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.96 }}
                     onClick={() => setShowHint(true)}
-                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[var(--soft-pink)]/80 hover:bg-[var(--soft-pink)] border border-[var(--border-medium)] text-xs sm:text-sm font-rounded font-semibold text-[var(--pink-deep)] shadow-2xs hover:shadow-xs transition-all cursor-pointer group"
+                    className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-[var(--pale-rose)] via-[#FFF4F7] to-[var(--pale-rose)] hover:from-[#FFE4EC] hover:to-[#FFE4EC] border border-[var(--pink-primary)]/35 hover:border-[var(--pink-primary)] text-xs sm:text-sm font-rounded font-semibold text-[var(--pink-strong)] shadow-[0_2px_10px_rgba(255,95,150,0.12)] hover:shadow-[0_4px_16px_rgba(255,95,150,0.22)] transition-all duration-300 cursor-pointer group"
                   >
-                    <span className="text-sm group-hover:scale-125 transition-transform">🤫</span>
-                    <span>Psst… you know the answer.</span>
-                    <span className="text-xs text-[var(--pink-strong)]">✨</span>
+                    <span className="text-sm group-hover:scale-120 transition-transform">💌</span>
+                    <span>Need a sweet little hint, my love?</span>
+                    <span className="text-xs text-[var(--pink-strong)]">♡</span>
                   </motion.button>
                 </div>
               ) : (
@@ -190,20 +190,20 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
                   transition={{ duration: 0.35, ease: "easeOut" }}
                   className="mb-8 max-w-lg mx-auto overflow-hidden"
                 >
-                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[var(--warm-cream)] to-[var(--soft-pink)]/50 border border-[var(--border-medium)] shadow-xs relative text-left">
+                  <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[var(--warm-cream)] via-[#FFF5F8] to-[var(--pale-rose)]/60 border border-[var(--pink-primary)]/30 shadow-sm relative text-left">
                     <div className="flex items-start gap-3">
-                      <span className="text-xl mt-0.5">💡</span>
+                      <span className="text-xl mt-0.5">💌</span>
                       <div className="flex-1">
                         <div className="flex items-center justify-between mb-1.5">
                           <span className="text-xs font-bold text-[var(--pink-strong)] uppercase tracking-wider font-rounded">
-                            Psst… you know the answer.
+                            A sweet little clue for you ♡
                           </span>
                           <button
                             type="button"
                             onClick={() => setShowHint(false)}
-                            className="text-xs text-[var(--text-muted)] hover:text-[var(--pink-strong)] font-rounded cursor-pointer px-1.5 py-0.5 rounded hover:bg-white/60 transition-colors"
+                            className="text-xs text-[var(--text-muted)] hover:text-[var(--pink-strong)] font-rounded cursor-pointer px-2 py-0.5 rounded-full hover:bg-white/80 transition-colors"
                           >
-                            hide ✕
+                            hide ♡
                           </button>
                         </div>
                         <p className="font-serif italic text-sm sm:text-base text-[var(--romantic-plum)] leading-relaxed">

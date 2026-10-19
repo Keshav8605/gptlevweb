@@ -1,7 +1,6 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState } from "react";
 
 export interface CollagePhoto {
   id: string;
@@ -357,8 +356,6 @@ interface HeartPhotoCollageProps {
 }
 
 export function HeartPhotoCollage({ photos }: HeartPhotoCollageProps) {
-  const [hoveredPhoto, setHoveredPhoto] = useState<CollagePhoto | null>(null);
-
   // Map user-provided photos if available
   const activeTiles: CollagePhoto[] = heartCollagePhotos.map((tile, idx) => {
     if (photos && photos[idx]) {
@@ -412,8 +409,6 @@ export function HeartPhotoCollage({ photos }: HeartPhotoCollageProps) {
               zIndex: 50,
               boxShadow: "0 8px 24px rgba(81, 36, 63, 0.25)",
             }}
-            onMouseEnter={() => setHoveredPhoto(tile)}
-            onMouseLeave={() => setHoveredPhoto(null)}
             className={`relative overflow-hidden border border-white/95 sm:border-[1.5px] border-white rounded-[2px] sm:rounded-[3px] shadow-[0_2px_8px_rgba(81,36,63,0.12)] cursor-pointer transition-shadow duration-300 ${
               tile.isHero
                 ? "ring-2 ring-[var(--pink-strong)]/50 ring-offset-1 z-20 shadow-md"
@@ -451,21 +446,11 @@ export function HeartPhotoCollage({ photos }: HeartPhotoCollageProps) {
         ))}
       </div>
 
-      {/* Hover Caption Toast floating underneath the heart */}
+      {/* Universal Loving Caption underneath the heart */}
       <div className="h-10 mt-5 flex items-center justify-center text-center">
-        {hoveredPhoto ? (
-          <motion.div
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="px-5 py-1.5 rounded-full bg-white/95 border border-[var(--border-subtle)] shadow-md text-xs font-handwritten text-xl sm:text-2xl text-[var(--pink-strong)]"
-          >
-            {hoveredPhoto.caption}
-          </motion.div>
-        ) : (
-          <p className="font-handwritten text-xl sm:text-2xl text-[var(--text-secondary)]">
-            Hover over any little picture to read its memory ♡
-          </p>
-        )}
+        <div className="px-5 py-1.5 rounded-full bg-white/95 border border-[var(--border-subtle)] shadow-sm font-handwritten text-xl sm:text-2xl text-[var(--pink-strong)]">
+          You & Me, Always & Forever ♡
+        </div>
       </div>
     </div>
   );
