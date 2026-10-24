@@ -18,6 +18,9 @@ interface WelcomeExperienceProps {
   startDate?: string;
   onEnter: () => void;
   polaroids?: HeroPolaroid[];
+  buttonText?: string;
+  showPhotoBadges?: boolean;
+  character?: string;
 }
 
 export function WelcomeExperience({
@@ -27,6 +30,9 @@ export function WelcomeExperience({
   message,
   onEnter,
   polaroids,
+  buttonText = "Come inside, my love ♡",
+  showPhotoBadges = false,
+  character,
 }: WelcomeExperienceProps) {
   const [photoLoaded, setPhotoLoaded] = useState<Record<string, boolean>>({});
   const [clickedHeart, setClickedHeart] = useState<string | null>(null);
@@ -81,6 +87,9 @@ export function WelcomeExperience({
       ...item,
       src: custom?.src?.trim() || item.src,
       caption: custom?.caption?.trim() || item.caption,
+      positionClass: showPhotoBadges
+        ? item.positionClass.replace(/hidden (lg|md):block /g, "block ")
+        : item.positionClass,
     };
   });
 
@@ -117,6 +126,12 @@ export function WelcomeExperience({
         onClick={() => handleCardClick(heroPolaroids[0].id)}
         className={`${heroPolaroids[0].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl select-none`}
       >
+        {showPhotoBadges && (
+          <div className="absolute -top-3 -left-2 z-40 px-2.5 py-0.5 rounded-full bg-[var(--pink-strong)] text-white text-[11px] font-bold font-rounded shadow-md border-2 border-white flex items-center gap-1">
+            <span>📷</span>
+            <span>Photo 1</span>
+          </div>
+        )}
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--soft-pink)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -156,6 +171,12 @@ export function WelcomeExperience({
         onClick={() => handleCardClick(heroPolaroids[1].id)}
         className={`${heroPolaroids[1].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl select-none`}
       >
+        {showPhotoBadges && (
+          <div className="absolute -top-3 -right-2 z-40 px-2.5 py-0.5 rounded-full bg-[var(--pink-strong)] text-white text-[11px] font-bold font-rounded shadow-md border-2 border-white flex items-center gap-1">
+            <span>📷</span>
+            <span>Photo 2</span>
+          </div>
+        )}
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--lavender)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -195,6 +216,12 @@ export function WelcomeExperience({
         onClick={() => handleCardClick(heroPolaroids[2].id)}
         className={`${heroPolaroids[2].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl select-none`}
       >
+        {showPhotoBadges && (
+          <div className="absolute -top-3 -left-2 z-40 px-2.5 py-0.5 rounded-full bg-[var(--pink-strong)] text-white text-[11px] font-bold font-rounded shadow-md border-2 border-white flex items-center gap-1">
+            <span>📷</span>
+            <span>Photo 3</span>
+          </div>
+        )}
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--soft-pink)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -234,6 +261,12 @@ export function WelcomeExperience({
         onClick={() => handleCardClick(heroPolaroids[3].id)}
         className={`${heroPolaroids[3].positionClass} z-10 w-56 lg:w-64 xl:w-72 p-4 pb-5 bg-white rounded-2xl shadow-lg border-2 border-[var(--border-subtle)] transform cursor-pointer transition-shadow hover:shadow-2xl select-none`}
       >
+        {showPhotoBadges && (
+          <div className="absolute -top-3 -right-2 z-40 px-2.5 py-0.5 rounded-full bg-[var(--pink-strong)] text-white text-[11px] font-bold font-rounded shadow-md border-2 border-white flex items-center gap-1">
+            <span>📷</span>
+            <span>Photo 4</span>
+          </div>
+        )}
         <div className="relative aspect-square w-full rounded-xl overflow-hidden bg-[var(--pale-rose)] shadow-xs">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
@@ -274,7 +307,11 @@ export function WelcomeExperience({
           className="mb-3"
         >
           <RomanticCharacter
-            character="kissingCouple"
+            character={
+              character === "cozyCouple" || character === "tenderCouple" || character === "huggingCouple"
+                ? character
+                : "kissingCouple"
+            }
             size={230}
             priority
             sparkles
@@ -356,7 +393,7 @@ export function WelcomeExperience({
           &ldquo;{message || "Of all the stories life could give me, you're the one I'd choose to keep living."}&rdquo;
         </motion.p>
 
-        {/* Primary Action Button: "Come inside, my love ♡" */}
+        {/* Primary Action Button */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -367,7 +404,7 @@ export function WelcomeExperience({
             onClick={onEnter}
             className="group relative px-9 py-3.5 rounded-full text-white font-rounded font-semibold text-base sm:text-lg bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] shadow-lg shadow-pink-300/40 hover:shadow-xl hover:shadow-pink-400/50 hover:scale-105 active:scale-95 cursor-pointer transition-all duration-300 flex items-center gap-2"
           >
-            <span>Come inside, my love</span>
+            <span>{buttonText ? buttonText.replace("♡", "").trim() : "Come inside, my love"}</span>
             <span className="text-xl group-hover:scale-125 transition-transform duration-300">♡</span>
           </button>
 

@@ -9,6 +9,8 @@ import type {
   DeluluScenario,
   QuizQuestion,
   DigitalGift,
+  BucketListItem,
+  PersonalCard,
 } from "./gift-data";
 
 export interface ParticipantSession {
@@ -289,6 +291,22 @@ export interface GiftRecord {
   customDeluluScenarios?: DeluluScenario[];
   customQuizQuestions?: QuizQuestion[];
   customDigitalGifts?: DigitalGift[];
+  customBucketListItems?: BucketListItem[];
+  customPersonalCards?: PersonalCard[];
+  customDateIdeas?: DateIdea[];
+  lastSecretHeading?: string;
+  lastSecretMessage?: string;
+  lastSecretPhoto?: string;
+  lastSecretButtonLabel?: string;
+  lastSecretFinalNote?: string;
+  designPreferences?: {
+    colorPalette?: "blush" | "lavender" | "cream-rose" | "sunset" | string;
+    typographyPreset?: "elegant-serif" | "modern-rounded" | "romantic-classic" | string;
+    animationIntensity?: "subtle" | "playful" | string;
+    mood?: "soft-emotional" | "playful-cute" | "elegant-minimal" | string;
+    photoPresentation?: "scrapbook" | "polaroid" | "collage" | string;
+    backgroundMusicEnabled?: boolean;
+  };
   privacy: {
     isPasswordProtected: boolean;
     passcode?: string;
@@ -2330,9 +2348,10 @@ export function createGift(data: Partial<GiftRecord>): GiftRecord {
     id: `gift_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     slug,
     title,
-    status: "draft",
+    status: data.status || "published",
     createdAt: now,
     updatedAt: now,
+    publishedAt: data.status === "draft" ? undefined : now,
     senderName: (data.senderName || "Your Love").trim(),
     senderNickname: (data.senderNickname || "Babe").trim(),
     recipientName: (data.recipientName || "My Everything").trim(),
@@ -2344,6 +2363,7 @@ export function createGift(data: Partial<GiftRecord>): GiftRecord {
     welcomeMessage:
       data.welcomeMessage ||
       "Every single pixel on this page was crafted with you in my heart. Take your time exploring, my love.",
+    welcomePolaroids: data.welcomePolaroids,
     enabledSections: data.enabledSections && data.enabledSections.length > 0 ? data.enabledSections : allDefaultSections,
     sectionOrder: data.sectionOrder && data.sectionOrder.length > 0 ? data.sectionOrder : allDefaultSections,
     customMilestones: data.customMilestones,
@@ -2357,6 +2377,23 @@ export function createGift(data: Partial<GiftRecord>): GiftRecord {
     },
     finalLetter: data.finalLetter || "Thank you for making my life softer, sweeter, and infinitely brighter. Forever yours.",
     finalMessage: data.finalMessage || "Forever and always yours.",
+    customObservations: data.customObservations,
+    customMemories: data.customMemories,
+    customLetters: data.customLetters,
+    customOpenWhenLetters: data.customOpenWhenLetters,
+    customLittleReasons: data.customLittleReasons,
+    customDeluluScenarios: data.customDeluluScenarios,
+    customQuizQuestions: data.customQuizQuestions,
+    customDigitalGifts: data.customDigitalGifts,
+    customBucketListItems: data.customBucketListItems,
+    customPersonalCards: data.customPersonalCards,
+    customDateIdeas: data.customDateIdeas,
+    lastSecretHeading: data.lastSecretHeading,
+    lastSecretMessage: data.lastSecretMessage,
+    lastSecretPhoto: data.lastSecretPhoto,
+    lastSecretButtonLabel: data.lastSecretButtonLabel,
+    lastSecretFinalNote: data.lastSecretFinalNote,
+    designPreferences: data.designPreferences,
     privacy: {
       isPasswordProtected: data.privacy?.isPasswordProtected ?? false,
       passcode: data.privacy?.passcode || "love2024",

@@ -14,6 +14,7 @@ interface FinalHeartSectionProps {
   finalLetter?: string;
   finalMessage?: string;
   senderName: string;
+  photos?: { id: string; url: string; caption?: string }[];
 }
 
 interface TimeElapsed {
@@ -29,6 +30,7 @@ export function FinalHeartSection({
   finalLetter,
   finalMessage,
   senderName,
+  photos,
 }: FinalHeartSectionProps) {
   const [timeElapsed, setTimeElapsed] = useState<TimeElapsed>({
     days: 0,
@@ -159,7 +161,7 @@ export function FinalHeartSection({
                 exit={{ opacity: 0, scale: 0.97 }}
                 transition={{ duration: 0.28, ease: "easeInOut" }}
               >
-                <HeartPhotoCollage />
+                <HeartPhotoCollage photos={photos} />
               </motion.div>
             ) : (
               <motion.div

@@ -185,6 +185,7 @@ export interface SongDedication {
   dedication: string;
   whyItMatters?: string;
   embedUrl?: string;
+  coverArtwork?: string;
 }
 
 export interface JournalEntry {

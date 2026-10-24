@@ -342,12 +342,21 @@ export default function CreatorStudioPage() {
             </button>
           )}
 
+          {/* Launch Creator Wizard Button */}
+          <Link
+            href="/create"
+            className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white hover:opacity-95 shadow-xs cursor-pointer transition-all flex items-center gap-1.5"
+          >
+            <span>✨</span>
+            <span>Launch Wizard</span>
+          </Link>
+
           {/* New Gift Button */}
           <button
             onClick={() => setIsWizardOpen(true)}
             className="px-3.5 py-1.5 rounded-full text-xs font-semibold bg-white border border-[var(--border-medium)] text-[var(--pink-deep)] hover:bg-[var(--pale-rose)] cursor-pointer transition-colors"
           >
-            + New Gift
+            + Quick Gift
           </button>
         </div>
       </header>

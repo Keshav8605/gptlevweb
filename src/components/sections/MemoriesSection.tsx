@@ -11,6 +11,7 @@ import type { Memory } from "@/lib/gift-data";
 
 interface MemoriesSectionProps {
   memories: Memory[];
+  showPhotoBadges?: boolean;
 }
 
 // Curated romantic photos for scrapbook demo fallbacks matching Reference 1
@@ -65,7 +66,10 @@ const defaultPolaroids = [
   },
 ];
 
-export function MemoriesSection({ memories }: MemoriesSectionProps) {
+export function MemoriesSection({
+  memories,
+  showPhotoBadges = false,
+}: MemoriesSectionProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
   const [collageStyle, setCollageStyle] = useState<"heart" | "polaroid">("heart");
 
@@ -269,6 +273,14 @@ export function MemoriesSection({ memories }: MemoriesSectionProps) {
                       e.currentTarget.style.display = "none";
                     }}
                   />
+
+                  {/* Photo Number Badge if showPhotoBadges is true */}
+                  {showPhotoBadges && (
+                    <div className="absolute top-2.5 left-2.5 z-30 px-2.5 py-0.5 rounded-full bg-[var(--pink-strong)] text-white text-[10px] font-bold font-rounded shadow-md border border-white flex items-center gap-1">
+                      <span>📷</span>
+                      <span>Photo {idx + 1}</span>
+                    </div>
+                  )}
 
                   {/* Floating emoji icon badge */}
                   <div className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-sm shadow-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">

@@ -21,6 +21,9 @@ import { OpenWhenSection } from "@/components/sections/OpenWhenSection";
 import { LittleReasonsSection } from "@/components/sections/LittleReasonsSection";
 import { DigitalGiftsSection } from "@/components/sections/DigitalGiftsSection";
 import { OurSongSection } from "@/components/sections/OurSongSection";
+import { BucketListSection } from "@/components/sections/BucketListSection";
+import { PersonalCardsSection } from "@/components/sections/PersonalCardsSection";
+import { LastSecretSection } from "@/components/sections/LastSecretSection";
 import { FinalHeartSection } from "@/components/sections/FinalHeartSection";
 import { ParticipantAccessModal } from "@/components/auth/ParticipantAccessModal";
 import { CreatorStudio } from "@/components/creator/CreatorStudio";
@@ -220,18 +223,21 @@ function GiftRecipientContent({
   const sectionOrder = gift.sectionOrder || [
     "welcome",
     "observations",
-    "memories",
     "secretWorld",
+    "memories",
+    "ourSong",
+    "openWhenLetters",
     "deluluMode",
     "quiz",
     "letters",
-    "notebook",
-    "voice",
-    "datePlanner",
-    "openWhenLetters",
     "littleReasons",
     "digitalGifts",
-    "ourSong",
+    "notebook",
+    "voice",
+    "bucketList",
+    "personalCards",
+    "datePlanner",
+    "lastSecret",
     "finalHeart",
   ];
 
@@ -375,6 +381,34 @@ function GiftRecipientContent({
                   key="ourSong"
                   featuredSong={songToUse}
                   additionalSongs={defaultGiftConfig.additionalSongs}
+                />
+              );
+
+            case "bucketList":
+              return (
+                <BucketListSection
+                  key="bucketList"
+                  items={gift.customBucketListItems || defaultGiftConfig.bucketListItems || []}
+                />
+              );
+
+            case "personalCards":
+              return (
+                <PersonalCardsSection
+                  key="personalCards"
+                  cards={gift.customPersonalCards || defaultGiftConfig.personalCards || []}
+                />
+              );
+
+            case "lastSecret":
+              return (
+                <LastSecretSection
+                  key="lastSecret"
+                  revealHeading={gift.lastSecretHeading}
+                  revealMessage={gift.lastSecretMessage}
+                  surprisePhoto={gift.lastSecretPhoto}
+                  buttonLabel={gift.lastSecretButtonLabel}
+                  finalNote={gift.lastSecretFinalNote}
                 />
               );
 

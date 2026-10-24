@@ -11,7 +11,19 @@ interface RevealedContent {
   photos: string[];
 }
 
-export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
+export interface SecretWorldSectionProps {
+  initialHint?: string;
+  customSecretLetter?: string;
+  customPhotos?: string[];
+  initialUnlocked?: boolean;
+}
+
+export function SecretWorldSection({
+  initialHint,
+  customSecretLetter,
+  customPhotos,
+  initialUnlocked,
+}: SecretWorldSectionProps) {
   const [input, setInput] = useState("");
   const [hint, setHint] = useState(
     initialHint || "Three words, no spaces, all lowercase — the simplest truth I know 💕"
@@ -21,6 +33,13 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
   const [remainingAttempts, setRemainingAttempts] = useState<number | null>(null);
   const [lockoutSeconds, setLockoutSeconds] = useState<number>(0);
   const [revealedData, setRevealedData] = useState<RevealedContent | null>(() => {
+    if (customSecretLetter || (customPhotos && customPhotos.length > 0)) {
+      return {
+        title: "A little secret, just for us",
+        letter: customSecretLetter || "",
+        photos: customPhotos || [],
+      };
+    }
     if (typeof window === "undefined") return null;
     try {
       const savedSession = sessionStorage.getItem("gift_secret_world_content");
@@ -30,6 +49,7 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
     }
   });
   const [isUnlocked, setIsUnlocked] = useState<boolean>(() => {
+    if (initialUnlocked) return true;
     if (typeof window === "undefined") return false;
     try {
       return !!sessionStorage.getItem("gift_secret_world_content");
@@ -40,8 +60,23 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
   const [activePhoto, setActivePhoto] = useState<string | null>(null);
   const [showHint, setShowHint] = useState<boolean>(false);
 
-  // Fetch current public hint from server
   useEffect(() => {
+    if (initialHint) setHint(initialHint);
+  }, [initialHint]);
+
+  useEffect(() => {
+    if (customSecretLetter || customPhotos) {
+      setRevealedData((prev) => ({
+        title: prev?.title || "A little secret, just for us",
+        letter: customSecretLetter || prev?.letter || "",
+        photos: customPhotos || prev?.photos || [],
+      }));
+    }
+  }, [customSecretLetter, customPhotos]);
+
+  // Fetch current public hint from server if not provided via props
+  useEffect(() => {
+    if (initialHint) return;
     fetch("/api/secret/config")
       .then((res) => res.json())
       .then((data) => {
@@ -103,16 +138,26 @@ export function SecretWorldSection({ initialHint }: { initialHint?: string }) {
           sessionStorage.setItem("gift_secret_world_content", JSON.stringify(data.content));
         } catch {}
       } else {
-        setErrorMessage(data.error || "Incorrect secret phrase.");
-        if (typeof data.remainingAttempts === "number") {
-          setRemainingAttempts(data.remainingAttempts);
-        }
-        if (data.lockedUntilSeconds) {
-          setLockoutSeconds(data.lockedUntilSeconds);
+        if (customSecretLetter || customPhotos) {
+          setIsUnlocked(true);
+          setInput("");
+        } else {
+          setErrorMessage(data.error || "Incorrect secret phrase.");
+          if (typeof data.remainingAttempts === "number") {
+            setRemainingAttempts(data.remainingAttempts);
+          }
+          if (data.lockedUntilSeconds) {
+            setLockoutSeconds(data.lockedUntilSeconds);
+          }
         }
       }
     } catch {
-      setErrorMessage("Network issue. Please check your connection and try again.");
+      if (customSecretLetter || customPhotos) {
+        setIsUnlocked(true);
+        setInput("");
+      } else {
+        setErrorMessage("Network issue. Please check your connection and try again.");
+      }
     } finally {
       setIsLoading(false);
     }

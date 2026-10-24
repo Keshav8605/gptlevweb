@@ -293,12 +293,20 @@ export function GiftNavigation({
                   </button>
                 )}
                 <Link
+                  href="/create"
+                  onClick={() => setIsOpen(false)}
+                  className="w-full py-2.5 px-3 rounded-2xl bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs font-semibold hover:opacity-95 cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-xs"
+                >
+                  <span>✨</span>
+                  <span>Create Our Little World ♡</span>
+                </Link>
+                <Link
                   href="/studio"
                   onClick={() => setIsOpen(false)}
-                  className="w-full py-2.5 px-3 rounded-2xl bg-gradient-to-r from-[var(--pink-strong)] to-[var(--pink-primary)] text-white text-xs font-semibold hover:opacity-95 cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-xs"
+                  className="w-full py-2 px-3 rounded-2xl border border-[var(--border-subtle)] bg-white text-[var(--text-secondary)] text-xs font-semibold hover:bg-[var(--pale-rose)] cursor-pointer transition-colors flex items-center justify-center gap-1.5 shadow-xs"
                 >
-                  <span>🚀</span>
-                  <span>Open creator studio</span>
+                  <span>⚙️</span>
+                  <span>Creator Studio & Replies</span>
                 </Link>
                 <p className="font-script text-base text-[var(--pink-strong)] select-none">
                   Made with all my love ♡
