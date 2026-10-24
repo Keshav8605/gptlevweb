@@ -351,18 +351,39 @@ export const heartCollagePhotos: CollagePhoto[] = [
   },
 ];
 
-interface HeartPhotoCollageProps {
-  photos?: { id: string; url: string; caption?: string }[];
+export interface HeartPhotoCollageProps {
+  centerPhoto?: string;
+  centerCaption?: string;
+  photos?: (string | { id?: string; url: string; caption?: string })[];
+  caption?: string;
 }
 
-export function HeartPhotoCollage({ photos }: HeartPhotoCollageProps) {
-  // Map user-provided photos if available
-  const activeTiles: CollagePhoto[] = heartCollagePhotos.map((tile, idx) => {
-    if (photos && photos[idx]) {
+export function HeartPhotoCollage({
+  centerPhoto,
+  centerCaption,
+  photos,
+  caption,
+}: HeartPhotoCollageProps) {
+  // Normalize custom photos
+  const customUrls = (photos || [])
+    .map((p) => (typeof p === "string" ? p : p.url))
+    .filter(Boolean);
+
+  let mosaicIdx = 0;
+  const activeTiles: CollagePhoto[] = heartCollagePhotos.map((tile) => {
+    if (tile.isHero) {
       return {
         ...tile,
-        src: photos[idx].url || tile.src,
-        caption: photos[idx].caption || tile.caption,
+        src: centerPhoto || tile.src,
+        caption: centerCaption || tile.caption,
+      };
+    }
+    if (customUrls.length > 0) {
+      const customUrl = customUrls[mosaicIdx % customUrls.length];
+      mosaicIdx++;
+      return {
+        ...tile,
+        src: customUrl || tile.src,
       };
     }
     return tile;
@@ -449,7 +470,7 @@ export function HeartPhotoCollage({ photos }: HeartPhotoCollageProps) {
       {/* Universal Loving Caption underneath the heart */}
       <div className="h-10 mt-5 flex items-center justify-center text-center">
         <div className="px-5 py-1.5 rounded-full bg-white/95 border border-[var(--border-subtle)] shadow-sm font-handwritten text-xl sm:text-2xl text-[var(--pink-strong)]">
-          You & Me, Always & Forever ♡
+          {caption || "You & Me, Always & Forever ♡"}
         </div>
       </div>
     </div>

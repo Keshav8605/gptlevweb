@@ -202,8 +202,13 @@ export function WizardPreview({
               {currentPreviewChapter.id === "welcome" && (
                 <WelcomeExperience
                   title={config.welcome.heading || config.websiteTitle}
-                  subtitle={config.welcome.eyebrowLabel}
-                  message={config.welcome.message || config.openingLine}
+                  eyebrowLabel={config.welcome.eyebrowLabel}
+                  handwrittenNote={config.welcome.handwrittenNote}
+                  subtitle={config.welcome.subtitle || "A little world made from my favorite person, our little moments, and all the things I sometimes struggle to put into words."}
+                  message={config.welcome.quote || config.welcome.message || config.openingLine}
+                  buttonText={config.welcome.buttonText}
+                  polaroids={config.welcome.polaroids}
+                  character={config.welcome.selectedIllustration}
                   recipientNickname={config.recipientNickname || "Baby"}
                   onEnter={() => {}}
                 />
@@ -223,6 +228,14 @@ export function WizardPreview({
                 <MemoriesSection
                   memories={config.memories.items.filter((m) => m.selected)}
                   showPhotoBadges={true}
+                  collageType={config.memories.collageType || "heart"}
+                  heartCenterPhoto={config.memories.heartCollage?.centerHeroPhoto}
+                  heartCenterCaption={config.memories.heartCollage?.centerHeroCaption}
+                  heartPhotos={config.memories.heartCollage?.photos}
+                  heartCaption={config.memories.heartCollage?.caption}
+                  polaroidCenterPhoto={config.memories.polaroidCollage?.centralHeartPhoto}
+                  polaroidCenterCaption={config.memories.polaroidCollage?.centralCaption}
+                  polaroidBorderPhotos={config.memories.polaroidCollage?.borderPhotos}
                 />
               )}
 

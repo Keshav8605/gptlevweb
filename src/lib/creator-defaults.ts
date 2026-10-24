@@ -562,6 +562,29 @@ export function getInitialCreatorConfig(): CreatorConfig {
 
     memories: {
       layoutStyle: "scrapbook",
+      collageType: "heart",
+      heartCollage: {
+        centerHeroPhoto: "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=800&q=85",
+        centerHeroCaption: "The center of my universe ♡",
+        photos: [
+          "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80",
+          "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80",
+          "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=600&q=80",
+          "https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?auto=format&fit=crop&w=600&q=80",
+          "https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80",
+        ],
+        caption: "You & Me, Always & Forever ♡",
+      },
+      polaroidCollage: {
+        centralHeartPhoto: "https://images.unsplash.com/photo-1501901609772-df0848060b33?auto=format&fit=crop&w=1200&q=85",
+        centralCaption: "You & Me, Always & Forever ♡",
+        borderPhotos: [
+          "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1529333166437-7750a6dd5a70?auto=format&fit=crop&w=400&q=80",
+          "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=400&q=80",
+        ],
+      },
       items: (defaultGiftConfig.memories || []).map((m) => ({
         ...m,
         selected: true,

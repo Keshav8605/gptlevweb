@@ -269,6 +269,20 @@ export interface GiftRecord {
   welcomeSubtitle: string;
   welcomeMessage: string;
   welcomePolaroids?: { id?: string; src?: string; caption?: string }[];
+  welcomeEyebrow?: string;
+  welcomeHandwrittenNote?: string;
+  memoriesCollageType?: "heart" | "polaroid";
+  memoriesHeartCollage?: {
+    centerHeroPhoto?: string;
+    centerHeroCaption?: string;
+    photos?: string[];
+    caption?: string;
+  };
+  memoriesPolaroidCollage?: {
+    centralHeartPhoto?: string;
+    centralCaption?: string;
+    borderPhotos?: string[];
+  };
   enabledSections: string[];
   sectionOrder: string[];
   customMilestones?: { id: string; label: string; date: string }[];
@@ -2364,6 +2378,11 @@ export function createGift(data: Partial<GiftRecord>): GiftRecord {
       data.welcomeMessage ||
       "Every single pixel on this page was crafted with you in my heart. Take your time exploring, my love.",
     welcomePolaroids: data.welcomePolaroids,
+    welcomeEyebrow: data.welcomeEyebrow,
+    welcomeHandwrittenNote: data.welcomeHandwrittenNote,
+    memoriesCollageType: data.memoriesCollageType,
+    memoriesHeartCollage: data.memoriesHeartCollage,
+    memoriesPolaroidCollage: data.memoriesPolaroidCollage,
     enabledSections: data.enabledSections && data.enabledSections.length > 0 ? data.enabledSections : allDefaultSections,
     sectionOrder: data.sectionOrder && data.sectionOrder.length > 0 ? data.sectionOrder : allDefaultSections,
     customMilestones: data.customMilestones,

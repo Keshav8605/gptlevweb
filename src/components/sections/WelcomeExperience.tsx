@@ -13,6 +13,8 @@ export interface HeroPolaroid {
 interface WelcomeExperienceProps {
   recipientNickname: string;
   title?: string;
+  eyebrowLabel?: string;
+  handwrittenNote?: string;
   subtitle?: string;
   message?: string;
   startDate?: string;
@@ -26,6 +28,8 @@ interface WelcomeExperienceProps {
 export function WelcomeExperience({
   recipientNickname,
   title,
+  eyebrowLabel,
+  handwrittenNote,
   subtitle,
   message,
   onEnter,
@@ -328,7 +332,7 @@ export function WelcomeExperience({
           className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/80 border border-[var(--border-subtle)] shadow-2xs mb-4"
         >
           <span className="text-[11px] font-bold tracking-widest uppercase font-rounded text-[var(--pink-strong)]">
-            A LITTLE WORLD, JUST FOR YOU
+            {eyebrowLabel || "A LITTLE WORLD, JUST FOR YOU"}
           </span>
           <span className="text-xs">✨</span>
         </motion.div>
@@ -360,7 +364,7 @@ export function WelcomeExperience({
           transition={{ duration: 0.7, delay: 0.5 }}
           className="mt-2 font-handwritten text-xl sm:text-2xl md:text-3xl text-[var(--pink-strong)]"
         >
-          If I could put everything I feel into one place, it would look a little like this.
+          {handwrittenNote || "If I could put everything I feel into one place, it would look a little like this."}
         </motion.p>
 
         {/* Recipient dedication */}

@@ -112,6 +112,8 @@ export function LivePreviewModal({ isOpen, onClose, gift }: LivePreviewModalProp
               <WelcomeExperience
                 recipientNickname={gift.recipientNickname || gift.recipientName || "My Everything"}
                 title={gift.welcomeTitle}
+                eyebrowLabel={gift.welcomeEyebrow}
+                handwrittenNote={gift.welcomeHandwrittenNote}
                 subtitle={gift.welcomeSubtitle}
                 message={gift.welcomeMessage}
                 polaroids={gift.welcomePolaroids}
@@ -137,6 +139,14 @@ export function LivePreviewModal({ isOpen, onClose, gift }: LivePreviewModalProp
                       <MemoriesSection
                         key="memories"
                         memories={gift.customMemories || defaultGiftConfig.memories}
+                        collageType={gift.memoriesCollageType || "heart"}
+                        heartCenterPhoto={gift.memoriesHeartCollage?.centerHeroPhoto}
+                        heartCenterCaption={gift.memoriesHeartCollage?.centerHeroCaption}
+                        heartPhotos={gift.memoriesHeartCollage?.photos}
+                        heartCaption={gift.memoriesHeartCollage?.caption}
+                        polaroidCenterPhoto={gift.memoriesPolaroidCollage?.centralHeartPhoto}
+                        polaroidCenterCaption={gift.memoriesPolaroidCollage?.centralCaption}
+                        polaroidBorderPhotos={gift.memoriesPolaroidCollage?.borderPhotos}
                       />
                     );
                   case "secretWorld":

@@ -1806,31 +1806,38 @@ export interface FramedPhotoCollageProps {
     src: string;
     caption?: string;
   };
-  borderPhotos?: {
+  borderPhotos?: (string | {
     url: string;
     caption?: string;
-  }[];
+  })[];
+  caption?: string;
 }
 
 export function FramedPhotoCollage({
   centralPhoto,
   borderPhotos,
+  caption,
 }: FramedPhotoCollageProps) {
 
   // Default romantic couple central photograph
   const heroSrc =
-    centralPhoto?.src ||
+    centralPhoto?.src?.trim() ||
     "https://images.unsplash.com/photo-1501901609772-df0848060b33?auto=format&fit=crop&w=1200&q=85";
-  const heroCaption = centralPhoto?.caption || "You & Me, Always & Forever ♡";
+  const heroCaption = centralPhoto?.caption || caption || "You & Me, Always & Forever ♡";
+
+  // Normalize custom border photos (strings or objects)
+  const customBorderUrls = (borderPhotos || [])
+    .map((p) => (typeof p === "string" ? p : p.url))
+    .filter(Boolean);
 
   // Map user-provided custom photos to border positions if available
   const activeBorderPhotos: BorderPhotoConfig[] = defaultBorderPhotos.map(
     (tile, idx) => {
-      if (borderPhotos && borderPhotos[idx]) {
+      if (customBorderUrls.length > 0) {
+        const customUrl = customBorderUrls[idx % customBorderUrls.length];
         return {
           ...tile,
-          src: borderPhotos[idx].url || tile.src,
-          caption: borderPhotos[idx].caption || tile.caption,
+          src: customUrl || tile.src,
         };
       }
       return tile;

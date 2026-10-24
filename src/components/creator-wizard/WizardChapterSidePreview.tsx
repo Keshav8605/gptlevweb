@@ -29,6 +29,7 @@ interface WizardChapterSidePreviewProps {
   chapterNumber: number;
   chapterTitle: string;
   chapterEmoji: string;
+  onChange?: (updates: Partial<CreatorConfig>) => void;
 }
 
 export function WizardChapterSidePreview({
@@ -37,6 +38,7 @@ export function WizardChapterSidePreview({
   chapterNumber,
   chapterTitle,
   chapterEmoji,
+  onChange,
 }: WizardChapterSidePreviewProps) {
   const [deviceMode, setDeviceMode] = useState<"desktop" | "mobile">("desktop");
   const containerRef = useRef<HTMLDivElement>(null);
@@ -87,9 +89,18 @@ export function WizardChapterSidePreview({
       }
       case "memories": {
         const selectedMems = config.memories.items.filter((m) => m.selected);
+        const collageType = config.memories.collageType || "heart";
+        const heartCount = (config.memories.heartCollage?.centerHeroPhoto ? 1 : 0) + (config.memories.heartCollage?.photos?.length || 0);
+        const polaroidCount = (config.memories.polaroidCollage?.centralHeartPhoto ? 1 : 0) + (config.memories.polaroidCollage?.borderPhotos?.length || 0);
+        const collageCount = collageType === "heart" ? heartCount : polaroidCount;
         return {
-          count: selectedMems.length,
-          labels: selectedMems.map((m, i) => `Photo ${i + 1} (${m.title || "Memory"})`),
+          count: collageCount + selectedMems.length,
+          labels: [
+            ...(collageType === "heart"
+              ? ["Heart Center Photo", "Heart Mosaic Tiles"]
+              : ["Central Heart Photo", "Polaroid Border Tiles"]),
+            ...selectedMems.map((m, i) => `Photo ${i + 1} (${m.title || "Memory"})`),
+          ],
         };
       }
       case "datePlanner": {
@@ -226,6 +237,8 @@ export function WizardChapterSidePreview({
           <WelcomeExperience
             recipientNickname={config.recipientNickname || "Baby"}
             title={config.welcome.heading || config.websiteTitle || "Dear, Us"}
+            eyebrowLabel={config.welcome.eyebrowLabel}
+            handwrittenNote={config.welcome.handwrittenNote}
             subtitle={config.welcome.subtitle || "A little world made from my favorite person, our little moments, and all the things I sometimes struggle to put into words."}
             message={config.welcome.quote || config.welcome.message || "Of all the stories life could give me, you're the one I'd choose to keep living."}
             buttonText={config.welcome.buttonText || "Come inside, my love ♡"}
@@ -257,6 +270,22 @@ export function WizardChapterSidePreview({
           <MemoriesSection
             memories={config.memories.items.filter((m) => m.selected)}
             showPhotoBadges={true}
+            collageType={config.memories.collageType || "heart"}
+            onCollageTypeChange={(type) => {
+              onChange?.({
+                memories: {
+                  ...config.memories,
+                  collageType: type,
+                },
+              });
+            }}
+            heartCenterPhoto={config.memories.heartCollage?.centerHeroPhoto}
+            heartCenterCaption={config.memories.heartCollage?.centerHeroCaption}
+            heartPhotos={config.memories.heartCollage?.photos}
+            heartCaption={config.memories.heartCollage?.caption}
+            polaroidCenterPhoto={config.memories.polaroidCollage?.centralHeartPhoto}
+            polaroidCenterCaption={config.memories.polaroidCollage?.centralCaption}
+            polaroidBorderPhotos={config.memories.polaroidCollage?.borderPhotos}
           />
         );
 

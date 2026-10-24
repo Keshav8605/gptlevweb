@@ -9,9 +9,18 @@ import { HeartPhotoCollage } from "../HeartPhotoCollage";
 import { FramedPhotoCollage } from "../FramedPhotoCollage";
 import type { Memory } from "@/lib/gift-data";
 
-interface MemoriesSectionProps {
+export interface MemoriesSectionProps {
   memories: Memory[];
   showPhotoBadges?: boolean;
+  collageType?: "heart" | "polaroid";
+  onCollageTypeChange?: (type: "heart" | "polaroid") => void;
+  heartCenterPhoto?: string;
+  heartCenterCaption?: string;
+  heartPhotos?: string[];
+  heartCaption?: string;
+  polaroidCenterPhoto?: string;
+  polaroidCenterCaption?: string;
+  polaroidBorderPhotos?: string[];
 }
 
 // Curated romantic photos for scrapbook demo fallbacks matching Reference 1
@@ -69,9 +78,33 @@ const defaultPolaroids = [
 export function MemoriesSection({
   memories,
   showPhotoBadges = false,
+  collageType: controlledCollageType,
+  onCollageTypeChange,
+  heartCenterPhoto,
+  heartCenterCaption,
+  heartPhotos,
+  heartCaption,
+  polaroidCenterPhoto,
+  polaroidCenterCaption,
+  polaroidBorderPhotos,
 }: MemoriesSectionProps) {
   const [selectedIndex, setSelectedIndex] = useState<number | null>(null);
-  const [collageStyle, setCollageStyle] = useState<"heart" | "polaroid">("heart");
+  const [internalCollageStyle, setInternalCollageStyle] = useState<"heart" | "polaroid">(
+    controlledCollageType || "heart"
+  );
+
+  useEffect(() => {
+    if (controlledCollageType) {
+      setInternalCollageStyle(controlledCollageType);
+    }
+  }, [controlledCollageType]);
+
+  const activeCollageStyle = controlledCollageType || internalCollageStyle;
+
+  const handleStyleChange = (style: "heart" | "polaroid") => {
+    setInternalCollageStyle(style);
+    onCollageTypeChange?.(style);
+  };
 
   // Combine user memories with default layout
   const displayItems = memories && memories.length > 0
@@ -169,11 +202,11 @@ export function MemoriesSection({
               type="button"
               role="tab"
               id="tab-heart-collage"
-              aria-selected={collageStyle === "heart"}
+              aria-selected={activeCollageStyle === "heart"}
               aria-controls="panel-heart-collage"
-              onClick={() => setCollageStyle("heart")}
+              onClick={() => handleStyleChange("heart")}
               className={`relative px-5 sm:px-7 py-2.5 rounded-full font-rounded font-bold text-xs sm:text-sm transition-all duration-300 flex items-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)] ${
-                collageStyle === "heart"
+                activeCollageStyle === "heart"
                   ? "bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white shadow-md shadow-pink-300/40 scale-102"
                   : "text-[var(--text-secondary)] hover:text-[var(--romantic-plum)] hover:bg-[var(--soft-pink)]/40"
               }`}
@@ -186,11 +219,11 @@ export function MemoriesSection({
               type="button"
               role="tab"
               id="tab-polaroid-frame"
-              aria-selected={collageStyle === "polaroid"}
+              aria-selected={activeCollageStyle === "polaroid"}
               aria-controls="panel-polaroid-frame"
-              onClick={() => setCollageStyle("polaroid")}
+              onClick={() => handleStyleChange("polaroid")}
               className={`relative px-5 sm:px-7 py-2.5 rounded-full font-rounded font-bold text-xs sm:text-sm transition-all duration-300 flex items-center gap-2 cursor-pointer focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)] ${
-                collageStyle === "polaroid"
+                activeCollageStyle === "polaroid"
                   ? "bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white shadow-md shadow-pink-300/40 scale-102"
                   : "text-[var(--text-secondary)] hover:text-[var(--romantic-plum)] hover:bg-[var(--soft-pink)]/40"
               }`}
@@ -204,7 +237,7 @@ export function MemoriesSection({
         {/* The Two Distinct Collage Presentations */}
         <div className="relative">
           <AnimatePresence mode="wait">
-            {collageStyle === "heart" ? (
+            {activeCollageStyle === "heart" ? (
               <motion.div
                 key="heart-collage"
                 id="panel-heart-collage"
@@ -215,7 +248,12 @@ export function MemoriesSection({
                 exit={{ opacity: 0, scale: 0.97 }}
                 transition={{ duration: 0.28, ease: "easeInOut" }}
               >
-                <HeartPhotoCollage />
+                <HeartPhotoCollage
+                  centerPhoto={heartCenterPhoto}
+                  centerCaption={heartCenterCaption}
+                  photos={heartPhotos}
+                  caption={heartCaption}
+                />
               </motion.div>
             ) : (
               <motion.div
@@ -228,7 +266,14 @@ export function MemoriesSection({
                 exit={{ opacity: 0, scale: 0.97 }}
                 transition={{ duration: 0.28, ease: "easeInOut" }}
               >
-                <FramedPhotoCollage />
+                <FramedPhotoCollage
+                  centralPhoto={{
+                    src: polaroidCenterPhoto || "",
+                    caption: polaroidCenterCaption || heartCaption || "You & Me, Always & Forever ♡",
+                  }}
+                  borderPhotos={polaroidBorderPhotos}
+                  caption={polaroidCenterCaption || heartCaption}
+                />
               </motion.div>
             )}
           </AnimatePresence>

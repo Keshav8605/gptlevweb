@@ -270,6 +270,8 @@ function GiftRecipientContent({
         <WelcomeExperience
           recipientNickname={gift.recipientNickname || defaultGiftConfig.recipientNickname}
           title={gift.welcomeTitle || defaultGiftConfig.welcomeTitle}
+          eyebrowLabel={gift.welcomeEyebrow}
+          handwrittenNote={gift.welcomeHandwrittenNote}
           subtitle={gift.welcomeSubtitle || defaultGiftConfig.welcomeSubtitle}
           message={gift.welcomeMessage || defaultGiftConfig.welcomeMessage}
           polaroids={gift.welcomePolaroids || defaultGiftConfig.welcomePolaroids}
@@ -296,6 +298,14 @@ function GiftRecipientContent({
                 <MemoriesSection
                   key="memories"
                   memories={gift.customMemories || defaultGiftConfig.memories}
+                  collageType={gift.memoriesCollageType || "heart"}
+                  heartCenterPhoto={gift.memoriesHeartCollage?.centerHeroPhoto}
+                  heartCenterCaption={gift.memoriesHeartCollage?.centerHeroCaption}
+                  heartPhotos={gift.memoriesHeartCollage?.photos}
+                  heartCaption={gift.memoriesHeartCollage?.caption}
+                  polaroidCenterPhoto={gift.memoriesPolaroidCollage?.centralHeartPhoto}
+                  polaroidCenterCaption={gift.memoriesPolaroidCollage?.centralCaption}
+                  polaroidBorderPhotos={gift.memoriesPolaroidCollage?.borderPhotos}
                 />
               );
 

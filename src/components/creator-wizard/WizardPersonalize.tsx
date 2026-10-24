@@ -271,6 +271,23 @@ export function WizardPersonalize({
               />
             </div>
 
+            <div className="space-y-1.5">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                Handwritten Note Underneath Title
+              </label>
+              <input
+                type="text"
+                value={config.welcome.handwrittenNote || ""}
+                onChange={(e) =>
+                  onChange({
+                    welcome: { ...config.welcome, handwrittenNote: e.target.value },
+                  })
+                }
+                placeholder="If I could put everything I feel into one place, it would look a little like this."
+                className="w-full px-4 py-2.5 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm font-handwritten text-[var(--pink-strong)] text-base focus:outline-none focus:ring-2 focus:ring-[var(--pink-strong)]"
+              />
+            </div>
+
             {/* 4 Floating Hero Polaroids (Photo 1 to Photo 4) */}
             <div className="pt-4 border-t border-[var(--border-subtle)] space-y-4">
               <div className="flex items-center justify-between">
@@ -846,13 +863,577 @@ export function WizardPersonalize({
         {/* ==================== CHAPTER 4: MEMORIES ==================== */}
         {activeChapterId === "memories" && (
           <div className="space-y-6">
-            <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
+            <div className="border-b border-[var(--border-subtle)] pb-4">
+              <h3 className="font-serif text-xl font-bold text-[var(--text-primary)]">
+                Memories &amp; Photo Collage
+              </h3>
+              <p className="text-xs text-[var(--text-muted)] font-rounded mt-1">
+                Choose how your memories collage is presented (Heart Collage or Polaroid Frame), customize its photos, and write your scrapbook stories.
+              </p>
+            </div>
+
+            {/* Collage Style Selection */}
+            <div className="space-y-3">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                Memory Collage Presentation Style
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                <button
+                  type="button"
+                  onClick={() =>
+                    onChange({
+                      memories: {
+                        ...config.memories,
+                        collageType: "heart",
+                      },
+                    })
+                  }
+                  className={`p-4 rounded-2xl border-2 text-left cursor-pointer transition-all flex flex-col justify-between gap-2.5 ${
+                    (config.memories.collageType || "heart") === "heart"
+                      ? "border-[var(--pink-strong)] bg-gradient-to-br from-pink-50 to-rose-50/60 shadow-sm ring-2 ring-pink-300/40"
+                      : "border-[var(--border-subtle)] bg-white hover:border-pink-200"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-rounded font-bold text-sm text-[var(--text-primary)] flex items-center gap-1.5">
+                      <span>❤️</span>
+                      <span>Heart Photo Collage</span>
+                    </span>
+                    {(config.memories.collageType || "heart") === "heart" && (
+                      <span className="px-2 py-0.5 rounded-full bg-[var(--pink-strong)] text-white text-[10px] font-bold font-rounded">
+                        Active
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-[var(--text-secondary)] font-rounded">
+                    Sculpted mosaic of 29 romantic prints with a prominent couple centerpiece photo.
+                  </p>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    onChange({
+                      memories: {
+                        ...config.memories,
+                        collageType: "polaroid",
+                      },
+                    })
+                  }
+                  className={`p-4 rounded-2xl border-2 text-left cursor-pointer transition-all flex flex-col justify-between gap-2.5 ${
+                    config.memories.collageType === "polaroid"
+                      ? "border-[var(--pink-strong)] bg-gradient-to-br from-purple-50 to-pink-50/60 shadow-sm ring-2 ring-pink-300/40"
+                      : "border-[var(--border-subtle)] bg-white hover:border-pink-200"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span className="font-rounded font-bold text-sm text-[var(--text-primary)] flex items-center gap-1.5">
+                      <span>📷</span>
+                      <span>Polaroid Frame Collage</span>
+                    </span>
+                    {config.memories.collageType === "polaroid" && (
+                      <span className="px-2 py-0.5 rounded-full bg-[var(--pink-strong)] text-white text-[10px] font-bold font-rounded">
+                        Active
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-[var(--text-secondary)] font-rounded">
+                    Heart-shaped cutout revealing your main couple photo, framed by dense polaroid prints.
+                  </p>
+                </button>
+              </div>
+            </div>
+
+            {/* Conditional Collage Customization: Heart Collage */}
+            {(config.memories.collageType || "heart") === "heart" && (
+              <div className="p-4 sm:p-5 rounded-3xl border-2 border-pink-200 bg-gradient-to-br from-pink-50/70 via-rose-50/30 to-pink-50/70 space-y-4 shadow-2xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-pink-200/70 pb-3">
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--pink-strong)] font-rounded flex items-center gap-1.5">
+                      <span>❤️</span>
+                      <span>Heart Collage Photo Inputs</span>
+                    </h4>
+                    <p className="text-[11px] text-[var(--text-muted)] font-rounded mt-0.5">
+                      Configure the grand center photo (&quot;Our Center ♡&quot;) and surrounding heart mosaic photos.
+                    </p>
+                  </div>
+                  <span className="text-[10px] text-pink-700 bg-pink-100 font-bold px-2 py-0.5 rounded-full border border-pink-200 self-start sm:self-auto">
+                    Live Synced ➔
+                  </span>
+                </div>
+
+                {/* Center Hero Photo */}
+                <div className="p-3.5 rounded-2xl bg-white border border-pink-200 shadow-2xs space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-md bg-[var(--pink-strong)] text-white text-[10px] font-bold font-rounded">
+                        Photo 1 · Centerpiece
+                      </span>
+                      <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                        Our Center ♡ (Hero Photo)
+                      </label>
+                    </div>
+                    {config.memories.heartCollage?.centerHeroPhoto && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onChange({
+                            memories: {
+                              ...config.memories,
+                              heartCollage: {
+                                ...config.memories.heartCollage,
+                                centerHeroPhoto: undefined,
+                              },
+                            },
+                          })
+                        }
+                        className="text-[11px] text-rose-500 hover:underline cursor-pointer font-rounded"
+                      >
+                        Reset to Default
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-[var(--text-muted)] font-rounded">
+                    The large 3x4 portrait photograph placed right at the heart&apos;s focal center.
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-3 pt-1">
+                    <div
+                      onClick={() =>
+                        onOpenPhotoLibrary((url) => {
+                          onChange({
+                            memories: {
+                              ...config.memories,
+                              heartCollage: {
+                                ...config.memories.heartCollage,
+                                centerHeroPhoto: url,
+                              },
+                            },
+                          });
+                        }, "Choose Our Center ♡ Photo")
+                      }
+                      className="w-16 h-20 rounded-xl border-2 border-dashed border-pink-300 bg-pink-50/70 hover:bg-pink-100/70 flex items-center justify-center cursor-pointer overflow-hidden relative group transition-all shrink-0"
+                    >
+                      {config.memories.heartCollage?.centerHeroPhoto ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={config.memories.heartCollage.centerHeroPhoto}
+                          alt="Center Hero Photo"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        />
+                      ) : (
+                        <span className="text-xl">📸</span>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-[200px] space-y-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onOpenPhotoLibrary((url) => {
+                            onChange({
+                              memories: {
+                                ...config.memories,
+                                heartCollage: {
+                                  ...config.memories.heartCollage,
+                                  centerHeroPhoto: url,
+                                },
+                              },
+                            });
+                          }, "Choose Our Center ♡ Photo")
+                        }
+                        className="text-xs font-rounded font-bold text-[var(--pink-strong)] hover:underline cursor-pointer block text-left"
+                      >
+                        {config.memories.heartCollage?.centerHeroPhoto ? "Change Center Photo 📷" : "Select Center Photo 📷"}
+                      </button>
+
+                      <input
+                        type="text"
+                        value={config.memories.heartCollage?.centerHeroCaption ?? "The center of my universe ♡"}
+                        onChange={(e) =>
+                          onChange({
+                            memories: {
+                              ...config.memories,
+                              heartCollage: {
+                                ...config.memories.heartCollage,
+                                centerHeroCaption: e.target.value,
+                              },
+                            },
+                          })
+                        }
+                        placeholder="The center of my universe ♡"
+                        className="w-full px-3 py-1.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs font-rounded focus:outline-none focus:ring-1 focus:ring-[var(--pink-strong)]"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Additional Heart Mosaic Photos */}
+                <div className="space-y-2.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                        Heart Mosaic Photos ({(config.memories.heartCollage?.photos || []).length} added)
+                      </label>
+                      <p className="text-[11px] text-[var(--text-muted)] font-rounded mt-0.5">
+                        These photos fill the surrounding tiles forming the sculpted heart shape.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const memPhotos = config.memories.items
+                            .flatMap((m) => m.photos || [])
+                            .filter(Boolean);
+                          if (memPhotos.length === 0) return;
+                          const existing = config.memories.heartCollage?.photos || [];
+                          const merged = Array.from(new Set([...existing, ...memPhotos]));
+                          onChange({
+                            memories: {
+                              ...config.memories,
+                              heartCollage: {
+                                ...config.memories.heartCollage,
+                                photos: merged,
+                              },
+                            },
+                          });
+                        }}
+                        className="px-2.5 py-1.5 rounded-full bg-white border border-pink-200 text-[10px] text-[var(--pink-strong)] font-rounded font-bold hover:bg-pink-50 cursor-pointer shadow-2xs"
+                        title="Import all photos already uploaded to memory cards"
+                      >
+                        ✨ Fill from Scrapbook
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onOpenPhotoLibrary((url) => {
+                            const cur = config.memories.heartCollage?.photos || [];
+                            onChange({
+                              memories: {
+                                ...config.memories,
+                                heartCollage: {
+                                  ...config.memories.heartCollage,
+                                  photos: [...cur, url],
+                                },
+                              },
+                            });
+                          }, "Add Photo to Heart Mosaic")
+                        }
+                        className="px-3 py-1.5 rounded-full bg-[var(--pink-strong)] text-white text-xs font-rounded font-bold hover:opacity-90 cursor-pointer flex items-center gap-1 shadow-2xs"
+                      >
+                        <span>📷</span>
+                        <span>+ Add Photo</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {(config.memories.heartCollage?.photos || []).length > 0 ? (
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 pt-1">
+                      {(config.memories.heartCollage?.photos || []).map((url, pIdx) => (
+                        <div
+                          key={pIdx}
+                          className="rounded-xl border border-pink-200 overflow-hidden relative group bg-white shadow-2xs aspect-square"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={url} alt={`Heart tile ${pIdx + 1}`} className="w-full h-full object-cover" />
+                          <span className="absolute top-1 left-1 bg-black/60 text-white text-[9px] font-bold px-1 rounded shadow">
+                            H{pIdx + 1}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const next = (config.memories.heartCollage?.photos || []).filter((_, i) => i !== pIdx);
+                              onChange({
+                                memories: {
+                                  ...config.memories,
+                                  heartCollage: {
+                                    ...config.memories.heartCollage,
+                                    photos: next,
+                                  },
+                                },
+                              });
+                            }}
+                            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow"
+                            title="Remove photo"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-[var(--text-muted)] italic font-rounded bg-white/70 p-2.5 rounded-xl border border-dashed border-pink-200 text-center">
+                      Currently using romantic defaults. Click <strong>+ Add Photo</strong> or <strong>✨ Fill from Scrapbook</strong> to populate with your own memories ♡
+                    </p>
+                  )}
+                </div>
+
+                {/* Bottom Ribbon Caption */}
+                <div className="space-y-1.5 pt-1">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                    Heart Bottom Ribbon Caption
+                  </label>
+                  <input
+                    type="text"
+                    value={config.memories.heartCollage?.caption ?? "You & Me, Always & Forever ♡"}
+                    onChange={(e) =>
+                      onChange({
+                        memories: {
+                          ...config.memories,
+                          heartCollage: {
+                            ...config.memories.heartCollage,
+                            caption: e.target.value,
+                          },
+                        },
+                      })
+                    }
+                    placeholder="You & Me, Always & Forever ♡"
+                    className="w-full px-4 py-2.5 rounded-2xl border border-[var(--border-subtle)] bg-white text-sm font-rounded text-[var(--text-primary)] focus:outline-none focus:ring-2 focus:ring-[var(--pink-strong)]"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Conditional Collage Customization: Polaroid Frame Collage */}
+            {config.memories.collageType === "polaroid" && (
+              <div className="p-4 sm:p-5 rounded-3xl border-2 border-purple-200 bg-gradient-to-br from-purple-50/60 via-pink-50/30 to-purple-50/60 space-y-4 shadow-2xs">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 border-b border-purple-200/70 pb-3">
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-purple-800 font-rounded flex items-center gap-1.5">
+                      <span>📷</span>
+                      <span>Polaroid Frame Collage Photo Slots</span>
+                    </h4>
+                    <p className="text-[11px] text-[var(--text-muted)] font-rounded mt-0.5">
+                      Configure the central heart cutout photo and surrounding polaroid prints.
+                    </p>
+                  </div>
+                  <span className="text-[10px] text-purple-700 bg-purple-100 font-bold px-2 py-0.5 rounded-full border border-purple-200 self-start sm:self-auto">
+                    Live Synced ➔
+                  </span>
+                </div>
+
+                {/* Central Heart Cutout Photo */}
+                <div className="p-3.5 rounded-2xl bg-white border border-purple-200 shadow-2xs space-y-2.5">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="px-2 py-0.5 rounded-md bg-purple-600 text-white text-[10px] font-bold font-rounded">
+                        Central Cutout Photo
+                      </span>
+                      <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                        Main Heart Couple Photograph
+                      </label>
+                    </div>
+                    {config.memories.polaroidCollage?.centralHeartPhoto && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onChange({
+                            memories: {
+                              ...config.memories,
+                              polaroidCollage: {
+                                ...config.memories.polaroidCollage,
+                                centralHeartPhoto: undefined,
+                              },
+                            },
+                          })
+                        }
+                        className="text-[11px] text-rose-500 hover:underline cursor-pointer font-rounded"
+                      >
+                        Reset to Default
+                      </button>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-[var(--text-muted)] font-rounded">
+                    Visible right inside the organic heart cutout in the center of the frame.
+                  </p>
+
+                  <div className="flex flex-wrap items-center gap-3 pt-1">
+                    <div
+                      onClick={() =>
+                        onOpenPhotoLibrary((url) => {
+                          onChange({
+                            memories: {
+                              ...config.memories,
+                              polaroidCollage: {
+                                ...config.memories.polaroidCollage,
+                                centralHeartPhoto: url,
+                              },
+                            },
+                          });
+                        }, "Choose Central Heart Photo")
+                      }
+                      className="w-16 h-20 rounded-xl border-2 border-dashed border-purple-300 bg-purple-50/70 hover:bg-purple-100/70 flex items-center justify-center cursor-pointer overflow-hidden relative group transition-all shrink-0"
+                    >
+                      {config.memories.polaroidCollage?.centralHeartPhoto ? (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={config.memories.polaroidCollage.centralHeartPhoto}
+                          alt="Central Heart Photo"
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                        />
+                      ) : (
+                        <span className="text-xl">📸</span>
+                      )}
+                    </div>
+
+                    <div className="flex-1 min-w-[200px] space-y-2">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onOpenPhotoLibrary((url) => {
+                            onChange({
+                              memories: {
+                                ...config.memories,
+                                polaroidCollage: {
+                                  ...config.memories.polaroidCollage,
+                                  centralHeartPhoto: url,
+                                },
+                              },
+                            });
+                          }, "Choose Central Heart Photo")
+                        }
+                        className="text-xs font-rounded font-bold text-purple-700 hover:underline cursor-pointer block text-left"
+                      >
+                        {config.memories.polaroidCollage?.centralHeartPhoto ? "Change Central Photo 📷" : "Select Central Photo 📷"}
+                      </button>
+
+                      <input
+                        type="text"
+                        value={config.memories.polaroidCollage?.centralCaption ?? "You & Me, Always & Forever ♡"}
+                        onChange={(e) =>
+                          onChange({
+                            memories: {
+                              ...config.memories,
+                              polaroidCollage: {
+                                ...config.memories.polaroidCollage,
+                                centralCaption: e.target.value,
+                              },
+                            },
+                          })
+                        }
+                        placeholder="You & Me, Always & Forever ♡"
+                        className="w-full px-3 py-1.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-xs font-rounded focus:outline-none focus:ring-1 focus:ring-purple-500"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Border Polaroid Prints */}
+                <div className="space-y-2.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                        Border Polaroid Prints ({(config.memories.polaroidCollage?.borderPhotos || []).length} added)
+                      </label>
+                      <p className="text-[11px] text-[var(--text-muted)] font-rounded mt-0.5">
+                        These photos wrap around the outside of the heart frame.
+                      </p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const memPhotos = config.memories.items
+                            .flatMap((m) => m.photos || [])
+                            .filter(Boolean);
+                          if (memPhotos.length === 0) return;
+                          const existing = config.memories.polaroidCollage?.borderPhotos || [];
+                          const merged = Array.from(new Set([...existing, ...memPhotos]));
+                          onChange({
+                            memories: {
+                              ...config.memories,
+                              polaroidCollage: {
+                                ...config.memories.polaroidCollage,
+                                borderPhotos: merged,
+                              },
+                            },
+                          });
+                        }}
+                        className="px-2.5 py-1.5 rounded-full bg-white border border-purple-200 text-[10px] text-purple-700 font-rounded font-bold hover:bg-purple-50 cursor-pointer shadow-2xs"
+                        title="Import all photos already uploaded to memory cards"
+                      >
+                        ✨ Fill from Scrapbook
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onOpenPhotoLibrary((url) => {
+                            const cur = config.memories.polaroidCollage?.borderPhotos || [];
+                            onChange({
+                              memories: {
+                                ...config.memories,
+                                polaroidCollage: {
+                                  ...config.memories.polaroidCollage,
+                                  borderPhotos: [...cur, url],
+                                },
+                              },
+                            });
+                          }, "Add Border Polaroid")
+                        }
+                        className="px-3 py-1.5 rounded-full bg-purple-600 text-white text-xs font-rounded font-bold hover:opacity-90 cursor-pointer flex items-center gap-1 shadow-2xs"
+                      >
+                        <span>📷</span>
+                        <span>+ Add Polaroid</span>
+                      </button>
+                    </div>
+                  </div>
+
+                  {(config.memories.polaroidCollage?.borderPhotos || []).length > 0 ? (
+                    <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2 pt-1">
+                      {(config.memories.polaroidCollage?.borderPhotos || []).map((url, pIdx) => (
+                        <div
+                          key={pIdx}
+                          className="rounded-xl border border-purple-200 overflow-hidden relative group bg-white shadow-2xs aspect-square"
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={url} alt={`Border polaroid ${pIdx + 1}`} className="w-full h-full object-cover" />
+                          <span className="absolute top-1 left-1 bg-black/60 text-white text-[9px] font-bold px-1 rounded shadow">
+                            P{pIdx + 1}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const next = (config.memories.polaroidCollage?.borderPhotos || []).filter((_, i) => i !== pIdx);
+                              onChange({
+                                memories: {
+                                  ...config.memories,
+                                  polaroidCollage: {
+                                    ...config.memories.polaroidCollage,
+                                    borderPhotos: next,
+                                  },
+                                },
+                              });
+                            }}
+                            className="absolute top-1 right-1 w-5 h-5 rounded-full bg-rose-500 text-white text-[10px] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer shadow"
+                            title="Remove photo"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-[11px] text-[var(--text-muted)] italic font-rounded bg-white/70 p-2.5 rounded-xl border border-dashed border-purple-200 text-center">
+                      Currently using romantic defaults. Click <strong>+ Add Polaroid</strong> or <strong>✨ Fill from Scrapbook</strong> to add custom border photos ♡
+                    </p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Scrapbook Stories Header */}
+            <div className="flex items-center justify-between border-t border-[var(--border-subtle)] pt-6">
               <div>
-                <h3 className="font-serif text-xl font-bold text-[var(--text-primary)]">
-                  Memories Scrapbook
-                </h3>
-                <p className="text-xs text-[var(--text-muted)] font-rounded mt-1">
-                  Upload photos and write stories for your favorite shared moments.
+                <h4 className="font-serif text-lg font-bold text-[var(--text-primary)]">
+                  Scrapbook Memory Stories
+                </h4>
+                <p className="text-xs text-[var(--text-muted)] font-rounded mt-0.5">
+                  Individual memory cards with story text, dates, and locations displayed below the collage.
                 </p>
               </div>
 
@@ -2729,6 +3310,7 @@ export function WizardPersonalize({
             chapterNumber={currentChapter.chapterNumber}
             chapterTitle={currentChapter.title}
             chapterEmoji={currentChapter.emoji}
+            onChange={onChange}
           />
         </div>
       </div>

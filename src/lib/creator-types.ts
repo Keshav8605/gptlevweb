@@ -155,6 +155,18 @@ export interface CreatorConfig {
 
   memories: {
     layoutStyle: "scrapbook" | "collage" | "timeline" | "single";
+    collageType?: "heart" | "polaroid";
+    heartCollage?: {
+      centerHeroPhoto?: string;
+      centerHeroCaption?: string;
+      photos?: string[];
+      caption?: string;
+    };
+    polaroidCollage?: {
+      centralHeartPhoto?: string;
+      centralCaption?: string;
+      borderPhotos?: string[];
+    };
     items: CreatorMemoryItem[];
   };
 
