@@ -63,9 +63,10 @@ export function WizardChapterSidePreview({
     return () => ro.disconnect();
   }, []);
 
-  const DESKTOP_WIDTH = 1080;
+  const DESKTOP_WIDTH = 1200;
   // Calculate responsive zoom scale to fit the exact desktop preview in side column
-  const zoomScale = Math.min(1, Math.max(0.48, (containerWidth - 28) / DESKTOP_WIDTH));
+  const availableWidth = Math.max(300, containerWidth - 24);
+  const zoomScale = Math.min(1, Math.max(0.25, availableWidth / DESKTOP_WIDTH));
 
   // Check how many photos exist on this screen
   const getPhotoSummary = () => {
@@ -245,6 +246,7 @@ export function WizardChapterSidePreview({
             polaroids={config.welcome.polaroids}
             showPhotoBadges={true}
             character={config.welcome.selectedIllustration}
+            deviceMode={deviceMode}
             onEnter={() => {}}
           />
         );
@@ -262,6 +264,7 @@ export function WizardChapterSidePreview({
             initialHint={config.secretWorld.hint}
             customSecretLetter={config.secretWorld.secretLetter}
             customPhotos={config.secretWorld.secretPhotos}
+            initialUnlocked={true}
           />
         );
 

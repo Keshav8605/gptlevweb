@@ -117,6 +117,7 @@ export function LivePreviewModal({ isOpen, onClose, gift }: LivePreviewModalProp
                 subtitle={gift.welcomeSubtitle}
                 message={gift.welcomeMessage}
                 polaroids={gift.welcomePolaroids}
+                deviceMode={deviceMode}
                 onEnter={() => {}}
               />
             )}

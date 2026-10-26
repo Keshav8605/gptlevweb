@@ -210,6 +210,7 @@ export function WizardPreview({
                   polaroids={config.welcome.polaroids}
                   character={config.welcome.selectedIllustration}
                   recipientNickname={config.recipientNickname || "Baby"}
+                  deviceMode={deviceMode}
                   onEnter={() => {}}
                 />
               )}
