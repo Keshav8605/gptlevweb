@@ -155,6 +155,8 @@ export function LivePreviewModal({ isOpen, onClose, gift }: LivePreviewModalProp
                       <SecretWorldSection
                         key="secretWorld"
                         initialHint={gift.secretHint || defaultGiftConfig.secretHint}
+                        customSecretLetter={gift.secretContent}
+                        customPasscode={gift.secretPassword}
                       />
                     );
                   case "deluluMode":

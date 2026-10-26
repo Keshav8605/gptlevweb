@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { RomanticCharacter } from "../RomanticCharacter";
+import { getResponsiveCardGridLayout } from "@/lib/layout-utils";
 
 interface RevealedContent {
   title: string;
@@ -11,18 +12,56 @@ interface RevealedContent {
   photos: string[];
 }
 
+export interface InsideJokeItem {
+  id: string;
+  title: string;
+  explanation: string;
+  photo?: string;
+}
+
 export interface SecretWorldSectionProps {
   initialHint?: string;
   customSecretLetter?: string;
   customPhotos?: string[];
+  customPasscode?: string;
+  customInsideJokes?: InsideJokeItem[];
   initialUnlocked?: boolean;
+  showPhotoBadges?: boolean;
+  isPreviewMode?: boolean;
+  onLockChange?: (unlocked: boolean) => void;
 }
+
+const DEFAULT_SECRET_LETTER =
+  "I wanted a place that belonged completely to us. Beyond every busy day, noise, and routine — this is where I keep the moments that make me feel whole. You are my safe harbor, my favorite laugh, and my home.";
+
+const DEFAULT_DEMO_PHOTOS = [
+  "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80",
+  "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=600&q=80",
+];
+
+const DEFAULT_INSIDE_JOKES: InsideJokeItem[] = [
+  {
+    id: "joke_1",
+    title: "The Midnight Snack Debacle",
+    explanation: "When we tried to bake cookies at 2 AM and ended up laughing on the kitchen floor.",
+  },
+  {
+    id: "joke_2",
+    title: "Our 5-Minute Warning",
+    explanation: "That always mysteriously turns into 45 more minutes of talking in the car.",
+  },
+];
 
 export function SecretWorldSection({
   initialHint,
   customSecretLetter,
   customPhotos,
+  customPasscode,
+  customInsideJokes,
   initialUnlocked,
+  showPhotoBadges = false,
+  isPreviewMode = false,
+  onLockChange,
 }: SecretWorldSectionProps) {
   const [input, setInput] = useState("");
   const [hint, setHint] = useState(
@@ -61,15 +100,21 @@ export function SecretWorldSection({
   const [showHint, setShowHint] = useState<boolean>(false);
 
   useEffect(() => {
+    if (typeof initialUnlocked === "boolean") {
+      setIsUnlocked(initialUnlocked);
+    }
+  }, [initialUnlocked]);
+
+  useEffect(() => {
     if (initialHint) setHint(initialHint);
   }, [initialHint]);
 
   useEffect(() => {
-    if (customSecretLetter || customPhotos) {
+    if (customSecretLetter !== undefined || customPhotos !== undefined) {
       setRevealedData((prev) => ({
         title: prev?.title || "A little secret, just for us",
-        letter: customSecretLetter || prev?.letter || "",
-        photos: customPhotos || prev?.photos || [],
+        letter: customSecretLetter !== undefined ? customSecretLetter : prev?.letter || "",
+        photos: customPhotos !== undefined ? customPhotos : prev?.photos || [],
       }));
     }
   }, [customSecretLetter, customPhotos]);
@@ -83,7 +128,7 @@ export function SecretWorldSection({
         if (data.hint) setHint(data.hint);
       })
       .catch(() => {});
-  }, []);
+  }, [initialHint]);
 
   // Lockout countdown timer
   useEffect(() => {
@@ -118,6 +163,22 @@ export function SecretWorldSection({
     e.preventDefault();
     if (!input.trim() || isLoading || lockoutSeconds > 0) return;
 
+    // 1. Direct match with customPasscode (for creator preview / wizard)
+    if (customPasscode) {
+      const cleanInput = input.trim().toLowerCase();
+      const cleanPass = customPasscode.trim().toLowerCase();
+      if (cleanInput === cleanPass) {
+        setIsUnlocked(true);
+        onLockChange?.(true);
+        setInput("");
+        setErrorMessage(null);
+        return;
+      } else {
+        setErrorMessage("Incorrect secret phrase. Tap the clue button above for a sweet hint! 💕");
+        return;
+      }
+    }
+
     setIsLoading(true);
     setErrorMessage(null);
 
@@ -133,6 +194,7 @@ export function SecretWorldSection({
       if (response.ok && data.success && data.content) {
         setRevealedData(data.content);
         setIsUnlocked(true);
+        onLockChange?.(true);
         setInput("");
         try {
           sessionStorage.setItem("gift_secret_world_content", JSON.stringify(data.content));
@@ -140,6 +202,7 @@ export function SecretWorldSection({
       } else {
         if (customSecretLetter || customPhotos) {
           setIsUnlocked(true);
+          onLockChange?.(true);
           setInput("");
         } else {
           setErrorMessage(data.error || "Incorrect secret phrase.");
@@ -154,6 +217,7 @@ export function SecretWorldSection({
     } catch {
       if (customSecretLetter || customPhotos) {
         setIsUnlocked(true);
+        onLockChange?.(true);
         setInput("");
       } else {
         setErrorMessage("Network issue. Please check your connection and try again.");
@@ -165,7 +229,10 @@ export function SecretWorldSection({
 
   const handleLockAgain = () => {
     setIsUnlocked(false);
-    setRevealedData(null);
+    onLockChange?.(false);
+    setInput("");
+    setErrorMessage(null);
+    setShowHint(false);
     try {
       sessionStorage.removeItem("gift_secret_world_content");
     } catch {}
@@ -364,55 +431,198 @@ export function SecretWorldSection({
               </div>
 
               {/* Secret Letter */}
-              {revealedData?.letter && (
-                <div id="secret-letter-box" className="space-y-4 max-w-xl mx-auto p-6 sm:p-8 rounded-2xl bg-gradient-to-b from-[var(--bg-main)] to-[var(--bg-surface)] border border-[var(--border-subtle)] font-serif italic text-base sm:text-lg leading-relaxed text-[var(--text-primary)] mb-8">
-                  {revealedData.letter.split("\n\n").map((para, i) => (
-                    <p key={i} className="leading-loose">
-                      {para}
-                    </p>
-                  ))}
-                </div>
-              )}
+              {(() => {
+                const effectiveLetter =
+                  (revealedData?.letter?.trim() || customSecretLetter?.trim())
+                    ? (revealedData?.letter?.trim() || customSecretLetter?.trim() || "")
+                    : (initialUnlocked || isPreviewMode ? DEFAULT_SECRET_LETTER : "");
 
-              {/* Photos Gallery */}
-              {revealedData?.photos && revealedData.photos.length > 0 && (
-                <div className="mb-8">
-                  <p className="text-center font-script text-2xl text-[var(--pink-strong)] mb-4">
-                    Moments Only We Cherish ✨
-                  </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    {revealedData.photos.map((src, i) => (
-                      <div
-                        key={i}
-                        role="button"
-                        tabIndex={0}
-                        onClick={() => setActivePhoto(src)}
-                        onKeyDown={(e) => {
-                          if (e.key === "Enter" || e.key === " ") {
-                            e.preventDefault();
-                            setActivePhoto(src);
-                          }
-                        }}
-                        aria-label={`View secret photo ${i + 1} in full size`}
-                        className="rounded-2xl overflow-hidden aspect-[4/3] border border-[var(--border-subtle)] shadow-sm hover:shadow-md transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
-                      >
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={src}
-                          alt={`Secret memory moment ${i + 1}`}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                        />
+                if (!effectiveLetter) return null;
+
+                return (
+                  <div
+                    id="secret-letter-box"
+                    className="relative max-w-xl mx-auto p-6 sm:p-8 rounded-3xl bg-gradient-to-b from-[#FFFDF9] via-[#FFF9F3] to-[#FFF3EB] border-2 border-[#F3D7C5] shadow-[0_8px_30px_rgba(180,100,70,0.08)] mb-10 overflow-hidden text-left"
+                  >
+                    {/* Parchment decorative stamp & header */}
+                    <div className="flex items-center justify-between border-b border-[#F5DFCF] pb-3 mb-5">
+                      <div className="flex items-center gap-2.5">
+                        <span className="text-2xl select-none">💌</span>
+                        <div>
+                          <p className="text-[10px] font-bold uppercase tracking-widest text-[#B36048] font-rounded">
+                            Confidential • For Your Eyes Only
+                          </p>
+                          <h4 className="font-serif font-bold text-base sm:text-lg text-[var(--text-primary)]">
+                            A Note From My Heart
+                          </h4>
+                        </div>
                       </div>
-                    ))}
+                      <span className="text-xs font-handwritten text-[#B36048] bg-[#FDEFE6] px-3 py-1 rounded-full border border-[#F3D7C5]">
+                        Forever Yours ♡
+                      </span>
+                    </div>
+
+                    <div className="font-serif italic text-base sm:text-lg leading-loose text-[var(--text-primary)] space-y-4">
+                      {effectiveLetter.split("\n\n").map((para, i) => (
+                        <p key={i}>{para}</p>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
+
+              {/* Photos Gallery (Moments Only We Cherish) */}
+              {(() => {
+                const realPhotos = (revealedData?.photos || customPhotos || []).filter(Boolean);
+                const minSlots = (showPhotoBadges || isPreviewMode) ? Math.max(2, realPhotos.length) : realPhotos.length;
+                if (minSlots === 0 && !isPreviewMode) return null;
+
+                const photoSlots = Array.from({ length: Math.max(minSlots, 1) }).map((_, i) => ({
+                  index: i,
+                  photoUrl: realPhotos[i] || (realPhotos.length === 0 && !showPhotoBadges ? DEFAULT_DEMO_PHOTOS[i] : null),
+                }));
+
+                const photoGridLayout = getResponsiveCardGridLayout(photoSlots.length);
+
+                return (
+                  <div className="mb-10 text-left">
+                    <div className="text-center mb-6">
+                      <p className="font-script text-3xl text-[var(--pink-strong)] mb-1">
+                        Moments Only We Cherish ✨
+                      </p>
+                      <p className="text-xs sm:text-sm text-[var(--text-secondary)] font-rounded">
+                        Private glimpses of our love, unlocked just for us.
+                      </p>
+                    </div>
+
+                    <div className={photoGridLayout.containerClass + " gap-5"}>
+                      {photoSlots.map((slot) => {
+                        const hasImage = Boolean(slot.photoUrl);
+                        const photoNumber = slot.index + 1;
+
+                        if (hasImage && slot.photoUrl) {
+                          return (
+                            <div
+                              key={slot.index}
+                              role="button"
+                              tabIndex={0}
+                              onClick={() => setActivePhoto(slot.photoUrl)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter" || e.key === " ") {
+                                  e.preventDefault();
+                                  setActivePhoto(slot.photoUrl);
+                                }
+                              }}
+                              aria-label={`View secret photo ${photoNumber} in full size`}
+                              className={`${photoGridLayout.cardClass} relative rounded-3xl overflow-hidden aspect-[4/3] border-2 border-pink-200 shadow-md hover:shadow-xl transition-all cursor-pointer group focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)] bg-white`}
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img
+                                src={slot.photoUrl}
+                                alt={`Secret memory moment ${photoNumber}`}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                              />
+
+                              {/* Photo Slot Badge matching customization panel */}
+                              {showPhotoBadges && (
+                                <div className="absolute top-3 left-3 z-10 flex items-center gap-1.5 px-3 py-1 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white font-rounded font-bold text-xs shadow-md">
+                                  <span>Photo {photoNumber}</span>
+                                  <span className="text-[10px]">♡</span>
+                                </div>
+                              )}
+
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity flex items-end p-4">
+                                <span className="text-white text-xs font-rounded font-medium flex items-center gap-1.5">
+                                  <span>🔍</span>
+                                  <span>Click to view full size</span>
+                                </span>
+                              </div>
+                            </div>
+                          );
+                        }
+
+                        // Slot without photo (shows creator where Photo N will appear)
+                        return (
+                          <div
+                            key={slot.index}
+                            className={`${photoGridLayout.cardClass} relative rounded-3xl overflow-hidden aspect-[4/3] border-2 border-dashed border-pink-300 bg-pink-50/50 flex flex-col items-center justify-center p-6 text-center space-y-2 select-none`}
+                          >
+                            <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-100 border border-pink-300 text-[var(--pink-strong)] font-rounded font-bold text-xs shadow-2xs">
+                              <span>Photo {photoNumber}</span>
+                              <span className="text-[10px] text-gray-500 font-normal">(Slot)</span>
+                            </div>
+                            <span className="text-3xl animate-bounce">📷</span>
+                            <p className="font-serif font-bold text-sm text-[var(--text-primary)]">
+                              Photo {photoNumber} Will Appear Here
+                            </p>
+                            <p className="text-[11px] text-[var(--text-secondary)] font-rounded max-w-xs leading-relaxed">
+                              Select or change Photo {photoNumber} in the customization panel to display your romantic moment here.
+                            </p>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                );
+              })()}
+
+              {/* Inside Jokes & Private Traditions */}
+              {(() => {
+                const effectiveJokes = (customInsideJokes && customInsideJokes.length > 0)
+                  ? customInsideJokes
+                  : ((initialUnlocked || isPreviewMode) ? DEFAULT_INSIDE_JOKES : []);
+
+                if (effectiveJokes.length === 0) return null;
+
+                const jokesGridLayout = getResponsiveCardGridLayout(effectiveJokes.length);
+                const stickers = ["🍪", "🌙", "☕", "✨", "🍕", "🧸", "💌", "🍿"];
+
+                return (
+                  <div className="mb-10 text-left">
+                    <div className="text-center mb-6">
+                      <span className="inline-flex items-center gap-1.5 px-3.5 py-1 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] text-xs font-bold font-rounded">
+                        <span>🤫</span>
+                        <span>JUST BETWEEN US TWO</span>
+                      </span>
+                      <h4 className="font-serif text-2xl font-bold text-[var(--text-primary)] mt-2">
+                        Inside Jokes & Private Traditions
+                      </h4>
+                      <p className="text-xs sm:text-sm text-[var(--text-secondary)] font-rounded mt-1">
+                        The little things that no one else in the entire world would understand.
+                      </p>
+                    </div>
+
+                    <div className={jokesGridLayout.containerClass + " gap-4"}>
+                      {effectiveJokes.map((joke, i) => (
+                        <div
+                          key={joke.id || i}
+                          className={`${jokesGridLayout.cardClass} p-5 rounded-2xl bg-gradient-to-br from-[#FFF9FB] to-white border border-[var(--border-subtle)] shadow-xs hover:shadow-md transition-shadow relative overflow-hidden group`}
+                        >
+                          <div className="flex items-start gap-3">
+                            <span className="text-2xl mt-0.5 select-none">
+                              {stickers[i % stickers.length]}
+                            </span>
+                            <div className="flex-1 min-w-0">
+                              <h5 className="font-serif font-bold text-base text-[var(--text-primary)] mb-1">
+                                {joke.title || `Our Little Secret #${i + 1}`}
+                              </h5>
+                              <p className="text-xs sm:text-sm font-rounded text-[var(--text-secondary)] leading-relaxed">
+                                {joke.explanation}
+                              </p>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* Lock again toggle */}
-              <div className="text-center pt-2 border-t border-[var(--border-subtle)]">
+              <div className="text-center pt-4 border-t border-[var(--border-subtle)]">
                 <button
                   onClick={handleLockAgain}
-                  className="text-xs text-[var(--text-muted)] hover:text-[var(--pink-strong)] transition-colors cursor-pointer inline-flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
+                  className="text-xs text-[var(--text-muted)] hover:text-[var(--pink-strong)] transition-colors cursor-pointer inline-flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)] px-3 py-1.5 rounded-full hover:bg-pink-50"
                 >
                   <span>🔒</span>
                   <span>Lock this haven again</span>

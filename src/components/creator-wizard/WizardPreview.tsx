@@ -222,7 +222,16 @@ export function WizardPreview({
               )}
 
               {currentPreviewChapter.id === "secretWorld" && (
-                <SecretWorldSection initialHint={config.secretWorld.hint} />
+                <SecretWorldSection
+                  initialHint={config.secretWorld.hint}
+                  customSecretLetter={config.secretWorld.secretLetter}
+                  customPhotos={config.secretWorld.secretPhotos}
+                  customPasscode={config.secretWorld.password}
+                  customInsideJokes={config.secretWorld.insideJokes}
+                  initialUnlocked={true}
+                  showPhotoBadges={true}
+                  isPreviewMode={true}
+                />
               )}
 
               {currentPreviewChapter.id === "memories" && (

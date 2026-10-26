@@ -314,6 +314,8 @@ function GiftRecipientContent({
                 <SecretWorldSection
                   key="secretWorld"
                   initialHint={gift.secretHint || defaultGiftConfig.secretHint}
+                  customSecretLetter={gift.secretContent}
+                  customPasscode={gift.secretPassword}
                 />
               );
 

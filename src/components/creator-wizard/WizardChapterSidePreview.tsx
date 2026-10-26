@@ -41,6 +41,7 @@ export function WizardChapterSidePreview({
   onChange,
 }: WizardChapterSidePreviewProps) {
   const [deviceMode, setDeviceMode] = useState<"desktop" | "mobile">("desktop");
+  const [secretWorldUnlocked, setSecretWorldUnlocked] = useState<boolean>(true);
   const containerRef = useRef<HTMLDivElement>(null);
   const [containerWidth, setContainerWidth] = useState<number>(650);
 
@@ -119,10 +120,13 @@ export function WizardChapterSidePreview({
           labels: config.finalHeart.collagePhotos.map((_, i) => `Photo ${i + 1}`),
         };
       case "secretWorld": {
-        const photoCount = config.secretWorld.secretPhotos?.length || 0;
+        const photos = config.secretWorld.secretPhotos || [];
+        const count = Math.max(photos.length, 2);
         return {
-          count: photoCount,
-          labels: (config.secretWorld.secretPhotos || []).map((_, i) => `Photo ${i + 1} (Secret Haven)`),
+          count,
+          labels: Array.from({ length: count }).map(
+            (_, i) => `Photo ${i + 1} (${photos[i] ? "Secret Haven Card" : "Slot waiting for photo"})`
+          ),
         };
       }
       case "ourSong":
@@ -207,6 +211,47 @@ export function WizardChapterSidePreview({
         </div>
       )}
 
+      {/* Chapter 3 Secret Haven Toggle Switcher */}
+      {activeChapterId === "secretWorld" && (
+        <div className="bg-gradient-to-r from-rose-50 via-pink-50 to-rose-50 border-b border-pink-200/80 px-4 py-2 flex items-center justify-between gap-2 text-xs font-rounded">
+          <div className="flex items-center gap-1.5 min-w-0">
+            <span className="text-[13px]">👁️</span>
+            <span className="text-[var(--text-secondary)] font-medium truncate">
+              Previewing:{" "}
+              <strong className="text-[var(--pink-strong)]">
+                {secretWorldUnlocked ? "Unlocked Haven (Letter + Gallery + Jokes)" : "Locked Door (Passcode Test)"}
+              </strong>
+            </span>
+          </div>
+          <div className="flex items-center gap-1 bg-white/90 p-0.5 rounded-xl border border-pink-200/80 shadow-2xs shrink-0">
+            <button
+              type="button"
+              onClick={() => setSecretWorldUnlocked(true)}
+              className={`px-3 py-1 rounded-lg font-bold text-[11px] transition-all cursor-pointer flex items-center gap-1 ${
+                secretWorldUnlocked
+                  ? "bg-[var(--pink-strong)] text-white shadow-2xs"
+                  : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:bg-pink-50"
+              }`}
+            >
+              <span>🔓</span>
+              <span>Unlocked Haven</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setSecretWorldUnlocked(false)}
+              className={`px-3 py-1 rounded-lg font-bold text-[11px] transition-all cursor-pointer flex items-center gap-1 ${
+                !secretWorldUnlocked
+                  ? "bg-[var(--pink-strong)] text-white shadow-2xs"
+                  : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)] hover:bg-pink-50"
+              }`}
+            >
+              <span>🔒</span>
+              <span>Test Locked Door</span>
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Scrollable Preview Canvas */}
       <div
         ref={containerRef}
@@ -264,7 +309,12 @@ export function WizardChapterSidePreview({
             initialHint={config.secretWorld.hint}
             customSecretLetter={config.secretWorld.secretLetter}
             customPhotos={config.secretWorld.secretPhotos}
-            initialUnlocked={true}
+            customPasscode={config.secretWorld.password}
+            customInsideJokes={config.secretWorld.insideJokes}
+            initialUnlocked={secretWorldUnlocked}
+            showPhotoBadges={true}
+            isPreviewMode={true}
+            onLockChange={(unlocked) => setSecretWorldUnlocked(unlocked)}
           />
         );
 

@@ -642,178 +642,405 @@ export function WizardPersonalize({
         {activeChapterId === "secretWorld" && (
           <div className="space-y-6">
             <div className="border-b border-[var(--border-subtle)] pb-4">
-              <h3 className="font-serif text-xl font-bold text-[var(--text-primary)]">
-                Our Secret World
-              </h3>
-              <p className="text-xs text-[var(--text-muted)] font-rounded mt-1">
-                Private nicknames, inside jokes, traditions, and the secret password for Chapter 3.
-              </p>
-            </div>
-
-            {/* Secret password & hint */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 bg-[var(--pale-rose)]/40 p-5 rounded-2xl border border-[var(--pink-primary)]/20">
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
-                  Secret Word / Passcode
-                </label>
-                <input
-                  type="text"
-                  value={config.secretWorld.password || ""}
-                  onChange={(e) =>
-                    onChange({
-                      secretWorld: { ...config.secretWorld, password: e.target.value },
-                    })
-                  }
-                  placeholder="e.g. iloveyou, sunshine, ourspecialdate"
-                  className="w-full px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] bg-white text-sm font-rounded focus:outline-none focus:ring-2 focus:ring-[var(--pink-strong)] font-mono"
-                />
-              </div>
-
-              <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
-                  Passcode Hint
-                </label>
-                <input
-                  type="text"
-                  value={config.secretWorld.hint || ""}
-                  onChange={(e) =>
-                    onChange({
-                      secretWorld: { ...config.secretWorld, hint: e.target.value },
-                    })
-                  }
-                  placeholder="e.g. Three words, no spaces, what I whisper..."
-                  className="w-full px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] bg-white text-sm font-rounded focus:outline-none focus:ring-2 focus:ring-[var(--pink-strong)]"
-                />
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                  <h3 className="font-serif text-xl font-bold text-[var(--text-primary)] flex items-center gap-2">
+                    <span>Our Secret World</span>
+                    <span className="text-base">🔒</span>
+                  </h3>
+                  <p className="text-xs text-[var(--text-muted)] font-rounded mt-1">
+                    A password-protected haven with a secret letter, private photo gallery, and inside jokes revealed only to your partner.
+                  </p>
+                </div>
+                <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-pink-50 border border-pink-200 text-[11px] font-rounded font-bold text-[var(--pink-strong)]">
+                  <span>✨ 4-Step Secret Haven</span>
+                </div>
               </div>
             </div>
 
-            {/* Secret Haven Letter revealed upon unlocking */}
-            <div className="space-y-1.5">
+            {/* Step 1: Secret Password & Passcode Hint */}
+            <div className="space-y-3 p-5 rounded-2xl bg-gradient-to-br from-pink-50/60 via-rose-50/40 to-pink-50/60 border border-[var(--pink-primary)]/25 shadow-2xs">
               <div className="flex items-center justify-between">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
-                  Secret Letter (Revealed When Unlocked)
-                </label>
-                <span className="text-[10px] text-[var(--pink-strong)] font-semibold font-rounded">
-                  Hidden Until Unlocked ♡
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-[var(--pink-strong)] text-white text-xs font-bold font-rounded flex items-center justify-center shadow-xs">
+                    1
+                  </span>
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                      Secret Passcode & Clue 🔐
+                    </h4>
+                    <p className="text-[11px] text-[var(--text-muted)] font-rounded">
+                      Your partner enters this secret word to unlock Chapter 3.
+                    </p>
+                  </div>
+                </div>
+                <span className="text-[10px] text-[var(--pink-strong)] font-semibold font-rounded hidden sm:inline">
+                  Case-insensitive ♡
                 </span>
               </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-bold text-[var(--text-primary)] font-rounded">
+                    Secret Word / Passcode
+                  </label>
+                  <input
+                    type="text"
+                    value={config.secretWorld.password || ""}
+                    onChange={(e) =>
+                      onChange({
+                        secretWorld: { ...config.secretWorld, password: e.target.value },
+                      })
+                    }
+                    placeholder="e.g. iloveyou, sunshine, ourspecialdate"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] bg-white text-sm font-rounded focus:outline-none focus:ring-2 focus:ring-[var(--pink-strong)] font-mono shadow-2xs"
+                  />
+                  <p className="text-[10px] text-[var(--text-muted)] font-rounded">
+                    The secret phrase your partner will type to unlock.
+                  </p>
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-[11px] font-bold text-[var(--text-primary)] font-rounded">
+                    Passcode Hint (Sweet Clue)
+                  </label>
+                  <input
+                    type="text"
+                    value={config.secretWorld.hint || ""}
+                    onChange={(e) =>
+                      onChange({
+                        secretWorld: { ...config.secretWorld, hint: e.target.value },
+                      })
+                    }
+                    placeholder="e.g. Three words, no spaces, all lowercase..."
+                    className="w-full px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] bg-white text-sm font-rounded focus:outline-none focus:ring-2 focus:ring-[var(--pink-strong)] shadow-2xs"
+                  />
+                  <p className="text-[10px] text-[var(--text-muted)] font-rounded">
+                    Revealed if your partner taps &ldquo;Need a sweet little hint?&rdquo;
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-1 text-[11px] text-[var(--pink-deep)] font-rounded flex items-center gap-1.5 bg-white/70 px-3 py-1.5 rounded-lg border border-pink-200/60">
+                <span>💡</span>
+                <span>
+                  <strong>Tip:</strong> You can test typing this passcode in the live preview on the right by clicking <strong>&ldquo;Test Locked Door&rdquo;</strong>!
+                </span>
+              </div>
+            </div>
+
+            {/* Step 2: Secret Haven Letter revealed upon unlocking */}
+            <div className="space-y-3 p-5 rounded-2xl bg-white border border-[var(--border-subtle)] shadow-2xs">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-[var(--pink-strong)] text-white text-xs font-bold font-rounded flex items-center justify-center shadow-xs">
+                    2
+                  </span>
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                      Secret Love Letter 💌
+                    </h4>
+                    <p className="text-[11px] text-[var(--text-muted)] font-rounded">
+                      Revealed in a warm vintage parchment card directly below the welcome illustration.
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() =>
+                    onChange({
+                      secretWorld: {
+                        ...config.secretWorld,
+                        secretLetter:
+                          "I wanted a place that belonged completely to us. Beyond every busy day, noise, and routine — this is where I keep the moments that make me feel whole. You are my safe harbor, my favorite laugh, and my home.",
+                      },
+                    })
+                  }
+                  className="text-[11px] text-[var(--pink-strong)] font-bold hover:underline cursor-pointer flex items-center gap-1"
+                >
+                  <span>✨</span>
+                  <span>Use Romantic Default</span>
+                </button>
+              </div>
+
               <textarea
                 rows={4}
-                value={config.secretWorld.secretLetter || ""}
+                value={config.secretWorld.secretLetter ?? ""}
                 onChange={(e) =>
                   onChange({
                     secretWorld: { ...config.secretWorld, secretLetter: e.target.value },
                   })
                 }
-                placeholder="I wanted a place that belonged completely to us. Beyond every busy day, noise, and routine — this is where I keep the moments that make me feel whole..."
-                className="w-full px-4 py-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm font-rounded font-serif italic leading-relaxed focus:outline-none focus:ring-2 focus:ring-[var(--pink-strong)]"
+                placeholder="I wanted a place that belonged completely to us. Beyond every busy day, noise, and routine — this is where I keep the moments that make me feel whole. You are my safe harbor, my favorite laugh, and my home..."
+                className="w-full px-4 py-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm font-rounded font-serif italic leading-relaxed focus:outline-none focus:ring-2 focus:ring-[var(--pink-strong)] shadow-2xs"
               />
+              <p className="text-[10px] text-[var(--text-muted)] font-rounded">
+                If left empty, the romantic default letter shown in the live preview will be used.
+              </p>
             </div>
 
-            {/* Secret Haven Photos (Photo 1 and Photo 2 inside Moments Only We Cherish) */}
-            <div className="space-y-2.5">
-              <div className="flex items-center justify-between">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
-                  Moments Only We Cherish (Secret Gallery Photos)
-                </label>
-                <span className="text-[10px] text-[var(--text-muted)] font-rounded">
-                  Visible in Secret World gallery
-                </span>
+            {/* Step 3: Moments Only We Cherish (Secret Haven Gallery Photos) */}
+            <div className="space-y-4 p-5 rounded-2xl bg-white border border-[var(--border-subtle)] shadow-2xs">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-pink-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-[var(--pink-strong)] text-white text-xs font-bold font-rounded flex items-center justify-center shadow-xs">
+                    3
+                  </span>
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                      Moments Only We Cherish (Secret Gallery Photos) 📸
+                    </h4>
+                    <p className="text-[11px] text-[var(--text-muted)] font-rounded">
+                      Private photos displayed as interactive gallery cards in the unlocked haven.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onChange({
+                        secretWorld: {
+                          ...config.secretWorld,
+                          secretPhotos: [
+                            "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80",
+                            "https://images.unsplash.com/photo-1522673607200-164d1b6ce486?auto=format&fit=crop&w=600&q=80",
+                          ],
+                        },
+                      });
+                    }}
+                    className="text-[11px] text-[var(--pink-strong)] font-bold hover:underline cursor-pointer flex items-center gap-1"
+                  >
+                    <span>✨</span>
+                    <span>Load Demo Photos</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const current = [...(config.secretWorld.secretPhotos || [])];
+                      if (current.length < 6) {
+                        current.push("");
+                        onChange({
+                          secretWorld: { ...config.secretWorld, secretPhotos: current },
+                        });
+                      }
+                    }}
+                    disabled={(config.secretWorld.secretPhotos?.length || 0) >= 6}
+                    className="px-3 py-1 rounded-xl bg-pink-100 hover:bg-pink-200 text-[var(--pink-strong)] text-xs font-bold font-rounded transition-colors disabled:opacity-40 cursor-pointer"
+                  >
+                    + Add Photo Slot
+                  </button>
+                </div>
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {[0, 1].map((pIdx) => {
-                  const currentPhoto = config.secretWorld.secretPhotos?.[pIdx];
-                  return (
-                    <div
-                      key={pIdx}
-                      className="p-3.5 rounded-2xl border border-pink-200 bg-pink-50/40 space-y-2 flex flex-col justify-between"
-                    >
-                      <div className="flex items-center justify-between">
-                        <span className="px-2 py-0.5 rounded bg-[var(--pink-strong)] text-white text-[10px] font-bold font-rounded">
-                          Photo {pIdx + 1}
-                        </span>
-                        <span className="text-[11px] font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
-                          Input for Photo {pIdx + 1}
-                        </span>
-                      </div>
+              {/* Visual Guidance Banner */}
+              <div className="p-3 rounded-xl bg-gradient-to-r from-pink-50 via-rose-50 to-pink-50 border border-pink-200/70 text-xs font-rounded flex items-start gap-2.5">
+                <span className="text-base mt-0.5">👁️</span>
+                <div className="flex-1 text-[11px] text-[var(--text-secondary)] leading-relaxed">
+                  <strong className="text-[var(--pink-strong)]">How photos appear: </strong>
+                  Each photo slot below directly matches the <span className="font-bold text-rose-600 bg-white px-1.5 py-0.5 rounded border border-rose-200">Photo 1</span> and <span className="font-bold text-rose-600 bg-white px-1.5 py-0.5 rounded border border-rose-200">Photo 2</span> cards in the live preview on the right. When your partner clicks any photo, it opens in a full-screen romantic lightbox!
+                </div>
+              </div>
 
-                      <div
-                        onClick={() =>
-                          onOpenPhotoLibrary((url) => {
-                            const current = [...(config.secretWorld.secretPhotos || [])];
-                            current[pIdx] = url;
-                            onChange({
-                              secretWorld: { ...config.secretWorld, secretPhotos: current },
-                            });
-                          }, `Choose Input for Photo ${pIdx + 1} (Secret Haven Gallery)`)
-                        }
-                        className="aspect-[4/3] rounded-xl border-2 border-dashed border-pink-300 bg-white hover:bg-pink-50/60 flex items-center justify-center cursor-pointer overflow-hidden relative group transition-all"
-                      >
-                        {currentPhoto ? (
-                          <>
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={currentPhoto}
-                              alt={`Secret Photo ${pIdx + 1}`}
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                            />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-rounded font-bold">
-                              Change Photo {pIdx + 1} 📷
+              {/* Photo Slots Grid */}
+              {(() => {
+                const photos = config.secretWorld.secretPhotos || [];
+                const totalSlots = Math.max(photos.length, 2);
+
+                return (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {Array.from({ length: totalSlots }).map((_, pIdx) => {
+                      const currentPhoto = photos[pIdx];
+                      const photoNum = pIdx + 1;
+
+                      return (
+                        <div
+                          key={pIdx}
+                          className="p-3.5 rounded-2xl border-2 border-pink-200/80 bg-gradient-to-b from-white to-pink-50/30 space-y-2.5 shadow-2xs flex flex-col justify-between"
+                        >
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-1.5">
+                              <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[10px] font-bold font-rounded shadow-2xs">
+                                Photo {photoNum}
+                              </span>
+                              <span className="text-[11px] font-bold text-[var(--text-primary)] font-rounded">
+                                Secret Gallery Slot #{photoNum}
+                              </span>
                             </div>
-                            <span className="absolute top-1.5 left-1.5 bg-black/60 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
-                              Photo {pIdx + 1}
-                            </span>
-                          </>
-                        ) : (
-                          <div className="text-center p-2 text-xs font-rounded text-[var(--pink-strong)] space-y-1">
-                            <span className="text-xl block">🔒</span>
-                            <span className="font-bold block">Input for Photo {pIdx + 1}</span>
-                            <span className="text-[10px] text-gray-400 block">Click to select photo</span>
+
+                            <div className="flex items-center gap-1">
+                              {currentPhoto && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const current = [...(config.secretWorld.secretPhotos || [])];
+                                    current[pIdx] = "";
+                                    onChange({
+                                      secretWorld: { ...config.secretWorld, secretPhotos: current },
+                                    });
+                                  }}
+                                  title={`Remove Photo ${photoNum}`}
+                                  className="text-[11px] text-gray-400 hover:text-rose-500 px-1 cursor-pointer font-rounded"
+                                >
+                                  Clear
+                                </button>
+                              )}
+                              {pIdx >= 2 && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const current = [...(config.secretWorld.secretPhotos || [])];
+                                    current.splice(pIdx, 1);
+                                    onChange({
+                                      secretWorld: { ...config.secretWorld, secretPhotos: current },
+                                    });
+                                  }}
+                                  title="Delete this extra photo slot"
+                                  className="text-gray-400 hover:text-rose-500 text-xs px-1 cursor-pointer"
+                                >
+                                  ✕
+                                </button>
+                              )}
+                            </div>
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
+
+                          <div
+                            onClick={() =>
+                              onOpenPhotoLibrary((url) => {
+                                const current = [...(config.secretWorld.secretPhotos || [])];
+                                current[pIdx] = url;
+                                onChange({
+                                  secretWorld: { ...config.secretWorld, secretPhotos: current },
+                                });
+                              }, `Choose Photo ${photoNum} (Secret Haven Gallery)`)
+                            }
+                            className="aspect-[4/3] rounded-xl border-2 border-dashed border-pink-300 bg-white hover:bg-pink-50/60 flex items-center justify-center cursor-pointer overflow-hidden relative group transition-all shadow-inner"
+                          >
+                            {currentPhoto ? (
+                              <>
+                                {/* eslint-disable-next-line @next/next/no-img-element */}
+                                <img
+                                  src={currentPhoto}
+                                  alt={`Secret Photo ${photoNum}`}
+                                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                />
+                                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity text-white text-xs font-rounded font-bold gap-1.5">
+                                  <span>📷</span>
+                                  <span>Change Photo {photoNum}</span>
+                                </div>
+                                <span className="absolute top-2 left-2 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[9px] font-bold px-2 py-0.5 rounded-full shadow">
+                                  Photo {photoNum} • In Haven
+                                </span>
+                              </>
+                            ) : (
+                              <div className="text-center p-3 text-xs font-rounded text-[var(--pink-strong)] space-y-1.5">
+                                <span className="text-2xl block animate-bounce">📷</span>
+                                <span className="font-bold block text-sm">
+                                  Click to Select Photo {photoNum}
+                                </span>
+                                <span className="text-[10px] text-gray-400 block max-w-[180px] mx-auto">
+                                  Choose from library or upload. Will display as Photo {photoNum} in live preview.
+                                </span>
+                              </div>
+                            )}
+                          </div>
+
+                          <div className="text-[10px] text-[var(--text-muted)] font-rounded flex items-center justify-between">
+                            <span>
+                              {currentPhoto ? "✓ Photo set & live in preview" : "Waiting for photo selection"}
+                            </span>
+                            <span className="text-[var(--pink-strong)] font-semibold">
+                              Aspect: 4:3
+                            </span>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                );
+              })()}
             </div>
 
-            {/* Inside Jokes */}
-            <div className="space-y-3 pt-2 border-t border-[var(--border-subtle)]">
-              <div className="flex items-center justify-between">
-                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
-                  Inside Jokes & Private Traditions
-                </label>
-                <button
-                  type="button"
-                  onClick={() => {
-                    const id = `joke_${Date.now()}`;
-                    onChange({
-                      secretWorld: {
-                        ...config.secretWorld,
-                        insideJokes: [
-                          ...config.secretWorld.insideJokes,
-                          {
-                            id,
-                            title: "Our Secret Joke",
-                            explanation: "Only the two of us will ever understand why this is funny.",
+            {/* Step 4: Inside Jokes & Private Traditions */}
+            <div className="space-y-4 p-5 rounded-2xl bg-white border border-[var(--border-subtle)] shadow-2xs">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-pink-100 pb-3">
+                <div className="flex items-center gap-2">
+                  <span className="w-6 h-6 rounded-full bg-[var(--pink-strong)] text-white text-xs font-bold font-rounded flex items-center justify-center shadow-xs">
+                    4
+                  </span>
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                      Inside Jokes & Private Traditions 🤫
+                    </h4>
+                    <p className="text-[11px] text-[var(--text-muted)] font-rounded">
+                      Displayed as cute secret keepsake notes inside your unlocked haven.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  {config.secretWorld.insideJokes.length === 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onChange({
+                          secretWorld: {
+                            ...config.secretWorld,
+                            insideJokes: [
+                              {
+                                id: "joke_1",
+                                title: "The Midnight Snack Debacle",
+                                explanation: "When we tried to bake cookies at 2 AM and ended up laughing on the kitchen floor.",
+                              },
+                              {
+                                id: "joke_2",
+                                title: "Our 5-Minute Warning",
+                                explanation: "That always mysteriously turns into 45 more minutes of talking in the car.",
+                              },
+                            ],
                           },
-                        ],
-                      },
-                    });
-                  }}
-                  className="text-xs text-[var(--pink-strong)] font-rounded font-bold hover:underline cursor-pointer"
-                >
-                  + Add a Little Secret
-                </button>
+                        });
+                      }}
+                      className="text-[11px] text-[var(--pink-strong)] font-bold hover:underline cursor-pointer flex items-center gap-1"
+                    >
+                      <span>✨</span>
+                      <span>Load Example Jokes</span>
+                    </button>
+                  )}
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const id = `joke_${Date.now()}`;
+                      onChange({
+                        secretWorld: {
+                          ...config.secretWorld,
+                          insideJokes: [
+                            ...config.secretWorld.insideJokes,
+                            {
+                              id,
+                              title: "Our Secret Joke",
+                              explanation: "Only the two of us will ever understand why this is funny.",
+                            },
+                          ],
+                        },
+                      });
+                    }}
+                    className="px-3 py-1 rounded-xl bg-pink-100 hover:bg-pink-200 text-[var(--pink-strong)] text-xs font-bold font-rounded transition-colors cursor-pointer"
+                  >
+                    + Add a Little Secret
+                  </button>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {config.secretWorld.insideJokes.map((joke) => (
                   <div
                     key={joke.id}
-                    className="p-4 rounded-2xl border border-[var(--border-subtle)] bg-white space-y-2 relative"
+                    className="p-4 rounded-2xl border border-[var(--border-subtle)] bg-pink-50/30 hover:bg-white transition-all space-y-2 relative shadow-2xs"
                   >
                     <button
                       type="button"
@@ -825,22 +1052,25 @@ export function WizardPersonalize({
                           },
                         });
                       }}
-                      className="absolute top-3 right-3 text-gray-400 hover:text-rose-500 cursor-pointer"
+                      className="absolute top-3 right-3 text-gray-400 hover:text-rose-500 cursor-pointer text-xs"
+                      title="Remove inside joke"
                     >
                       ✕
                     </button>
-                    <input
-                      type="text"
-                      value={joke.title}
-                      onChange={(e) => {
-                        const updated = config.secretWorld.insideJokes.map((j) =>
-                          j.id === joke.id ? { ...j, title: e.target.value } : j
-                        );
-                        onChange({ secretWorld: { ...config.secretWorld, insideJokes: updated } });
-                      }}
-                      placeholder="Title of inside joke..."
-                      className="w-full font-serif font-bold text-sm text-[var(--text-primary)] focus:outline-none border-b border-transparent focus:border-[var(--pink-strong)]"
-                    />
+                    <div className="pr-6">
+                      <input
+                        type="text"
+                        value={joke.title}
+                        onChange={(e) => {
+                          const updated = config.secretWorld.insideJokes.map((j) =>
+                            j.id === joke.id ? { ...j, title: e.target.value } : j
+                          );
+                          onChange({ secretWorld: { ...config.secretWorld, insideJokes: updated } });
+                        }}
+                        placeholder="Title of inside joke..."
+                        className="w-full font-serif font-bold text-sm text-[var(--text-primary)] focus:outline-none border-b border-transparent focus:border-[var(--pink-strong)] pb-1"
+                      />
+                    </div>
                     <textarea
                       rows={2}
                       value={joke.explanation}
@@ -851,7 +1081,7 @@ export function WizardPersonalize({
                         onChange({ secretWorld: { ...config.secretWorld, insideJokes: updated } });
                       }}
                       placeholder="The story behind it..."
-                      className="w-full text-xs font-rounded text-[var(--text-secondary)] focus:outline-none"
+                      className="w-full text-xs font-rounded text-[var(--text-secondary)] focus:outline-none bg-transparent"
                     />
                   </div>
                 ))}

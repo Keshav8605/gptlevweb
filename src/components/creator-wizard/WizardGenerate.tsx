@@ -43,6 +43,7 @@ export function WizardGenerate({ config, onBack }: WizardGenerateProps) {
         finalMessage: config.finalHeart.finalMessage,
         secretPassword: config.secretWorld.password || "iloveyou",
         secretHint: config.secretWorld.hint || "Three words, no spaces...",
+        secretContent: config.secretWorld.secretLetter,
         featuredSong: {
           title: config.ourSong.title,
           artist: config.ourSong.artist,
