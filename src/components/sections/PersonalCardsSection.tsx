@@ -2,6 +2,7 @@
 
 import { motion } from "framer-motion";
 import { SectionWrapper } from "../SectionWrapper";
+import { getResponsiveCardGridLayout } from "@/lib/layout-utils";
 import type { PersonalCard } from "@/lib/gift-data";
 
 interface PersonalCardsSectionProps {
@@ -9,6 +10,8 @@ interface PersonalCardsSectionProps {
 }
 
 export function PersonalCardsSection({ cards }: PersonalCardsSectionProps) {
+  const layout = getResponsiveCardGridLayout(cards.length);
+
   return (
     <SectionWrapper
       id="personalCards"
@@ -17,7 +20,7 @@ export function PersonalCardsSection({ cards }: PersonalCardsSectionProps) {
       emoji="🌸"
       bgVariant="lavender"
     >
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+      <div className={`${layout.containerClass} gap-6`}>
         {cards.map((card, i) => (
           <motion.div
             key={card.id}
@@ -26,7 +29,7 @@ export function PersonalCardsSection({ cards }: PersonalCardsSectionProps) {
             viewport={{ once: true }}
             transition={{ delay: i * 0.1, duration: 0.6 }}
             whileHover={{ y: -4, rotate: i % 2 === 0 ? 1 : -1 }}
-            className="rounded-2xl p-6 md:p-8 relative overflow-hidden group"
+            className={`rounded-2xl p-6 md:p-8 relative overflow-hidden group ${layout.cardClass}`}
             style={{
               background: "var(--white)",
               border: "1px solid var(--border-subtle)",

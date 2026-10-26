@@ -5,6 +5,7 @@ import { useState } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { SharedInteractions } from "../interactions/SharedInteractions";
 import { RomanticCharacter } from "../RomanticCharacter";
+import { getResponsiveCardGridLayout } from "@/lib/layout-utils";
 import type { OpenWhenLetter } from "@/lib/gift-data";
 
 interface OpenWhenSectionProps {
@@ -14,6 +15,7 @@ interface OpenWhenSectionProps {
 export function OpenWhenSection({ letters }: OpenWhenSectionProps) {
   const [openId, setOpenId] = useState<string | null>(null);
   const [openedIds, setOpenedIds] = useState<Set<string>>(new Set());
+  const layout = getResponsiveCardGridLayout(letters.length);
 
   const handleOpen = (id: string) => {
     if (openId === id) {
@@ -52,7 +54,7 @@ export function OpenWhenSection({ letters }: OpenWhenSectionProps) {
         Choose the letter you need today.
       </p>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+      <div className={`${layout.containerClass} gap-5`}>
         {letters.map((letter, i) => (
           <EnvelopeCard
             key={letter.id}
@@ -61,6 +63,7 @@ export function OpenWhenSection({ letters }: OpenWhenSectionProps) {
             isOpen={openId === letter.id}
             wasOpened={openedIds.has(letter.id)}
             onToggle={() => handleOpen(letter.id)}
+            className={layout.cardClass}
           />
         ))}
       </div>
@@ -84,12 +87,14 @@ function EnvelopeCard({
   isOpen,
   wasOpened,
   onToggle,
+  className = "",
 }: {
   letter: OpenWhenLetter;
   index: number;
   isOpen: boolean;
   wasOpened: boolean;
   onToggle: () => void;
+  className?: string;
 }) {
   return (
     <motion.button
@@ -100,7 +105,7 @@ function EnvelopeCard({
       whileHover={{ y: -4, scale: 1.02 }}
       whileTap={{ scale: 0.98 }}
       onClick={onToggle}
-      className="w-full text-left rounded-2xl p-5 md:p-6 cursor-pointer transition-all duration-300 relative overflow-hidden group"
+      className={`text-left rounded-2xl p-5 md:p-6 cursor-pointer transition-all duration-300 relative overflow-hidden group ${className || "w-full"}`}
       style={{
         background: wasOpened
           ? "linear-gradient(135deg, var(--white) 0%, var(--pale-rose) 100%)"

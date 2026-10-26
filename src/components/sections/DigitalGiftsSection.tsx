@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useState } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { RomanticCharacter } from "../RomanticCharacter";
+import { getResponsiveCardGridLayout } from "@/lib/layout-utils";
 import type { DigitalGift } from "@/lib/gift-data";
 
 export interface ClaimRecord {
@@ -209,27 +210,30 @@ export function DigitalGiftsSection({ gifts = defaultGiftsList }: DigitalGiftsSe
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {activeGifts.map((gift, i) => {
-              const claim = claims[gift.id];
-              const isClaimed = !!claim;
-              const isFulfilled = !!fulfilledMap[gift.id];
-              const isCelebrating = celebrationGift?.id === gift.id;
+          (() => {
+            const layout = getResponsiveCardGridLayout(activeGifts.length);
+            return (
+              <div className={`${layout.containerClass} gap-6`}>
+                {activeGifts.map((gift, i) => {
+                  const claim = claims[gift.id];
+                  const isClaimed = !!claim;
+                  const isFulfilled = !!fulfilledMap[gift.id];
+                  const isCelebrating = celebrationGift?.id === gift.id;
 
-              return (
-                <motion.div
-                  key={gift.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.08, duration: 0.5 }}
-                  whileHover={!isClaimed ? { y: -5 } : {}}
-                  className={`rounded-3xl p-6 sm:p-7 flex flex-col justify-between border transition-all duration-300 relative overflow-hidden ${
-                    isClaimed
-                      ? "bg-gradient-to-br from-[var(--pale-rose)] via-[var(--bg-surface)] to-white border-[var(--pink-primary)] shadow-md"
-                      : "bg-white border-[var(--border-subtle)] shadow-[0_4px_20px_var(--shadow-pink)] hover:shadow-lg"
-                  }`}
-                >
+                  return (
+                    <motion.div
+                      key={gift.id}
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ delay: i * 0.08, duration: 0.5 }}
+                      whileHover={!isClaimed ? { y: -5 } : {}}
+                      className={`rounded-3xl p-6 sm:p-7 flex flex-col justify-between border transition-all duration-300 relative overflow-hidden ${
+                        isClaimed
+                          ? "bg-gradient-to-br from-[var(--pale-rose)] via-[var(--bg-surface)] to-white border-[var(--pink-primary)] shadow-md"
+                          : "bg-white border-[var(--border-subtle)] shadow-[0_4px_20px_var(--shadow-pink)] hover:shadow-lg"
+                      } ${layout.cardClass}`}
+                    >
                   {/* Celebration Sparkle Burst */}
                   <AnimatePresence>
                     {isCelebrating && (
@@ -324,8 +328,10 @@ export function DigitalGiftsSection({ gifts = defaultGiftsList }: DigitalGiftsSe
                 </motion.div>
               );
             })}
-          </div>
-        )}
+            </div>
+          );
+        })()
+      )}
       </div>
 
       {/* Claim Modal with Optional Note */}

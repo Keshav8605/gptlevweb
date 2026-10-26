@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { SectionWrapper } from "../SectionWrapper";
 import { SharedInteractions } from "../interactions/SharedInteractions";
 import { RomanticCharacter } from "../RomanticCharacter";
+import { getResponsiveCardGridLayout } from "@/lib/layout-utils";
 import type { ObservationCard } from "@/lib/gift-data";
 
 interface ObservationsSectionProps {
@@ -11,6 +12,8 @@ interface ObservationsSectionProps {
 }
 
 export function ObservationsSection({ observations }: ObservationsSectionProps) {
+  const layout = getResponsiveCardGridLayout(observations.length);
+
   return (
     <SectionWrapper
       id="observations"
@@ -35,7 +38,7 @@ export function ObservationsSection({ observations }: ObservationsSectionProps) 
         />
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-7">
+      <div className={`${layout.containerClass} gap-6 sm:gap-7`}>
         {observations.map((card, i) => {
           return (
             <motion.div
@@ -45,7 +48,7 @@ export function ObservationsSection({ observations }: ObservationsSectionProps) 
               viewport={{ once: true, margin: "-40px" }}
               whileHover={{ y: -6, scale: 1.02 }}
               transition={{ delay: i * 0.08, duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="rounded-3xl p-6 sm:p-7 transition-shadow duration-300 relative overflow-hidden flex flex-col justify-between group bg-white border border-[var(--border-subtle)] shadow-xs hover:shadow-2xl"
+              className={`rounded-3xl p-6 sm:p-7 transition-shadow duration-300 relative overflow-hidden flex flex-col justify-between group bg-white border border-[var(--border-subtle)] shadow-xs hover:shadow-2xl ${layout.cardClass}`}
             >
               {/* Cute Washi-tape sticker accent at top */}
               <div

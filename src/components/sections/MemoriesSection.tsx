@@ -7,6 +7,7 @@ import { SharedInteractions } from "../interactions/SharedInteractions";
 import { RomanticCharacter } from "../RomanticCharacter";
 import { HeartPhotoCollage } from "../HeartPhotoCollage";
 import { FramedPhotoCollage } from "../FramedPhotoCollage";
+import { getResponsiveCardGridLayout } from "@/lib/layout-utils";
 import type { Memory } from "@/lib/gift-data";
 
 export interface MemoriesSectionProps {
@@ -290,21 +291,24 @@ export function MemoriesSection({
         </div>
 
         {/* Scrapbook Polaroid Grid (Inspired by Reference 1) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-10 pt-2 pb-8">
-          {displayItems.map((item, idx) => (
-            <motion.div
-              key={item.id}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-40px" }}
-              transition={{ duration: 0.6, delay: idx * 0.1 }}
-              whileHover={{ scale: 1.05, rotate: 0, zIndex: 20 }}
-              onClick={() => setSelectedIndex(idx)}
-              className="group cursor-pointer select-none"
-              style={{
-                transform: `rotate(${item.rotation}deg)`,
-              }}
-            >
+        {(() => {
+          const scrapbookLayout = getResponsiveCardGridLayout(displayItems.length);
+          return (
+            <div className={`${scrapbookLayout.containerClass} gap-6 sm:gap-8 lg:gap-10 pt-2 pb-8`}>
+              {displayItems.map((item, idx) => (
+                <motion.div
+                  key={item.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.6, delay: idx * 0.1 }}
+                  whileHover={{ scale: 1.05, rotate: 0, zIndex: 20 }}
+                  onClick={() => setSelectedIndex(idx)}
+                  className={`group cursor-pointer select-none ${scrapbookLayout.cardClass}`}
+                  style={{
+                    transform: `rotate(${item.rotation}deg)`,
+                  }}
+                >
               <div className="bg-white p-4 pb-5 rounded-2xl shadow-md group-hover:shadow-2xl border border-[var(--border-subtle)] transition-all duration-300">
                 {/* Photo Container */}
                 <div className={`relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br ${item.tint} flex items-center justify-center`}>
@@ -367,6 +371,8 @@ export function MemoriesSection({
             </motion.div>
           ))}
         </div>
+      );
+    })()}
 
         {/* Cute Dot Navigation / Heart Indicators */}
         <div className="flex items-center justify-center gap-2 pt-4">
