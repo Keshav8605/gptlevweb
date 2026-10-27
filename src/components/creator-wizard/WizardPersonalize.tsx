@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ALL_18_CHAPTERS } from "@/lib/creator-defaults";
 import type { CreatorConfig } from "@/lib/creator-types";
+import type { CharacterIdentifier } from "@/config/characterAssets";
 import { WizardChapterSidePreview } from "./WizardChapterSidePreview";
 
 interface WizardPersonalizeProps {
@@ -1805,18 +1806,58 @@ export function WizardPersonalize({
                       />
 
                       <div className="grid grid-cols-2 gap-2 pt-1 text-xs">
-                        <input
-                          type="text"
-                          value={mem.date || ""}
-                          onChange={(e) => {
-                            const updated = config.memories.items.map((m) =>
-                              m.id === mem.id ? { ...m, date: e.target.value } : m
-                            );
-                            onChange({ memories: { ...config.memories, items: updated } });
-                          }}
-                          placeholder="Date (e.g. Summer 2024)"
-                          className="px-2 py-1.5 rounded-lg border border-[var(--border-subtle)] text-[11px]"
-                        />
+                        <div className="relative flex items-center">
+                          <input
+                            type="text"
+                            value={mem.date || ""}
+                            onChange={(e) => {
+                              const updated = config.memories.items.map((m) =>
+                                m.id === mem.id ? { ...m, date: e.target.value } : m
+                              );
+                              onChange({ memories: { ...config.memories, items: updated } });
+                            }}
+                            placeholder="Date (e.g. Summer 2024)"
+                            className="w-full pl-2 pr-7 py-1.5 rounded-lg border border-[var(--border-subtle)] text-[11px] focus:outline-none focus:border-[var(--pink-strong)]"
+                          />
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              const input = e.currentTarget.querySelector('input[type="date"]') as HTMLInputElement;
+                              if (input) {
+                                if (typeof input.showPicker === "function") {
+                                  input.showPicker();
+                                } else {
+                                  input.click();
+                                }
+                              }
+                            }}
+                            title="Pick date from calendar"
+                            className="absolute right-1 text-gray-400 hover:text-[var(--pink-strong)] p-1 rounded cursor-pointer transition-colors"
+                          >
+                            <svg className="w-3.5 h-3.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                            </svg>
+                            <input
+                              type="date"
+                              tabIndex={-1}
+                              className="absolute inset-0 opacity-0 cursor-pointer w-full h-full"
+                              onChange={(e) => {
+                                if (!e.target.value) return;
+                                const [y, m, d] = e.target.value.split("-").map(Number);
+                                const dateObj = new Date(y, m - 1, d);
+                                const formatted = dateObj.toLocaleDateString("en-US", {
+                                  month: "short",
+                                  day: "numeric",
+                                  year: "numeric",
+                                });
+                                const updated = config.memories.items.map((mItem) =>
+                                  mItem.id === mem.id ? { ...mItem, date: formatted } : mItem
+                                );
+                                onChange({ memories: { ...config.memories, items: updated } });
+                              }}
+                            />
+                          </button>
+                        </div>
                         <input
                           type="text"
                           value={mem.location || ""}
@@ -1827,7 +1868,7 @@ export function WizardPersonalize({
                             onChange({ memories: { ...config.memories, items: updated } });
                           }}
                           placeholder="Location (e.g. The beach)"
-                          className="px-2 py-1.5 rounded-lg border border-[var(--border-subtle)] text-[11px]"
+                          className="px-2 py-1.5 rounded-lg border border-[var(--border-subtle)] text-[11px] focus:outline-none focus:border-[var(--pink-strong)]"
                         />
                       </div>
                     </div>
@@ -1850,8 +1891,61 @@ export function WizardPersonalize({
               </p>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <div className="space-y-2">
+            {/* 1. Section Heading & Subtitle (Displayed at the top of the Song screen) */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-white border border-[var(--border-subtle)] space-y-4 shadow-2xs">
+              <div className="border-b border-[var(--border-subtle)] pb-2.5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded flex items-center gap-1.5">
+                  <span>🎵</span>
+                  <span>Section Heading & Subtitle</span>
+                </h4>
+                <p className="text-[11px] text-[var(--text-muted)] font-rounded mt-0.5">
+                  Displayed at the very top of the song screen.
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                    Section Heading
+                  </label>
+                  <input
+                    type="text"
+                    value={config.ourSong.heading ?? "Our Song"}
+                    onChange={(e) =>
+                      onChange({
+                        ourSong: { ...config.ourSong, heading: e.target.value },
+                      })
+                    }
+                    placeholder="e.g. Our Song"
+                    className="w-full px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm font-rounded focus:outline-none focus:border-[var(--pink-strong)]"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                    Section Subtitle
+                  </label>
+                  <input
+                    type="text"
+                    value={
+                      config.ourSong.subtitle ??
+                      "Some songs play in the background. This one brings you right back to me."
+                    }
+                    onChange={(e) =>
+                      onChange({
+                        ourSong: { ...config.ourSong, subtitle: e.target.value },
+                      })
+                    }
+                    placeholder="Subtitle displayed below the heading..."
+                    className="w-full px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm font-rounded focus:outline-none focus:border-[var(--pink-strong)]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* 2. Song Details (Song Title & Artist Name) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
                 <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
                   Song Title
                 </label>
@@ -1864,11 +1958,11 @@ export function WizardPersonalize({
                     })
                   }
                   placeholder="e.g. Golden Hour, Until I Found You"
-                  className="w-full px-4 py-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm font-rounded"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm font-rounded focus:outline-none focus:border-[var(--pink-strong)]"
                 />
               </div>
 
-              <div className="space-y-2">
+              <div className="space-y-1.5">
                 <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
                   Artist Name
                 </label>
@@ -1881,14 +1975,62 @@ export function WizardPersonalize({
                     })
                   }
                   placeholder="e.g. JVKE, Stephen Sanchez"
-                  className="w-full px-4 py-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm font-rounded"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm font-rounded focus:outline-none focus:border-[var(--pink-strong)]"
                 />
               </div>
             </div>
 
-            <div className="space-y-2">
+            {/* 3. Personal Dedication (Displayed in the dedication card) */}
+            <div className="p-4 sm:p-5 rounded-2xl bg-white border border-[var(--border-subtle)] space-y-4 shadow-2xs">
+              <div className="border-b border-[var(--border-subtle)] pb-2.5">
+                <h4 className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded flex items-center gap-1.5">
+                  <span>💌</span>
+                  <span>Personal Dedication Card</span>
+                </h4>
+                <p className="text-[11px] text-[var(--text-muted)] font-rounded mt-0.5">
+                  Displayed in the dedicated card right below the song title and artist.
+                </p>
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                  Dedication Card Heading
+                </label>
+                <input
+                  type="text"
+                  value={config.ourSong.dedicationHeading ?? "A little dedication to you"}
+                  onChange={(e) =>
+                    onChange({
+                      ourSong: { ...config.ourSong, dedicationHeading: e.target.value },
+                    })
+                  }
+                  placeholder="e.g. A little dedication to you"
+                  className="w-full px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm font-rounded focus:outline-none focus:border-[var(--pink-strong)]"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                  Personal Dedication Message
+                </label>
+                <textarea
+                  rows={3}
+                  value={config.ourSong.dedication}
+                  onChange={(e) =>
+                    onChange({
+                      ourSong: { ...config.ourSong, dedication: e.target.value },
+                    })
+                  }
+                  placeholder="e.g. Dedicated to my favorite person in the whole wide world..."
+                  className="w-full px-4 py-2.5 rounded-xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm font-rounded focus:outline-none focus:border-[var(--pink-strong)]"
+                />
+              </div>
+            </div>
+
+            {/* 4. Why This Song Matters (Displayed as the romantic quote below the dedication card) */}
+            <div className="space-y-1.5">
               <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
-                Why This Song Matters
+                Why This Song Matters (Quote)
               </label>
               <textarea
                 rows={3}
@@ -1899,70 +2041,8 @@ export function WizardPersonalize({
                   })
                 }
                 placeholder="Every time this song plays, I remember the night we drove along the coast..."
-                className="w-full px-4 py-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm font-rounded"
+                className="w-full px-4 py-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm font-rounded italic focus:outline-none focus:border-[var(--pink-strong)]"
               />
-            </div>
-
-            <div className="space-y-2">
-              <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
-                Personal Dedication
-              </label>
-              <input
-                type="text"
-                value={config.ourSong.dedication}
-                onChange={(e) =>
-                  onChange({
-                    ourSong: { ...config.ourSong, dedication: e.target.value },
-                  })
-                }
-                placeholder="e.g. Dedicated to my favorite girl in the whole wide world."
-                className="w-full px-4 py-3 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)] text-sm font-rounded font-serif italic"
-              />
-            </div>
-
-            {/* Input for Photo 1 (Song Artwork / Photo) */}
-            <div className="p-4 rounded-2xl bg-pink-50/70 border border-pink-200 space-y-2">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-md bg-[var(--pink-strong)] text-white text-[10px] font-bold font-rounded">
-                    Photo 1
-                  </span>
-                  <label className="text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
-                    Input for Photo 1 (Song Artwork / Dedication Photo)
-                  </label>
-                </div>
-              </div>
-              <p className="text-[11px] text-[var(--text-muted)] font-rounded">
-                Appears on the rotating vinyl record in the live preview.
-              </p>
-              <div className="flex items-center gap-3">
-                <button
-                  type="button"
-                  onClick={() =>
-                    onOpenPhotoLibrary((url) => {
-                      onChange({
-                        ourSong: { ...config.ourSong, coverArtwork: url },
-                      });
-                    }, "Choose Input for Photo 1 (Song Artwork)")
-                  }
-                  className="px-4 py-2 rounded-xl border border-dashed border-[var(--pink-primary)] bg-white text-xs font-rounded font-semibold text-[var(--pink-strong)] hover:bg-[var(--pale-rose)] cursor-pointer"
-                >
-                  {config.ourSong.coverArtwork ? "Change Input for Photo 1 📸" : "+ Select Input for Photo 1 📸"}
-                </button>
-                {config.ourSong.coverArtwork && (
-                  <button
-                    type="button"
-                    onClick={() =>
-                      onChange({
-                        ourSong: { ...config.ourSong, coverArtwork: undefined },
-                      })
-                    }
-                    className="text-xs text-rose-500 hover:underline cursor-pointer"
-                  >
-                    Remove Photo 1
-                  </button>
-                )}
-              </div>
             </div>
           </div>
         )}
@@ -2039,7 +2119,7 @@ export function WizardPersonalize({
                     </button>
                   </div>
 
-                  <div className="flex items-center gap-2 mb-2">
+                  <div className="flex items-center gap-2 mb-2.5">
                     <input
                       type="text"
                       value={item.emoji || "💌"}
@@ -2066,18 +2146,151 @@ export function WizardPersonalize({
                     />
                   </div>
 
-                  <textarea
-                    rows={3}
-                    value={item.content}
-                    onChange={(e) => {
-                      const updated = config.openWhen.items.map((o) =>
-                        o.id === item.id ? { ...o, content: e.target.value } : o
-                      );
-                      onChange({ openWhen: { items: updated } });
-                    }}
-                    placeholder="The heartfelt message inside the envelope..."
-                    className="w-full text-xs font-rounded text-[var(--text-secondary)] focus:outline-none px-2.5 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)]"
-                  />
+                  {/* Letter Subtitle / Heading */}
+                  <div className="mb-2">
+                    <input
+                      type="text"
+                      value={item.heading || ""}
+                      onChange={(e) => {
+                        const updated = config.openWhen.items.map((o) =>
+                          o.id === item.id ? { ...o, heading: e.target.value } : o
+                        );
+                        onChange({ openWhen: { items: updated } });
+                      }}
+                      placeholder="Letter subtitle (e.g. A quiet lullaby for a wandering mind)"
+                      className="w-full text-xs font-handwritten text-[var(--pink-strong)] focus:outline-none px-2.5 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)]"
+                    />
+                  </div>
+
+                  {/* Message Body */}
+                  <div className="mb-2">
+                    <textarea
+                      rows={3}
+                      value={item.content}
+                      onChange={(e) => {
+                        const updated = config.openWhen.items.map((o) =>
+                          o.id === item.id ? { ...o, content: e.target.value } : o
+                        );
+                        onChange({ openWhen: { items: updated } });
+                      }}
+                      placeholder="The heartfelt message inside the envelope..."
+                      className="w-full text-xs font-rounded text-[var(--text-secondary)] focus:outline-none px-2.5 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)]"
+                    />
+                  </div>
+
+                  {/* Sign-off / Signature */}
+                  <div className="mb-2.5">
+                    <input
+                      type="text"
+                      value={item.signature || ""}
+                      onChange={(e) => {
+                        const updated = config.openWhen.items.map((o) =>
+                          o.id === item.id ? { ...o, signature: e.target.value } : o
+                        );
+                        onChange({ openWhen: { items: updated } });
+                      }}
+                      placeholder="Sign-off (e.g. Sleep peacefully, my favorite person. ♡)"
+                      className="w-full text-xs font-serif italic text-[var(--text-muted)] focus:outline-none px-2.5 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)]"
+                    />
+                  </div>
+
+                  {/* Cute Companion / Illustration Selector */}
+                  <div className="pt-2 border-t border-[var(--border-subtle)] space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded flex items-center gap-1">
+                        <span>🐾</span>
+                        <span>Companion Character / Sticker</span>
+                      </label>
+                      {item.photo && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            const updated = config.openWhen.items.map((o) =>
+                              o.id === item.id ? { ...o, photo: undefined } : o
+                            );
+                            onChange({ openWhen: { items: updated } });
+                          }}
+                          className="text-[10px] text-rose-500 hover:underline cursor-pointer font-rounded"
+                        >
+                          Reset to Character
+                        </button>
+                      )}
+                    </div>
+
+                    {item.photo ? (
+                      <div className="flex items-center gap-2 p-1.5 bg-pink-50 rounded-xl border border-pink-200">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={item.photo} alt="Custom sticker" className="w-8 h-8 rounded-lg object-cover" />
+                        <span className="text-[11px] font-rounded text-[var(--pink-strong)] font-semibold truncate flex-1">
+                          Custom sticker/photo active
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onOpenPhotoLibrary((url) => {
+                              const updated = config.openWhen.items.map((o) =>
+                                o.id === item.id ? { ...o, photo: url } : o
+                              );
+                              onChange({ openWhen: { items: updated } });
+                            }, `Choose sticker for "${item.title}"`)
+                          }
+                          className="text-[10px] text-[var(--pink-strong)] font-bold underline cursor-pointer"
+                        >
+                          Change
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        {[
+                          { id: "tenderCouple", label: "Forehead Kiss", img: "/images/534-5341290_heart-pink-png.png" },
+                          { id: "kissingCouple", label: "Cheek Kiss", img: "/images/528-5288220_kawaii-tumblr-png.png" },
+                          { id: "cozyCouple", label: "Snuggle", img: "/images/506-5064307_cute-cats-png.png" },
+                          { id: "huggingCouple", label: "Joyful Hug", img: "/images/519-5196830_cute-cat-png.png" },
+                        ].map((char) => {
+                          const isSelected = (item.character || "tenderCouple") === char.id;
+                          return (
+                            <button
+                              key={char.id}
+                              type="button"
+                              onClick={() => {
+                                const updated = config.openWhen.items.map((o) =>
+                                  o.id === item.id ? { ...o, character: char.id as CharacterIdentifier, photo: undefined } : o
+                                );
+                                onChange({ openWhen: { items: updated } });
+                              }}
+                              className={`p-1 px-1.5 rounded-xl border flex items-center gap-1.5 cursor-pointer transition-all ${
+                                isSelected
+                                  ? "bg-pink-100/90 border-[var(--pink-strong)] ring-1 ring-[var(--pink-strong)] shadow-2xs"
+                                  : "bg-white border-gray-200 hover:border-pink-300"
+                              }`}
+                              title={char.label}
+                            >
+                              {/* eslint-disable-next-line @next/next/no-img-element */}
+                              <img src={char.img} alt={char.label} className="w-5 h-5 object-contain" />
+                              <span className="text-[10px] font-rounded font-semibold text-gray-700 whitespace-nowrap">
+                                {char.label}
+                              </span>
+                            </button>
+                          );
+                        })}
+                        <button
+                          type="button"
+                          onClick={() =>
+                            onOpenPhotoLibrary((url) => {
+                              const updated = config.openWhen.items.map((o) =>
+                                o.id === item.id ? { ...o, photo: url } : o
+                              );
+                              onChange({ openWhen: { items: updated } });
+                            }, `Choose sticker for "${item.title}"`)
+                          }
+                          className="p-1 px-2 rounded-xl border border-dashed border-pink-300 bg-white hover:bg-[var(--pale-rose)] text-[10px] text-[var(--pink-strong)] font-rounded font-semibold cursor-pointer whitespace-nowrap transition-colors"
+                          title="Pick a custom sticker or photo"
+                        >
+                          + Photo 📷
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -2382,7 +2595,7 @@ export function WizardPersonalize({
                   Letters I Don&apos;t Say Enough
                 </h3>
                 <p className="text-xs text-[var(--text-muted)] font-rounded mt-1">
-                  Heartfelt love letters with personal greetings, body text, and signatures.
+                  Heartfelt love letters with personal body text and signatures.
                 </p>
               </div>
 
@@ -2397,7 +2610,6 @@ export function WizardPersonalize({
                         {
                           id,
                           title: "To My Favorite Person",
-                          greeting: `Dearest ${config.recipientNickname || "Baby"},`,
                           content: "Thank you for simply existing in my world. You make every day warmer.",
                           closingLine: "With all my love,",
                           signature: config.senderNickname || "Babe",
@@ -2444,18 +2656,6 @@ export function WizardPersonalize({
                       ✕ Remove
                     </button>
                   </div>
-
-                  <input
-                    type="text"
-                    value={letter.greeting || `Dear ${config.recipientNickname},`}
-                    onChange={(e) => {
-                      const updated = config.letters.items.map((l) =>
-                        l.id === letter.id ? { ...l, greeting: e.target.value } : l
-                      );
-                      onChange({ letters: { items: updated } });
-                    }}
-                    className="w-full text-xs font-rounded text-[var(--text-muted)] bg-transparent focus:outline-none"
-                  />
 
                   <textarea
                     rows={6}

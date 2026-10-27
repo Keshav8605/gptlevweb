@@ -290,10 +290,14 @@ export interface GiftRecord {
   secretHint?: string;
   secretContent?: string;
   featuredSong?: {
+    heading?: string;
+    subtitle?: string;
     title: string;
     artist: string;
+    dedicationHeading?: string;
     dedication: string;
     whyItMatters?: string;
+    coverArtwork?: string;
   };
   finalLetter?: string;
   finalMessage?: string;

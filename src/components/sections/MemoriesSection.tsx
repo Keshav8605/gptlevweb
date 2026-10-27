@@ -24,6 +24,19 @@ export interface MemoriesSectionProps {
   polaroidBorderPhotos?: string[];
 }
 
+function formatMemoryDate(dateStr?: string) {
+  if (!dateStr) return "";
+  const parsed = new Date(dateStr);
+  if (!isNaN(parsed.getTime())) {
+    return parsed.toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  }
+  return dateStr;
+}
+
 // Curated romantic photos for scrapbook demo fallbacks matching Reference 1
 const defaultPolaroids = [
   {
@@ -107,8 +120,8 @@ export function MemoriesSection({
     onCollageTypeChange?.(style);
   };
 
-  // Combine user memories with default layout
-  const displayItems = memories && memories.length > 0
+  // Combine user memories with default layout - respect empty array if user removed all cards
+  const displayItems = Array.isArray(memories)
     ? memories.map((m, idx) => {
         const fallback = defaultPolaroids[idx % defaultPolaroids.length];
         return {
@@ -280,108 +293,113 @@ export function MemoriesSection({
           </AnimatePresence>
         </div>
 
-        {/* Gallery Introduction & Instruction */}
-        <div className="pt-8 text-center space-y-2 border-t border-[var(--border-subtle)]/70">
-          <p className="font-handwritten text-xl sm:text-2xl text-[var(--pink-strong)]">
-            Some moments last only a second. Somehow, the feeling stays forever.
-          </p>
-          <p className="text-xs sm:text-sm font-rounded font-semibold text-[var(--text-muted)] tracking-wide">
-            Choose a picture to uncover its memory ♡
-          </p>
-        </div>
+        {/* Scrapbook Memory Stories (Polaroid Cards) */}
+        {displayItems.length > 0 && (
+          <>
+            {/* Gallery Introduction & Instruction */}
+            <div className="pt-8 text-center space-y-2 border-t border-[var(--border-subtle)]/70">
+              <p className="font-handwritten text-xl sm:text-2xl text-[var(--pink-strong)]">
+                Some moments last only a second. Somehow, the feeling stays forever.
+              </p>
+              <p className="text-xs sm:text-sm font-rounded font-semibold text-[var(--text-muted)] tracking-wide">
+                Choose a picture to uncover its memory ♡
+              </p>
+            </div>
 
-        {/* Scrapbook Polaroid Grid (Inspired by Reference 1) */}
-        {(() => {
-          const scrapbookLayout = getResponsiveCardGridLayout(displayItems.length);
-          return (
-            <div className={`${scrapbookLayout.containerClass} gap-6 sm:gap-8 lg:gap-10 pt-2 pb-8`}>
-              {displayItems.map((item, idx) => (
-                <motion.div
-                  key={item.id}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-40px" }}
-                  transition={{ duration: 0.6, delay: idx * 0.1 }}
-                  whileHover={{ scale: 1.05, rotate: 0, zIndex: 20 }}
-                  onClick={() => setSelectedIndex(idx)}
-                  className={`group cursor-pointer select-none ${scrapbookLayout.cardClass}`}
-                  style={{
-                    transform: `rotate(${item.rotation}deg)`,
-                  }}
-                >
-              <div className="bg-white p-4 pb-5 rounded-2xl shadow-md group-hover:shadow-2xl border border-[var(--border-subtle)] transition-all duration-300">
-                {/* Photo Container */}
-                <div className={`relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br ${item.tint} flex items-center justify-center`}>
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.photoUrl}
-                    alt={item.caption}
-                    className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-108"
-                    onError={(e) => {
-                      // Graceful fallback to lovely icon gradient if image fails
-                      e.currentTarget.style.display = "none";
-                    }}
-                  />
+            {/* Scrapbook Polaroid Grid (Inspired by Reference 1) */}
+            {(() => {
+              const scrapbookLayout = getResponsiveCardGridLayout(displayItems.length);
+              return (
+                <div className={`${scrapbookLayout.containerClass} gap-6 sm:gap-8 lg:gap-10 pt-2 pb-8`}>
+                  {displayItems.map((item, idx) => (
+                    <motion.div
+                      key={item.id}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true, margin: "-40px" }}
+                      transition={{ duration: 0.6, delay: idx * 0.1 }}
+                      whileHover={{ scale: 1.05, rotate: 0, zIndex: 20 }}
+                      onClick={() => setSelectedIndex(idx)}
+                      className={`group cursor-pointer select-none ${scrapbookLayout.cardClass}`}
+                      style={{
+                        transform: `rotate(${item.rotation}deg)`,
+                      }}
+                    >
+                  <div className="bg-white p-4 pb-5 rounded-2xl shadow-md group-hover:shadow-2xl border border-[var(--border-subtle)] transition-all duration-300">
+                    {/* Photo Container */}
+                    <div className={`relative aspect-square rounded-xl overflow-hidden bg-gradient-to-br ${item.tint} flex items-center justify-center`}>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={item.photoUrl}
+                        alt={item.caption}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-108"
+                        onError={(e) => {
+                          // Graceful fallback to lovely icon gradient if image fails
+                          e.currentTarget.style.display = "none";
+                        }}
+                      />
 
-                  {/* Photo Number Badge if showPhotoBadges is true */}
-                  {showPhotoBadges && (
-                    <div className="absolute top-2.5 left-2.5 z-30 px-2.5 py-0.5 rounded-full bg-[var(--pink-strong)] text-white text-[10px] font-bold font-rounded shadow-md border border-white flex items-center gap-1">
-                      <span>📷</span>
-                      <span>Photo {idx + 1}</span>
-                    </div>
-                  )}
+                      {/* Photo Number Badge if showPhotoBadges is true */}
+                      {showPhotoBadges && (
+                        <div className="absolute top-2.5 left-2.5 z-30 px-2.5 py-0.5 rounded-full bg-[var(--pink-strong)] text-white text-[10px] font-bold font-rounded shadow-md border border-white flex items-center gap-1">
+                          <span>📷</span>
+                          <span>Photo {idx + 1}</span>
+                        </div>
+                      )}
 
-                  {/* Floating emoji icon badge */}
-                  <div className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-sm shadow-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
-                    💖
-                  </div>
-
-                  {/* Cute Classy Hover Story Reveal Overlay */}
-                  <div className="absolute inset-0 p-4 sm:p-5 bg-gradient-to-b from-white/95 via-white/92 to-[var(--bg-surface)]/95 backdrop-blur-md rounded-xl flex flex-col justify-between opacity-0 group-hover:opacity-100 translate-y-3 group-hover:translate-y-0 transition-all duration-300 ease-out shadow-inner border border-white/80 z-20">
-                    <div>
-                      <div className="flex items-center justify-between gap-1 mb-2 pb-1.5 border-b border-[var(--border-subtle)]">
-                        <span className="text-[11px] font-bold text-[var(--pink-strong)] uppercase tracking-wider font-rounded flex items-center gap-1">
-                          <span>{item.emoji || "📸"}</span> Story
-                        </span>
-                        {item.date && (
-                          <span className="text-[10px] text-[var(--text-muted)] font-rounded">
-                            {new Date(item.date).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
-                          </span>
-                        )}
+                      {/* Floating emoji icon badge */}
+                      <div className="absolute top-2.5 right-2.5 w-8 h-8 rounded-full bg-white/80 backdrop-blur-xs flex items-center justify-center text-sm shadow-xs opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                        💖
                       </div>
-                      <p className="font-serif italic text-xs sm:text-sm text-[var(--romantic-plum)] leading-relaxed line-clamp-5 sm:line-clamp-6">
-                        &ldquo;{item.description}&rdquo;
+
+                      {/* Cute Classy Hover Story Reveal Overlay */}
+                      <div className="absolute inset-0 p-4 sm:p-5 bg-gradient-to-b from-white/95 via-white/92 to-[var(--bg-surface)]/95 backdrop-blur-md rounded-xl flex flex-col justify-between opacity-0 group-hover:opacity-100 translate-y-3 group-hover:translate-y-0 transition-all duration-300 ease-out shadow-inner border border-white/80 z-20">
+                        <div>
+                          <div className="flex items-center justify-between gap-1 mb-2 pb-1.5 border-b border-[var(--border-subtle)]">
+                            <span className="text-[11px] font-bold text-[var(--pink-strong)] uppercase tracking-wider font-rounded flex items-center gap-1">
+                              <span>{item.emoji || "📸"}</span> Story
+                            </span>
+                            {item.date && (
+                              <span className="text-[10px] text-[var(--text-muted)] font-rounded">
+                                {formatMemoryDate(item.date)}
+                              </span>
+                            )}
+                          </div>
+                          <p className="font-serif italic text-xs sm:text-sm text-[var(--romantic-plum)] leading-relaxed line-clamp-5 sm:line-clamp-6">
+                            &ldquo;{item.description}&rdquo;
+                          </p>
+                        </div>
+
+                        <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between text-[11px] text-[var(--pink-deep)] font-rounded font-semibold">
+                          <span>Tap to read more &amp; comment ♡</span>
+                          <span className="text-sm animate-pulse-soft">✨</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Handwritten Polaroid Caption */}
+                    <div className="pt-3.5 text-center">
+                      <p className="font-handwritten text-lg sm:text-xl text-[var(--romantic-plum)] leading-snug">
+                        {item.caption}
                       </p>
                     </div>
-
-                    <div className="pt-2 border-t border-[var(--border-subtle)] flex items-center justify-between text-[11px] text-[var(--pink-deep)] font-rounded font-semibold">
-                      <span>Tap to read more &amp; comment ♡</span>
-                      <span className="text-sm animate-pulse-soft">✨</span>
-                    </div>
                   </div>
-                </div>
+                </motion.div>
+              ))}
+            </div>
+          );
+        })()}
 
-                {/* Handwritten Polaroid Caption */}
-                <div className="pt-3.5 text-center">
-                  <p className="font-handwritten text-lg sm:text-xl text-[var(--romantic-plum)] leading-snug">
-                    {item.caption}
-                  </p>
-                </div>
-              </div>
-            </motion.div>
-          ))}
-        </div>
-      );
-    })()}
-
-        {/* Cute Dot Navigation / Heart Indicators */}
-        <div className="flex items-center justify-center gap-2 pt-4">
-          <span className="text-[var(--pink-primary)] text-xs">♥</span>
-          <span className="text-[var(--pink-primary)] text-sm">♥</span>
-          <span className="text-[var(--pink-strong)] text-base">♥</span>
-          <span className="text-[var(--pink-primary)] text-sm">♥</span>
-          <span className="text-[var(--pink-primary)] text-xs">♥</span>
-        </div>
+            {/* Cute Dot Navigation / Heart Indicators */}
+            <div className="flex items-center justify-center gap-2 pt-4">
+              <span className="text-[var(--pink-primary)] text-xs">♥</span>
+              <span className="text-[var(--pink-primary)] text-sm">♥</span>
+              <span className="text-[var(--pink-strong)] text-base">♥</span>
+              <span className="text-[var(--pink-primary)] text-sm">♥</span>
+              <span className="text-[var(--pink-primary)] text-xs">♥</span>
+            </div>
+          </>
+        )}
       </div>
 
       {/* Memory Lightbox Modal */}
@@ -460,11 +478,7 @@ export function MemoriesSection({
 
                 {selectedMemory.date && (
                   <p className="text-xs text-[var(--text-muted)] mb-4 font-rounded">
-                    {new Date(selectedMemory.date).toLocaleDateString("en-US", {
-                      month: "long",
-                      day: "numeric",
-                      year: "numeric",
-                    })}
+                    {formatMemoryDate(selectedMemory.date)}
                     {selectedMemory.location && ` • 📍 ${selectedMemory.location}`}
                   </p>
                 )}

@@ -129,8 +129,6 @@ export function WizardChapterSidePreview({
           ),
         };
       }
-      case "ourSong":
-        return { count: 1, labels: ["Photo 1 (Song Artwork)"] };
       default:
         return { count: 0, labels: [] };
     }
@@ -346,13 +344,15 @@ export function WizardChapterSidePreview({
         return (
           <OurSongSection
             featuredSong={{
+              heading: config.ourSong.heading,
+              subtitle: config.ourSong.subtitle,
               title: config.ourSong.title || "Golden Hour",
               artist: config.ourSong.artist || "JVKE",
+              dedicationHeading: config.ourSong.dedicationHeading,
               whyItMatters:
                 config.ourSong.whyItMatters ||
                 "The melody that will always remind me of the way you smile at golden hour.",
               dedication: config.ourSong.dedication || "To the brightest light in my world.",
-              coverArtwork: config.ourSong.coverArtwork,
             }}
           />
         );

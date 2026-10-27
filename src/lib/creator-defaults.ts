@@ -593,10 +593,13 @@ export function getInitialCreatorConfig(): CreatorConfig {
     },
 
     ourSong: {
+      heading: "Our Song",
+      subtitle: "Some songs play in the background. This one brings you right back to me.",
       title: defaultGiftConfig.featuredSong?.title || "Golden Hour",
       artist: defaultGiftConfig.featuredSong?.artist || "JVKE",
-      whyItMatters: defaultGiftConfig.featuredSong?.whyItMatters || "The melody that will always remind me of the way you smile at golden hour.",
+      dedicationHeading: "A little dedication to you",
       dedication: defaultGiftConfig.featuredSong?.dedication || "To the brightest light in my world.",
+      whyItMatters: defaultGiftConfig.featuredSong?.whyItMatters || "The melody that will always remind me of the way you smile at golden hour.",
     },
 
     openWhen: {
@@ -636,6 +639,8 @@ export function getInitialCreatorConfig(): CreatorConfig {
     },
 
     littleReasons: {
+      heading: "Little Reasons I Love You",
+      subtitle: "I started counting. Then I remembered that loving you isn't something I can finish counting.",
       items: (defaultGiftConfig.littleReasons || []).slice(0, 20).map((r) => ({
         ...r,
         selected: true,

@@ -160,8 +160,8 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
     <SectionWrapper
       id="ourSong"
       eyebrowLabel="A SONG THAT SOUNDS LIKE US"
-      title="Our Song"
-      subtitle="Some songs play in the background. This one brings you right back to me."
+      title={featuredSong.heading || "Our Song"}
+      subtitle={featuredSong.subtitle !== undefined ? featuredSong.subtitle : "Some songs play in the background. This one brings you right back to me."}
       emoji="🎵"
       bgVariant="blush"
       chapterNumber={14}
@@ -195,7 +195,7 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
                 repeat: isPlaying ? Infinity : 0,
                 ease: "linear",
               }}
-              className="w-36 h-36 rounded-full flex items-center justify-center shadow-lg"
+              className="w-36 h-36 rounded-full flex items-center justify-center shadow-lg relative overflow-hidden"
               style={{
                 background:
                   "conic-gradient(from 0deg, #2A1F2D 0%, #49323F 25%, #2A1F2D 50%, #49323F 75%, #2A1F2D 100%)",
@@ -210,7 +210,7 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
             {/* Play/Pause/Replay Button Overlay on Vinyl */}
             <button
               onClick={handleTogglePlay}
-              className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-white/90 backdrop-blur-xs text-[var(--pink-strong)] flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-transform cursor-pointer"
+              className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-white/90 backdrop-blur-xs text-[var(--pink-strong)] flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-transform cursor-pointer z-10"
               title={
                 isPlaying
                   ? "Pause our song"
@@ -272,7 +272,7 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
           {/* Dedication */}
           <div className="rounded-2xl p-6 mb-6 bg-[var(--bg-surface)] border border-[var(--border-subtle)] text-left">
             <p className="font-script text-xl mb-2 text-[var(--pink-strong)]">
-              A little dedication to you
+              {featuredSong.dedicationHeading || "A little dedication to you"}
             </p>
             <p className="text-sm md:text-base leading-relaxed text-[var(--text-secondary)]">
               {featuredSong.dedication || "Every time I hear this, I think of you. Of the moments we've shared, the ones still waiting for us, and all the feelings that are somehow easier to hear in a song."}

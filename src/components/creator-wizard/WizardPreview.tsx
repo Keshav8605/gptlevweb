@@ -252,8 +252,11 @@ export function WizardPreview({
               {currentPreviewChapter.id === "ourSong" && (
                 <OurSongSection
                   featuredSong={{
+                    heading: config.ourSong.heading,
+                    subtitle: config.ourSong.subtitle,
                     title: config.ourSong.title,
                     artist: config.ourSong.artist,
+                    dedicationHeading: config.ourSong.dedicationHeading,
                     whyItMatters: config.ourSong.whyItMatters,
                     dedication: config.ourSong.dedication,
                   }}

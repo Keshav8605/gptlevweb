@@ -1,4 +1,5 @@
 import { hundredReasonsList } from "./reasons-data";
+import type { CharacterIdentifier } from "@/config/characterAssets";
 
 export interface HeroPolaroidConfig {
   id?: string;
@@ -94,6 +95,7 @@ export interface OpenWhenLetter {
   photo?: string;
   signature?: string;
   isOpened?: boolean;
+  character?: CharacterIdentifier;
 }
 
 export interface ObservationCard {
@@ -186,6 +188,9 @@ export interface SongDedication {
   whyItMatters?: string;
   embedUrl?: string;
   coverArtwork?: string;
+  heading?: string;
+  subtitle?: string;
+  dedicationHeading?: string;
 }
 
 export interface JournalEntry {

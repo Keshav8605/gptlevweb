@@ -383,10 +383,14 @@ function GiftRecipientContent({
 
             case "ourSong":
               const songToUse = {
+                heading: gift.featuredSong?.heading,
+                subtitle: gift.featuredSong?.subtitle,
                 title: gift.featuredSong?.title || defaultGiftConfig.featuredSong?.title || "Our Song",
                 artist: gift.featuredSong?.artist || defaultGiftConfig.featuredSong?.artist || "Artist",
+                dedicationHeading: gift.featuredSong?.dedicationHeading,
                 dedication: gift.featuredSong?.dedication || defaultGiftConfig.featuredSong?.dedication || "For you",
                 whyItMatters: gift.featuredSong?.whyItMatters || defaultGiftConfig.featuredSong?.whyItMatters || "Because it's ours",
+                coverArtwork: gift.featuredSong?.coverArtwork,
               };
               return (
                 <OurSongSection

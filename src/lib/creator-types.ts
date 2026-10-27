@@ -171,10 +171,13 @@ export interface CreatorConfig {
   };
 
   ourSong: {
+    heading?: string;
+    subtitle?: string;
     title: string;
     artist: string;
-    whyItMatters: string;
+    dedicationHeading?: string;
     dedication: string;
+    whyItMatters: string;
     coverArtwork?: string;
     audioUrl?: string;
   };
@@ -196,6 +199,8 @@ export interface CreatorConfig {
   };
 
   littleReasons: {
+    heading?: string;
+    subtitle?: string;
     items: CreatorReasonItem[];
   };
 

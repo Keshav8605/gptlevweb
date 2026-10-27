@@ -268,12 +268,19 @@ function OpenLetterOverlay({
 
           {/* Sweet companion alongside revealed letter message */}
           <div className="flex justify-center pt-2 pb-2">
-            <RomanticCharacter
-              character="tenderCouple"
-              size={160}
-              animation="gentle-float"
-              sparkles
-            />
+            {letter.photo ? (
+              <div className="max-w-[200px] max-h-[180px] rounded-2xl overflow-hidden shadow-sm border border-[var(--border-subtle)] bg-[var(--soft-pink)]">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={letter.photo} alt={letter.title} className="w-full h-full object-cover" />
+              </div>
+            ) : (
+              <RomanticCharacter
+                character={letter.character || "tenderCouple"}
+                size={160}
+                animation="gentle-float"
+                sparkles
+              />
+            )}
           </div>
 
           {/* Action Row: Save Nearby & Fold for Later */}

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { RomanticCharacter } from "../RomanticCharacter";
 import type { LittleReason } from "@/lib/gift-data";
@@ -12,14 +12,29 @@ export const defaultReasonsList: LittleReason[] = hundredReasonsList.slice(0, 5)
 
 interface LittleReasonsSectionProps {
   reasons?: LittleReason[];
+  title?: string;
+  subtitle?: string;
 }
 
-export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleReasonsSectionProps) {
-  const activeReasons = reasons.length > 0 ? reasons : defaultReasonsList;
+export function LittleReasonsSection({
+  reasons,
+  title = "Little Reasons I Love You",
+  subtitle = "I started counting. Then I remembered that loving you isn't something I can finish counting.",
+}: LittleReasonsSectionProps) {
+  const activeReasons = Array.isArray(reasons) ? reasons : defaultReasonsList;
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [showFavoritesModal, setShowFavoritesModal] = useState(false);
+
+  // Safely clamp index if reasons list changes dynamically
+  const safeIndex = activeReasons.length > 0 ? Math.min(currentIndex, Math.max(0, activeReasons.length - 1)) : 0;
+
+  useEffect(() => {
+    if (activeReasons.length > 0 && currentIndex >= activeReasons.length) {
+      setCurrentIndex(Math.max(0, activeReasons.length - 1));
+    }
+  }, [activeReasons.length, currentIndex]);
 
   const [savedFavorites, setSavedFavorites] = useState<string[]>(() => {
     if (typeof window === "undefined") return [];
@@ -31,8 +46,23 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
     }
   });
 
-  const currentReason = activeReasons[currentIndex];
+  const currentReason = activeReasons[safeIndex];
   const isFavorited = currentReason ? savedFavorites.includes(currentReason.id) : false;
+
+  // Live-sync resolution: If reason text was edited while preset title was left behind, display edited text!
+  const isStaleTitle = Boolean(
+    currentReason?.title &&
+    currentReason.text &&
+    !currentReason.text.includes(currentReason.title)
+  );
+
+  const displayTitle = isStaleTitle
+    ? currentReason.text
+    : (currentReason?.title || currentReason?.text || "");
+
+  const displaySupporting = isStaleTitle
+    ? undefined
+    : currentReason?.supportingText;
 
   const handleNext = () => {
     setDirection(1);
@@ -47,12 +77,12 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
   const handleRandom = useCallback(() => {
     const available = activeReasons
       .map((_, i) => i)
-      .filter((i) => i !== currentIndex);
+      .filter((i) => i !== safeIndex);
     if (available.length === 0) return;
     const randomIdx = available[Math.floor(Math.random() * available.length)];
     setDirection(1);
     setCurrentIndex(randomIdx);
-  }, [currentIndex, activeReasons]);
+  }, [safeIndex, activeReasons]);
 
   const toggleFavorite = () => {
     if (!currentReason) return;
@@ -72,8 +102,8 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
     <SectionWrapper
       id="littleReasons"
       eyebrowLabel="A LIST THAT COULD KEEP GROWING"
-      title="Little Reasons I Love You"
-      subtitle="I started counting. Then I remembered that loving you isn't something I can finish counting."
+      title={title}
+      subtitle={subtitle}
       emoji="💗"
       bgVariant="cream"
       chapterNumber={12}
@@ -98,119 +128,132 @@ export function LittleReasonsSection({ reasons = defaultReasonsList }: LittleRea
           Here are a few of my favorites. ♡
         </p>
 
-        {/* Top Control Bar: Progress Counter & Saved Reasons link */}
-        <div className="flex items-center justify-between px-2 mb-4 pb-2 border-b border-[var(--border-subtle)] text-xs">
-          <span className="font-rounded font-bold tracking-wider text-[var(--pink-strong)] uppercase">
-            REASON {String(currentIndex + 1).padStart(2, "0")} OF {String(activeReasons.length).padStart(2, "0")}
-          </span>
+        {activeReasons.length === 0 ? (
+          <div className="py-12 px-6 rounded-3xl bg-white/80 border border-dashed border-pink-200 shadow-2xs space-y-3">
+            <span className="text-4xl block">💗</span>
+            <h4 className="font-serif text-xl sm:text-2xl font-bold text-[var(--romantic-plum)]">
+              No Reasons Added Yet
+            </h4>
+            <p className="font-rounded text-xs sm:text-sm text-[var(--text-muted)] max-w-md mx-auto">
+              Add some of the sweet, little things you adore about them in the creator panel to start your romantic collection!
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* Top Control Bar: Progress Counter & Saved Reasons link */}
+            <div className="flex items-center justify-between px-2 mb-4 pb-2 border-b border-[var(--border-subtle)] text-xs">
+              <span className="font-rounded font-bold tracking-wider text-[var(--pink-strong)] uppercase">
+                REASON {String(safeIndex + 1).padStart(2, "0")} OF {String(activeReasons.length).padStart(2, "0")}
+              </span>
 
-          <button
-            onClick={() => setShowFavoritesModal(true)}
-            className="font-rounded font-semibold text-[var(--pink-deep)] hover:underline cursor-pointer flex items-center gap-1.5"
-          >
-            <span>♥ Your saved reasons ({savedFavorites.length})</span>
-          </button>
-        </div>
+              <button
+                onClick={() => setShowFavoritesModal(true)}
+                className="font-rounded font-semibold text-[var(--pink-deep)] hover:underline cursor-pointer flex items-center gap-1.5"
+              >
+                <span>♥ Your saved reasons ({savedFavorites.length})</span>
+              </button>
+            </div>
 
-        {/* Reason Card Display */}
-        <div className="relative min-h-[240px] flex items-center justify-center">
-          <AnimatePresence mode="wait" custom={direction}>
-            <motion.div
-              key={currentReason?.id || currentIndex}
-              custom={direction}
-              initial={{ opacity: 0, x: direction * 40, scale: 0.95 }}
-              animate={{ opacity: 1, x: 0, scale: 1 }}
-              exit={{ opacity: 0, x: -direction * 40, scale: 0.95 }}
-              transition={{ duration: 0.35, ease: "easeInOut" }}
-              className="w-full bg-white rounded-3xl p-6 sm:p-10 text-center border border-[var(--border-subtle)] shadow-md relative overflow-hidden space-y-4"
-            >
-              {/* Emoji badge */}
-              <div className="w-14 h-14 mx-auto rounded-full bg-[var(--soft-pink)] flex items-center justify-center text-3xl mb-2 shadow-2xs">
-                {currentReason?.emoji || "💕"}
-              </div>
+            {/* Reason Card Display */}
+            <div className="relative min-h-[240px] flex items-center justify-center">
+              <AnimatePresence mode="wait" custom={direction}>
+                <motion.div
+                  key={currentReason?.id ? `${currentReason.id}_${displayTitle}` : safeIndex}
+                  custom={direction}
+                  initial={{ opacity: 0, x: direction * 40, scale: 0.95 }}
+                  animate={{ opacity: 1, x: 0, scale: 1 }}
+                  exit={{ opacity: 0, x: -direction * 40, scale: 0.95 }}
+                  transition={{ duration: 0.35, ease: "easeInOut" }}
+                  className="w-full bg-white rounded-3xl p-6 sm:p-10 text-center border border-[var(--border-subtle)] shadow-md relative overflow-hidden space-y-4"
+                >
+                  {/* Emoji badge */}
+                  <div className="w-14 h-14 mx-auto rounded-full bg-[var(--soft-pink)] flex items-center justify-center text-3xl mb-2 shadow-2xs">
+                    {currentReason?.emoji || "💕"}
+                  </div>
 
-              {/* Reason Title & Supporting line */}
-              {currentReason?.title ? (
-                <div className="space-y-2">
-                  <h4 className="font-serif text-2xl sm:text-3xl font-bold leading-snug text-[var(--romantic-plum)]">
-                    {currentReason.title}
-                  </h4>
-                  {currentReason.supportingText && (
-                    <p className="font-serif italic text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed max-w-lg mx-auto">
-                      &ldquo;{currentReason.supportingText}&rdquo;
+                  {/* Reason Title & Supporting line */}
+                  {displaySupporting ? (
+                    <div className="space-y-2">
+                      <h4 className="font-serif text-2xl sm:text-3xl font-bold leading-snug text-[var(--romantic-plum)]">
+                        {displayTitle}
+                      </h4>
+                      <p className="font-serif italic text-base sm:text-lg text-[var(--text-secondary)] leading-relaxed max-w-lg mx-auto">
+                        &ldquo;{displaySupporting}&rdquo;
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="font-serif text-xl sm:text-2xl font-medium leading-relaxed text-[var(--romantic-plum)]">
+                      &ldquo;{displayTitle}&rdquo;
                     </p>
                   )}
-                </div>
-              ) : (
-                <p className="font-serif text-xl sm:text-2xl font-medium leading-relaxed text-[var(--romantic-plum)]">
-                  &ldquo;{currentReason?.text}&rdquo;
-                </p>
-              )}
 
-              {/* Card Footer: Favorite action */}
-              <div className="flex items-center justify-center pt-2">
+                  {/* Card Footer: Favorite action */}
+                  <div className="flex items-center justify-center pt-2">
+                    <button
+                      onClick={toggleFavorite}
+                      className={`px-5 py-2 rounded-full text-xs font-rounded font-semibold transition-all cursor-pointer flex items-center gap-1.5 border ${
+                        isFavorited
+                          ? "bg-[var(--pink-primary)] text-white border-[var(--pink-strong)] shadow-xs"
+                          : "bg-[var(--pale-rose)] text-[var(--pink-strong)] border-[var(--border-subtle)] hover:bg-[var(--bg-blush)]"
+                      }`}
+                    >
+                      <span>{isFavorited ? "♥ Tucked into your favorites" : "♡ Keep this one close ♡"}</span>
+                    </button>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+
+            {/* Controls: Prev, Surprise Me, Next */}
+            <div className="flex items-center justify-between mt-6 pt-2">
+              <button
+                onClick={handlePrevious}
+                disabled={safeIndex === 0}
+                className="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-medium text-[var(--text-secondary)] hover:bg-white/60 disabled:opacity-30 cursor-pointer transition-colors"
+              >
+                ← Previous
+              </button>
+
+              <button
+                onClick={handleRandom}
+                className="px-6 py-2.5 rounded-full bg-white border border-[var(--border-medium)] text-[var(--pink-strong)] hover:bg-[var(--soft-pink)] text-xs font-rounded font-semibold cursor-pointer transition-all shadow-2xs hover:scale-105"
+              >
+                Surprise me ♡
+              </button>
+
+              {safeIndex === activeReasons.length - 1 ? (
                 <button
-                  onClick={toggleFavorite}
-                  className={`px-5 py-2 rounded-full text-xs font-rounded font-semibold transition-all cursor-pointer flex items-center gap-1.5 border ${
-                    isFavorited
-                      ? "bg-[var(--pink-primary)] text-white border-[var(--pink-strong)] shadow-xs"
-                      : "bg-[var(--pale-rose)] text-[var(--pink-strong)] border-[var(--border-subtle)] hover:bg-[var(--bg-blush)]"
-                  }`}
+                  onClick={() => {
+                    setDirection(1);
+                    setCurrentIndex(0);
+                  }}
+                  className="px-6 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-semibold bg-gradient-to-r from-[var(--pink-strong)] to-[var(--pink-primary)] text-white hover:opacity-95 cursor-pointer transition-all shadow-xs hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
+                  aria-label="Read from Reason 1"
                 >
-                  <span>{isFavorited ? "♥ Tucked into your favorites" : "♡ Keep this one close ♡"}</span>
+                  Read from Reason 01 ↺
                 </button>
-              </div>
-            </motion.div>
-          </AnimatePresence>
-        </div>
+              ) : (
+                <button
+                  onClick={handleNext}
+                  className="px-6 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-semibold bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white hover:opacity-95 cursor-pointer transition-all shadow-xs hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
+                  aria-label="Next reason"
+                >
+                  Next reason →
+                </button>
+              )}
+            </div>
 
-        {/* Controls: Prev, Surprise Me, Next */}
-        <div className="flex items-center justify-between mt-6 pt-2">
-          <button
-            onClick={handlePrevious}
-            disabled={currentIndex === 0}
-            className="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-medium text-[var(--text-secondary)] hover:bg-white/60 disabled:opacity-30 cursor-pointer transition-colors"
-          >
-            ← Previous
-          </button>
-
-          <button
-            onClick={handleRandom}
-            className="px-6 py-2.5 rounded-full bg-white border border-[var(--border-medium)] text-[var(--pink-strong)] hover:bg-[var(--soft-pink)] text-xs font-rounded font-semibold cursor-pointer transition-all shadow-2xs hover:scale-105"
-          >
-            Surprise me ♡
-          </button>
-
-          {currentIndex === activeReasons.length - 1 ? (
-            <button
-              onClick={() => {
-                setDirection(1);
-                setCurrentIndex(0);
-              }}
-              className="px-6 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-semibold bg-gradient-to-r from-[var(--pink-strong)] to-[var(--pink-primary)] text-white hover:opacity-95 cursor-pointer transition-all shadow-xs hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
-              aria-label="Read from Reason 1"
-            >
-              Read from Reason 01 ↺
-            </button>
-          ) : (
-            <button
-              onClick={handleNext}
-              className="px-6 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-semibold bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white hover:opacity-95 cursor-pointer transition-all shadow-xs hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
-              aria-label="Next reason"
-            >
-              Next reason →
-            </button>
-          )}
-        </div>
-
-        {/* Progress Line */}
-        <div className="mt-5 h-1.5 rounded-full bg-[var(--border-subtle)] overflow-hidden">
-          <motion.div
-            className="h-full rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)]"
-            animate={{ width: `${((currentIndex + 1) / activeReasons.length) * 100}%` }}
-            transition={{ duration: 0.3 }}
-          />
-        </div>
+            {/* Progress Line */}
+            <div className="mt-5 h-1.5 rounded-full bg-[var(--border-subtle)] overflow-hidden">
+              <motion.div
+                className="h-full rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)]"
+                animate={{ width: `${((safeIndex + 1) / activeReasons.length) * 100}%` }}
+                transition={{ duration: 0.3 }}
+              />
+            </div>
+          </>
+        )}
+      </div>
       </div>
 
       {/* Favorites Modal */}
