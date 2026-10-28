@@ -584,8 +584,10 @@ export function DateIdeasCatalog({
                     <span className="text-[var(--text-primary)] font-medium">{detailIdea.estimatedDuration || "About 2 hours"}</span>
                   </div>
                   <div>
-                    <span className="text-[var(--text-muted)] block text-[10px] font-semibold uppercase">Budget</span>
-                    <span className="text-[var(--text-primary)] font-medium">{getBudgetDisplay(detailIdea.costRange, detailIdea.costEstimateText)}</span>
+                    <span className="text-[var(--text-muted)] block text-[10px] font-semibold uppercase">Setting</span>
+                    <span className="text-[var(--text-primary)] font-medium capitalize">
+                      {detailIdea.environment ? detailIdea.environment : "Indoor / Outdoor"}
+                    </span>
                   </div>
                   {detailIdea.location && (
                     <div className="col-span-2">

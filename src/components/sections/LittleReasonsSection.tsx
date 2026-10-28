@@ -254,7 +254,6 @@ export function LittleReasonsSection({
           </>
         )}
       </div>
-      </div>
 
       {/* Favorites Modal */}
       <AnimatePresence>

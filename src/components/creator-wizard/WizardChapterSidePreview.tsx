@@ -390,7 +390,9 @@ export function WizardChapterSidePreview({
       case "littleReasons":
         return (
           <LittleReasonsSection
-            reasons={config.littleReasons.items.filter((r) => r.selected)}
+            reasons={config.littleReasons.items.filter((r) => r.selected !== false)}
+            title={config.littleReasons.heading}
+            subtitle={config.littleReasons.subtitle}
           />
         );
 
@@ -439,9 +441,13 @@ export function WizardChapterSidePreview({
         return (
           <FinalHeartSection
             startDate={config.finalHeart.startDate || config.anniversaryDate || "2023-08-20"}
+            closingHeading={config.finalHeart.closingHeading}
             finalLetter={config.finalHeart.finalMessage}
             finalMessage={config.finalHeart.finalMessage}
             senderName={config.senderNickname || config.senderName || "Babe"}
+            signature={config.finalHeart.signature}
+            closingButtonLabel={config.finalHeart.closingButtonLabel}
+            centerPhoto={config.finalHeart.finalPhoto}
             photos={config.finalHeart.collagePhotos.map((url, i) => ({
               id: `mosaic_${i}`,
               url,

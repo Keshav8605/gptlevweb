@@ -214,6 +214,12 @@ export function LivePreviewModal({ isOpen, onClose, gift }: LivePreviewModalProp
                         finalLetter={gift.finalLetter || defaultGiftConfig.finalLetter}
                         finalMessage={gift.finalMessage || defaultGiftConfig.finalMessage}
                         senderName={gift.senderNickname || gift.senderName || "Your Love"}
+                        centerPhoto={gift.finalPhoto || gift.finalCenterPhoto}
+                        photos={(gift.finalCollagePhotos || []).map((url, i) => ({
+                          id: `mosaic_${i}`,
+                          url,
+                          caption: `Our moment ${i + 1}`,
+                        }))}
                       />
                     );
                   default:

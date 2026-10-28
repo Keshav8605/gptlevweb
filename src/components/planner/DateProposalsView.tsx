@@ -284,7 +284,7 @@ export function DateProposalsView({
                           {idea.title}
                         </h4>
                         <p className="text-[11px] text-[var(--text-muted)] mt-0.5">
-                          {idea.estimatedDuration || "About 2 hours"} • {idea.costEstimateText || "Low cost"}
+                          {idea.estimatedDuration || "About 2 hours"}
                         </p>
                       </div>
                     </div>

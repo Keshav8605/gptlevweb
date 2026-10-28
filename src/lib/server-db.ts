@@ -317,6 +317,11 @@ export interface GiftRecord {
   lastSecretPhoto?: string;
   lastSecretButtonLabel?: string;
   lastSecretFinalNote?: string;
+  finalHeading?: string;
+  finalSignature?: string;
+  finalPhoto?: string;
+  finalCenterPhoto?: string;
+  finalCollagePhotos?: string[];
   designPreferences?: {
     colorPalette?: "blush" | "lavender" | "cream-rose" | "sunset" | string;
     typographyPreset?: "elegant-serif" | "modern-rounded" | "romantic-classic" | string;
@@ -2366,10 +2371,10 @@ export function createGift(data: Partial<GiftRecord>): GiftRecord {
     id: `gift_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     slug,
     title,
-    status: data.status || "published",
+    status: data.status || "draft",
     createdAt: now,
     updatedAt: now,
-    publishedAt: data.status === "draft" ? undefined : now,
+    publishedAt: data.status === "published" ? now : undefined,
     senderName: (data.senderName || "Your Love").trim(),
     senderNickname: (data.senderNickname || "Babe").trim(),
     recipientName: (data.recipientName || "My Everything").trim(),
@@ -2416,6 +2421,11 @@ export function createGift(data: Partial<GiftRecord>): GiftRecord {
     lastSecretPhoto: data.lastSecretPhoto,
     lastSecretButtonLabel: data.lastSecretButtonLabel,
     lastSecretFinalNote: data.lastSecretFinalNote,
+    finalHeading: data.finalHeading,
+    finalSignature: data.finalSignature,
+    finalPhoto: data.finalPhoto || data.finalCenterPhoto,
+    finalCenterPhoto: data.finalCenterPhoto || data.finalPhoto,
+    finalCollagePhotos: data.finalCollagePhotos,
     designPreferences: data.designPreferences,
     privacy: {
       isPasswordProtected: data.privacy?.isPasswordProtected ?? false,

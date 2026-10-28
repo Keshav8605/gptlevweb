@@ -434,9 +434,17 @@ function GiftRecipientContent({
                   key="finalHeart"
                   startDate={gift.dateOfficialCouple || gift.dateFirstMet || "2023-08-20"}
                   milestones={gift.customMilestones || defaultGiftConfig.customMilestones}
-                  finalLetter={gift.finalLetter || defaultGiftConfig.finalLetter}
+                  closingHeading={gift.finalHeading}
+                  finalLetter={gift.finalLetter || gift.finalMessage || defaultGiftConfig.finalLetter}
                   finalMessage={gift.finalMessage || defaultGiftConfig.finalMessage}
                   senderName={gift.senderNickname || gift.senderName || "Your Love"}
+                  signature={gift.finalSignature}
+                  centerPhoto={gift.finalPhoto || gift.finalCenterPhoto}
+                  photos={(gift.finalCollagePhotos || []).map((url, i) => ({
+                    id: `mosaic_${i}`,
+                    url,
+                    caption: `Our moment ${i + 1}`,
+                  }))}
                 />
               );
 

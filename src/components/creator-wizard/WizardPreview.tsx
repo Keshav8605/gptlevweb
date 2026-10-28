@@ -281,7 +281,9 @@ export function WizardPreview({
 
               {currentPreviewChapter.id === "littleReasons" && (
                 <LittleReasonsSection
-                  reasons={config.littleReasons.items.filter((r) => r.selected)}
+                  reasons={config.littleReasons.items.filter((r) => r.selected !== false)}
+                  title={config.littleReasons.heading}
+                  subtitle={config.littleReasons.subtitle}
                 />
               )}
 
@@ -322,9 +324,18 @@ export function WizardPreview({
               {currentPreviewChapter.id === "finalHeart" && (
                 <FinalHeartSection
                   startDate={config.finalHeart.startDate || config.anniversaryDate || "2023-08-20"}
+                  closingHeading={config.finalHeart.closingHeading}
                   finalLetter={config.finalHeart.finalMessage}
                   finalMessage={config.finalHeart.finalMessage}
                   senderName={config.senderNickname || config.senderName || "Babe"}
+                  signature={config.finalHeart.signature}
+                  closingButtonLabel={config.finalHeart.closingButtonLabel}
+                  centerPhoto={config.finalHeart.finalPhoto}
+                  photos={config.finalHeart.collagePhotos.map((url, i) => ({
+                    id: `mosaic_${i}`,
+                    url,
+                    caption: `Our moment ${i + 1}`,
+                  }))}
                 />
               )}
             </div>
@@ -339,7 +350,7 @@ export function WizardPreview({
           onClick={onBack}
           className="px-6 py-3 rounded-full border border-[var(--border-subtle)] bg-white text-xs font-rounded font-semibold text-[var(--text-secondary)] hover:bg-[var(--pale-rose)] cursor-pointer transition-colors"
         >
-          ← Back to Aesthetics
+          ← Back to Personalize
         </button>
 
         <button

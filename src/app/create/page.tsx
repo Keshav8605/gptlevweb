@@ -12,7 +12,6 @@ import { WizardWelcome } from "@/components/creator-wizard/WizardWelcome";
 import { WizardBasics } from "@/components/creator-wizard/WizardBasics";
 import { WizardChapters } from "@/components/creator-wizard/WizardChapters";
 import { WizardPersonalize } from "@/components/creator-wizard/WizardPersonalize";
-import { WizardPreferences } from "@/components/creator-wizard/WizardPreferences";
 import { WizardPreview } from "@/components/creator-wizard/WizardPreview";
 import { WizardGenerate } from "@/components/creator-wizard/WizardGenerate";
 import { WizardPhotoLibraryModal } from "@/components/creator-wizard/WizardPhotoLibraryModal";
@@ -77,9 +76,8 @@ function CreatorWizardInner() {
     { num: 2, label: "Basics" },
     { num: 3, label: "Chapters" },
     { num: 4, label: "Personalize" },
-    { num: 6, label: "Aesthetics" },
-    { num: 7, label: "Preview" },
-    { num: 8, label: "Create" },
+    { num: 5, label: "Preview" },
+    { num: 6, label: "Create" },
   ];
 
   return (
@@ -208,31 +206,15 @@ function CreatorWizardInner() {
                 config={config}
                 onChange={handleUpdateConfig}
                 onOpenPhotoLibrary={openPhotoLibrary}
-                onNext={() => setCurrentStep(6)}
+                onNext={() => setCurrentStep(5)}
                 onBack={() => setCurrentStep(3)}
               />
             </motion.div>
           )}
 
-          {currentStep === 6 && (
+          {currentStep === 5 && (
             <motion.div
-              key="step-6"
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -20 }}
-            >
-              <WizardPreferences
-                config={config}
-                onChange={handleUpdateConfig}
-                onNext={() => setCurrentStep(7)}
-                onBack={() => setCurrentStep(4)}
-              />
-            </motion.div>
-          )}
-
-          {currentStep === 7 && (
-            <motion.div
-              key="step-7"
+              key="step-5"
               initial={{ opacity: 0, x: 20 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
@@ -245,22 +227,22 @@ function CreatorWizardInner() {
                 onReorderChapters={(newOrder) => {
                   handleUpdateConfig({ chapterOrder: newOrder });
                 }}
-                onNext={() => setCurrentStep(8)}
-                onBack={() => setCurrentStep(6)}
+                onNext={() => setCurrentStep(6)}
+                onBack={() => setCurrentStep(4)}
               />
             </motion.div>
           )}
 
-          {currentStep === 8 && (
+          {currentStep === 6 && (
             <motion.div
-              key="step-8"
+              key="step-6"
               initial={{ opacity: 0, scale: 0.98 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0 }}
             >
               <WizardGenerate
                 config={config}
-                onBack={() => setCurrentStep(7)}
+                onBack={() => setCurrentStep(5)}
               />
             </motion.div>
           )}

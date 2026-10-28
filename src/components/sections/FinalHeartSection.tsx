@@ -11,10 +11,16 @@ import type { Milestone } from "@/lib/gift-data";
 interface FinalHeartSectionProps {
   startDate?: string;
   milestones?: Milestone[];
+  closingHeading?: string;
+  title?: string;
+  subtitle?: string;
   finalLetter?: string;
   finalMessage?: string;
   senderName: string;
+  signature?: string;
+  closingButtonLabel?: string;
   photos?: { id: string; url: string; caption?: string }[];
+  centerPhoto?: string;
 }
 
 interface TimeElapsed {
@@ -27,10 +33,16 @@ interface TimeElapsed {
 export function FinalHeartSection({
   startDate = "2023-08-20",
   milestones = [],
+  closingHeading,
+  title,
+  subtitle,
   finalLetter,
   finalMessage,
   senderName,
+  signature,
+  closingButtonLabel,
   photos,
+  centerPhoto,
 }: FinalHeartSectionProps) {
   const [timeElapsed, setTimeElapsed] = useState<TimeElapsed>({
     days: 0,
@@ -139,8 +151,8 @@ export function FinalHeartSection({
     <SectionWrapper
       id="finalHeart"
       eyebrowLabel="EVERY LITTLE THING LED HERE"
-      title="A Thousand Little Moments, One Big Love"
-      subtitle="Every picture, every laugh, every little step that brought me closer to you."
+      title={closingHeading || title || "A Thousand Little Moments, One Big Love"}
+      subtitle={finalMessage || subtitle || "Every picture, every laugh, every little step that brought me closer to you."}
       emoji="❤️"
       bgVariant="blush"
       chapterNumber={15}
@@ -161,7 +173,7 @@ export function FinalHeartSection({
                 exit={{ opacity: 0, scale: 0.97 }}
                 transition={{ duration: 0.28, ease: "easeInOut" }}
               >
-                <HeartPhotoCollage photos={photos} />
+                <HeartPhotoCollage photos={photos} centerPhoto={centerPhoto} />
               </motion.div>
             ) : (
               <motion.div
@@ -360,7 +372,7 @@ export function FinalHeartSection({
 
           <div className="mt-8 pt-6 border-t border-[var(--border-subtle)] text-center sm:text-right">
             <p className="text-xs uppercase tracking-wider text-[var(--text-muted)] font-rounded">
-              — With endless love, {senderName}
+              — {signature || `With endless love, ${senderName}`}
             </p>
           </div>
         </motion.div>
@@ -439,7 +451,7 @@ export function FinalHeartSection({
             className="px-8 py-4 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white font-rounded font-semibold shadow-lg hover:shadow-xl transition-all cursor-pointer inline-flex items-center gap-3 text-base shadow-pink-300/40"
           >
             <span className="text-xl">💌</span>
-            <span>Send a little love back ♡</span>
+            <span>{closingButtonLabel || "Send a little love back ♡"}</span>
             {loveCount > 0 && (
               <span className="bg-white/25 px-2 py-0.5 rounded-full text-xs font-bold font-rounded">
                 {loveCount}

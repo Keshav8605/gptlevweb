@@ -723,6 +723,7 @@ export function getInitialCreatorConfig(): CreatorConfig {
       signature: "With all my heart, Babe",
       startDate: defaultGiftConfig.dateOfficialCouple || "2023-08-20",
       collageStyle: "heart",
+      finalPhoto: "https://images.unsplash.com/photo-1501901609772-df0848060b33?auto=format&fit=crop&w=800&q=85",
       collagePhotos: [
         "https://images.unsplash.com/photo-1518199266791-5375a83190b7?auto=format&fit=crop&w=600&q=80",
         "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?auto=format&fit=crop&w=600&q=80",

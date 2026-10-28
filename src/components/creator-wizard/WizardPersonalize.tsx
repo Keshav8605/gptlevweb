@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ALL_18_CHAPTERS } from "@/lib/creator-defaults";
-import type { CreatorConfig } from "@/lib/creator-types";
+import type { CreatorConfig, CreatorReasonItem } from "@/lib/creator-types";
 import type { CharacterIdentifier } from "@/config/characterAssets";
 import { WizardChapterSidePreview } from "./WizardChapterSidePreview";
 
@@ -2697,79 +2697,192 @@ export function WizardPersonalize({
                   A Hundred Little Reasons
                 </h3>
                 <p className="text-xs text-[var(--text-muted)] font-rounded mt-1">
-                  Manage the reasons you adore them. You can have a curated short list or a long collection.
+                  Manage the reasons you adore them. Each card features an emoji, headline, and optional supporting note.
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={() => {
-                  const id = `reason_${Date.now()}`;
-                  onChange({
-                    littleReasons: {
-                      items: [
-                        ...config.littleReasons.items,
-                        {
-                          id,
-                          text: "The way you smile whenever you see our favorite food.",
-                          emoji: "💗",
-                          selected: true,
-                          isCustom: true,
-                        },
-                      ],
-                    },
-                  });
-                }}
-                className="px-4 py-2 rounded-full bg-[var(--pale-rose)] border border-[var(--pink-primary)] text-xs font-rounded font-bold text-[var(--pink-strong)] hover:bg-[var(--soft-pink)] cursor-pointer"
-              >
-                + Add a Reason
-              </button>
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-rounded font-semibold text-[var(--pink-strong)] bg-pink-50 px-2.5 py-1 rounded-full border border-pink-200">
+                  {config.littleReasons.items.length} Reasons
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const id = `reason_${Date.now()}`;
+                    const newReason: CreatorReasonItem = {
+                      id,
+                      title: "The way you smile whenever you see our favorite food.",
+                      supportingText: "It lights up the whole room instantly.",
+                      text: "The way you smile whenever you see our favorite food. It lights up the whole room instantly.",
+                      emoji: "💗",
+                      selected: true,
+                      isCustom: true,
+                    };
+                    onChange({
+                      littleReasons: {
+                        ...config.littleReasons,
+                        items: [...config.littleReasons.items, newReason],
+                      },
+                    });
+                  }}
+                  className="px-4 py-2 rounded-full bg-[var(--pale-rose)] border border-[var(--pink-primary)] text-xs font-rounded font-bold text-[var(--pink-strong)] hover:bg-[var(--soft-pink)] cursor-pointer"
+                >
+                  + Add a Reason
+                </button>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-[500px] overflow-y-auto pr-2">
-              {config.littleReasons.items.map((r, idx) => (
-                <div
-                  key={r.id}
-                  className="p-3 rounded-2xl border border-[var(--border-subtle)] bg-white flex items-center gap-2 shadow-2xs"
-                >
-                  <span className="text-xs font-bold font-rounded text-[var(--pink-strong)] w-5 shrink-0">
-                    #{idx + 1}
-                  </span>
+            {/* Section Headings Customization */}
+            <div className="p-4 rounded-2xl border border-[var(--border-subtle)] bg-[var(--bg-surface)]/60 space-y-3">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
+                Screen Title & Subtitle
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-[11px] font-rounded text-[var(--text-secondary)] mb-1">
+                    Screen Title
+                  </label>
                   <input
                     type="text"
-                    value={r.emoji || "💗"}
-                    onChange={(e) => {
-                      const updated = config.littleReasons.items.map((item) =>
-                        item.id === r.id ? { ...item, emoji: e.target.value } : item
-                      );
-                      onChange({ littleReasons: { items: updated } });
-                    }}
-                    placeholder="💗"
-                    className="w-8 text-center text-xs p-1 rounded-md border border-[var(--border-subtle)] bg-[var(--bg-surface)] focus:outline-none shrink-0"
+                    value={config.littleReasons.heading ?? "Little Reasons I Love You"}
+                    onChange={(e) =>
+                      onChange({
+                        littleReasons: {
+                          ...config.littleReasons,
+                          heading: e.target.value,
+                        },
+                      })
+                    }
+                    placeholder="Little Reasons I Love You"
+                    className="w-full text-xs font-rounded text-[var(--text-primary)] px-3 py-2 rounded-xl border border-[var(--border-subtle)] bg-white focus:outline-none focus:ring-1 focus:ring-[var(--pink-strong)]"
                   />
-                  <input
-                    type="text"
-                    value={r.text}
-                    onChange={(e) => {
-                      const updated = config.littleReasons.items.map((item) =>
-                        item.id === r.id ? { ...item, text: e.target.value } : item
-                      );
-                      onChange({ littleReasons: { items: updated } });
-                    }}
-                    className="w-full text-xs font-rounded text-[var(--text-primary)] focus:outline-none"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const updated = config.littleReasons.items.filter((item) => item.id !== r.id);
-                      onChange({ littleReasons: { items: updated } });
-                    }}
-                    className="text-xs text-gray-300 hover:text-rose-500 cursor-pointer p-1"
-                  >
-                    ✕
-                  </button>
                 </div>
-              ))}
+                <div>
+                  <label className="block text-[11px] font-rounded text-[var(--text-secondary)] mb-1">
+                    Screen Subtitle
+                  </label>
+                  <input
+                    type="text"
+                    value={config.littleReasons.subtitle ?? "I started counting. Then I remembered that loving you isn't something I can finish counting."}
+                    onChange={(e) =>
+                      onChange({
+                        littleReasons: {
+                          ...config.littleReasons,
+                          subtitle: e.target.value,
+                        },
+                      })
+                    }
+                    placeholder="Subtitle or romantic quote..."
+                    className="w-full text-xs font-rounded text-[var(--text-primary)] px-3 py-2 rounded-xl border border-[var(--border-subtle)] bg-white focus:outline-none focus:ring-1 focus:ring-[var(--pink-strong)]"
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 max-h-[550px] overflow-y-auto pr-2">
+              {config.littleReasons.items.map((r, idx) => {
+                // Live sync detection: If user edited text while preset title was stale, use text as current title
+                const isStaleTitle = Boolean(
+                  r.title &&
+                  r.text &&
+                  !r.text.includes(r.title)
+                );
+                const currentTitle = isStaleTitle ? r.text : (r.title ?? r.text);
+                const currentSupporting = isStaleTitle ? "" : (r.supportingText || "");
+
+                return (
+                  <div
+                    key={r.id}
+                    className="p-3.5 rounded-2xl border border-[var(--border-subtle)] bg-white/90 hover:bg-white flex flex-col justify-between space-y-2 shadow-2xs transition-all"
+                  >
+                    {/* Header Row: Index, Emoji Picker, Delete */}
+                    <div className="flex items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-bold font-rounded text-[var(--pink-strong)]">
+                          #{idx + 1}
+                        </span>
+                        <input
+                          type="text"
+                          value={r.emoji || "💗"}
+                          onChange={(e) => {
+                            const updated = config.littleReasons.items.map((item) =>
+                              item.id === r.id ? { ...item, emoji: e.target.value } : item
+                            );
+                            onChange({ littleReasons: { ...config.littleReasons, items: updated } });
+                          }}
+                          placeholder="💗"
+                          title="Emoji icon"
+                          className="w-8 h-7 text-center text-xs rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)] focus:outline-none focus:ring-1 focus:ring-[var(--pink-strong)]"
+                        />
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = config.littleReasons.items.filter((item) => item.id !== r.id);
+                          onChange({ littleReasons: { ...config.littleReasons, items: updated } });
+                        }}
+                        className="text-xs text-gray-400 hover:text-rose-500 cursor-pointer p-1 rounded-md hover:bg-rose-50 transition-colors"
+                        title="Remove reason"
+                      >
+                        ✕
+                      </button>
+                    </div>
+
+                    {/* Reason Headline / Title Input */}
+                    <div>
+                      <input
+                        type="text"
+                        value={currentTitle}
+                        onChange={(e) => {
+                          const newTitle = e.target.value;
+                          const updated = config.littleReasons.items.map((item) => {
+                            if (item.id !== r.id) return item;
+                            const supporting = isStaleTitle ? "" : (item.supportingText || "");
+                            const combined = supporting ? `${newTitle} ${supporting}`.trim() : newTitle;
+                            return {
+                              ...item,
+                              title: newTitle,
+                              supportingText: supporting,
+                              text: combined,
+                              isCustom: true,
+                            };
+                          });
+                          onChange({ littleReasons: { ...config.littleReasons, items: updated } });
+                        }}
+                        placeholder="Reason headline..."
+                        className="w-full text-xs font-serif font-bold text-[var(--text-primary)] px-2.5 py-1.5 rounded-lg border border-[var(--border-subtle)] bg-[var(--bg-surface)]/60 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[var(--pink-strong)]"
+                      />
+                    </div>
+
+                    {/* Supporting Detail / Note Input (optional) */}
+                    <div>
+                      <input
+                        type="text"
+                        value={currentSupporting}
+                        onChange={(e) => {
+                          const newSupporting = e.target.value;
+                          const updated = config.littleReasons.items.map((item) => {
+                            if (item.id !== r.id) return item;
+                            const title = isStaleTitle ? item.text : (item.title ?? item.text);
+                            const combined = newSupporting ? `${title} ${newSupporting}`.trim() : title;
+                            return {
+                              ...item,
+                              title,
+                              supportingText: newSupporting,
+                              text: combined,
+                              isCustom: true,
+                            };
+                          });
+                          onChange({ littleReasons: { ...config.littleReasons, items: updated } });
+                        }}
+                        placeholder="Supporting note / detail (optional)..."
+                        className="w-full text-[11px] font-serif italic text-[var(--text-secondary)] px-2.5 py-1 rounded-lg border border-dashed border-[var(--border-subtle)] bg-[var(--bg-surface)]/40 focus:bg-white focus:outline-none focus:ring-1 focus:ring-[var(--pink-strong)]"
+                      />
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </div>
         )}
@@ -3434,8 +3547,7 @@ export function WizardPersonalize({
                       />
                     </div>
 
-                    <div className="pt-2 border-t border-[var(--border-subtle)]/50 flex items-center justify-between text-[11px] font-rounded text-[var(--text-muted)]">
-                      <span>{date.costEstimateText || "Budget friendly"}</span>
+                    <div className="pt-2 border-t border-[var(--border-subtle)]/50 flex items-center justify-end text-[11px] font-rounded text-[var(--text-muted)]">
                       <button
                         type="button"
                         onClick={() =>
@@ -3664,15 +3776,144 @@ export function WizardPersonalize({
               />
             </div>
 
+            {/* Dedicated Input for Center Hero Photo */}
+            <div className="space-y-3 pt-2">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                  <label className="block text-xs font-bold uppercase tracking-wider text-[var(--pink-strong)] font-rounded flex items-center gap-1.5">
+                    <span>💖</span>
+                    <span>Grand Centerpiece Photo (Our Center ♡)</span>
+                  </label>
+                  <p className="text-[11px] text-[var(--text-muted)] font-rounded mt-0.5">
+                    A separate photo dedicated specifically to the <strong>grand center</strong> of your heart collage.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() =>
+                    onOpenPhotoLibrary((url) => {
+                      onChange({
+                        finalHeart: {
+                          ...config.finalHeart,
+                          finalPhoto: url,
+                        },
+                      });
+                    }, "Choose Centerpiece Hero Photo")
+                  }
+                  className="px-3.5 py-1.5 rounded-full bg-[var(--pink-strong)] text-white text-xs font-rounded font-bold hover:opacity-90 cursor-pointer flex items-center gap-1.5 shadow-2xs shrink-0"
+                >
+                  <span>📷</span>
+                  <span>{config.finalHeart.finalPhoto ? "Change Center Photo" : "+ Choose Center Photo"}</span>
+                </button>
+              </div>
+
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-pink-50/80 via-rose-50/40 to-pink-50/80 border-2 border-pink-200/90 shadow-2xs flex flex-col sm:flex-row items-center gap-4">
+                <div
+                  onClick={() =>
+                    onOpenPhotoLibrary((url) => {
+                      onChange({
+                        finalHeart: {
+                          ...config.finalHeart,
+                          finalPhoto: url,
+                        },
+                      });
+                    }, "Choose Centerpiece Hero Photo")
+                  }
+                  className="w-24 h-28 sm:w-28 sm:h-32 rounded-2xl border-2 border-pink-300 bg-white shadow-xs flex items-center justify-center cursor-pointer overflow-hidden shrink-0 relative group hover:border-[var(--pink-strong)] hover:shadow-md transition-all"
+                  title="Click to choose/change center photo"
+                >
+                  {config.finalHeart.finalPhoto ? (
+                    <>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={config.finalHeart.finalPhoto}
+                        alt="Center Hero Photo"
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      />
+                      <div className="absolute inset-0 bg-black/35 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white text-xs font-bold font-rounded">
+                        Change
+                      </div>
+                      <span className="absolute bottom-1 left-1 bg-[var(--pink-strong)] text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
+                        Center ♡
+                      </span>
+                    </>
+                  ) : (
+                    <div className="text-center p-2">
+                      <span className="text-2xl block mb-1">🖼️</span>
+                      <span className="text-[10px] text-[var(--pink-strong)] font-bold font-rounded block leading-tight">
+                        + Choose Center Photo
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 space-y-2 text-center sm:text-left w-full">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <h5 className="text-xs font-bold font-rounded text-[var(--text-primary)] flex items-center justify-center sm:justify-start gap-1.5">
+                        <span>Center Photo Tile</span>
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-bold bg-pink-100 text-[var(--pink-strong)] border border-pink-200">
+                          Heart Centerpiece
+                        </span>
+                      </h5>
+                      <p className="text-[11px] text-[var(--text-muted)] font-rounded mt-1">
+                        {config.finalHeart.finalPhoto
+                          ? "This photo appears prominently in the large centerpiece tile at the heart of your collage."
+                          : "No custom center photo selected. Defaults to the romantic couple hero photo."}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-center gap-2 justify-center sm:justify-start pt-1">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        onOpenPhotoLibrary((url) => {
+                          onChange({
+                            finalHeart: {
+                              ...config.finalHeart,
+                              finalPhoto: url,
+                            },
+                          });
+                        }, "Choose Centerpiece Hero Photo")
+                      }
+                      className="px-3 py-1.5 rounded-full bg-white border border-pink-300 text-xs text-[var(--pink-strong)] font-rounded font-bold hover:bg-pink-50 cursor-pointer shadow-2xs flex items-center gap-1.5"
+                    >
+                      <span>📷</span>
+                      <span>{config.finalHeart.finalPhoto ? "Replace Photo" : "Upload / Select Photo"}</span>
+                    </button>
+
+                    {config.finalHeart.finalPhoto && (
+                      <button
+                        type="button"
+                        onClick={() =>
+                          onChange({
+                            finalHeart: {
+                              ...config.finalHeart,
+                              finalPhoto: "",
+                            },
+                          })
+                        }
+                        className="px-3 py-1.5 rounded-full bg-white border border-gray-200 text-xs text-gray-500 font-rounded hover:text-rose-600 hover:border-rose-200 cursor-pointer"
+                        title="Remove custom center photo"
+                      >
+                        Reset to Default
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Collage Photos Multi-Picker with Explicit Input for Photo X */}
             <div className="space-y-3 pt-2">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <div>
                   <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
-                    Photo Mosaic Collage ({config.finalHeart.collagePhotos.length} photos)
+                    Surrounding Photo Mosaic ({config.finalHeart.collagePhotos.length} photos)
                   </label>
                   <p className="text-[11px] text-[var(--text-muted)] font-rounded mt-0.5">
-                    Each photo is mapped directly to <strong>Photo 1, Photo 2, Photo 3...</strong> in the side preview mosaic.
+                    Surrounding mosaic tiles mapped directly to <strong>Photo 1, Photo 2, Photo 3...</strong> forming the heart contour.
                   </p>
                 </div>
                 <button
@@ -3716,9 +3957,22 @@ export function WizardPersonalize({
                         ✕
                       </button>
                     </div>
-                    <div className="aspect-square rounded-xl overflow-hidden relative">
+                    <div
+                      onClick={() =>
+                        onOpenPhotoLibrary((newUrl) => {
+                          const next = [...config.finalHeart.collagePhotos];
+                          next[pIdx] = newUrl;
+                          onChange({ finalHeart: { ...config.finalHeart, collagePhotos: next } });
+                        }, `Change Photo ${pIdx + 1}`)
+                      }
+                      className="aspect-square rounded-xl overflow-hidden relative cursor-pointer group/thumb"
+                      title={`Click to change Photo ${pIdx + 1}`}
+                    >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={url} alt={`Photo ${pIdx + 1}`} className="w-full h-full object-cover" />
+                      <img src={url} alt={`Photo ${pIdx + 1}`} className="w-full h-full object-cover group-hover/thumb:scale-105 transition-transform" />
+                      <div className="absolute inset-0 bg-black/30 opacity-0 group-hover/thumb:opacity-100 transition-opacity flex items-center justify-center text-white text-[10px] font-bold font-rounded">
+                        Change
+                      </div>
                       <span className="absolute bottom-1 left-1 bg-black/60 text-white text-[9px] font-bold px-1.5 py-0.5 rounded shadow">
                         Photo {pIdx + 1}
                       </span>
@@ -3762,7 +4016,7 @@ export function WizardPersonalize({
         >
           <span>
             {selectedChapters.findIndex((c) => c.id === activeChapterId) === selectedChapters.length - 1
-              ? "Continue to Aesthetics →"
+              ? "Continue to Preview →"
               : "Next Chapter →"}
           </span>
         </button>

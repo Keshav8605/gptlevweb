@@ -73,6 +73,11 @@ export function WizardGenerate({ config, onBack }: WizardGenerateProps) {
         lastSecretPhoto: config.lastSecret.surprisePhoto,
         lastSecretButtonLabel: config.lastSecret.buttonLabel,
         lastSecretFinalNote: config.lastSecret.finalNote,
+        finalHeading: config.finalHeart.closingHeading,
+        finalSignature: config.finalHeart.signature,
+        finalPhoto: config.finalHeart.finalPhoto,
+        finalCenterPhoto: config.finalHeart.finalPhoto,
+        finalCollagePhotos: config.finalHeart.collagePhotos,
         designPreferences: config.preferences,
         privacy: {
           isPasswordProtected: false,
