@@ -112,7 +112,7 @@ export function WizardPreferences({ config, onChange, onNext, onBack }: WizardPr
               return (
                 <div
                   key={p.id}
-                  onClick={() => updatePref({ colorPalette: p.id as any })}
+                  onClick={() => updatePref({ colorPalette: p.id as CreatorConfig["preferences"]["colorPalette"] })}
                   className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
                     isSelected
                       ? "border-[var(--pink-primary)] ring-2 ring-[var(--pink-primary)]/20 bg-pink-50/30 shadow-xs"
@@ -151,7 +151,7 @@ export function WizardPreferences({ config, onChange, onNext, onBack }: WizardPr
               return (
                 <div
                   key={t.id}
-                  onClick={() => updatePref({ typographyPreset: t.id as any })}
+                  onClick={() => updatePref({ typographyPreset: t.id as CreatorConfig["preferences"]["typographyPreset"] })}
                   className={`p-4 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between ${
                     isSelected
                       ? "border-[var(--pink-primary)] ring-2 ring-[var(--pink-primary)]/20 bg-pink-50/30 shadow-xs"
@@ -188,7 +188,7 @@ export function WizardPreferences({ config, onChange, onNext, onBack }: WizardPr
               {moodOptions.map((m) => (
                 <div
                   key={m.id}
-                  onClick={() => updatePref({ mood: m.id as any })}
+                  onClick={() => updatePref({ mood: m.id as CreatorConfig["preferences"]["mood"] })}
                   className={`p-3 rounded-2xl border text-xs cursor-pointer transition-all ${
                     current.mood === m.id
                       ? "border-[var(--pink-primary)] bg-[var(--pale-rose)]/50 font-semibold text-[var(--pink-strong)]"
@@ -241,7 +241,7 @@ export function WizardPreferences({ config, onChange, onNext, onBack }: WizardPr
                 {photoStyles.map((ps) => (
                   <div
                     key={ps.id}
-                    onClick={() => updatePref({ photoPresentation: ps.id as any })}
+                    onClick={() => updatePref({ photoPresentation: ps.id as CreatorConfig["preferences"]["photoPresentation"] })}
                     className={`p-2.5 rounded-xl border text-[11px] cursor-pointer transition-all flex items-center justify-between ${
                       current.photoPresentation === ps.id
                         ? "border-[var(--pink-primary)] bg-[var(--soft-pink)] font-bold text-[var(--pink-strong)]"

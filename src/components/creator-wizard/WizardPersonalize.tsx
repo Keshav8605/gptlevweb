@@ -3178,7 +3178,7 @@ export function WizardPersonalize({
                       value={item.status}
                       onChange={(e) => {
                         const updated = config.bucketList.items.map((b) =>
-                          b.id === item.id ? { ...b, status: e.target.value as any } : b
+                          b.id === item.id ? { ...b, status: e.target.value as CreatorBucketListItem["status"] } : b
                         );
                         onChange({ bucketList: { items: updated } });
                       }}
