@@ -355,17 +355,17 @@ export function WelcomeExperience({
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, delay: 0.4 }}
-          className="font-display cute-love-outline text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight text-[var(--romantic-plum)] leading-tight select-none my-1.5 max-w-full break-words"
+          className="font-display cute-love-outline text-3xl sm:text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight text-[var(--romantic-plum)] leading-tight select-none my-1.5 max-w-full break-words"
         >
           {title && !title.includes("&") ? (
-            title
+            <span className="break-words">{title}</span>
           ) : (
             <>
-              {(title || "You & Me").split("&")[0].trim()}{" "}
-              <span className="font-script text-[var(--pink-primary)] font-normal px-2 text-6xl sm:text-7xl md:text-8xl lg:text-9xl align-middle">
+              <span className="break-words">{(title || "You & Me").split("&")[0].trim()}</span>{" "}
+              <span className="font-script text-[var(--pink-primary)] font-normal px-1 sm:px-2 text-4xl sm:text-6xl md:text-8xl lg:text-9xl align-middle inline-block">
                 &amp;
               </span>{" "}
-              {(title || "You & Me").split("&")[1]?.trim() || "Me"}
+              <span className="break-words">{(title || "You & Me").split("&")[1]?.trim() || "Me"}</span>
             </>
           )}
         </motion.h1>
@@ -457,7 +457,7 @@ export function WelcomeExperience({
         >
           <button
             onClick={onEnter}
-            className="group relative px-8 py-3 rounded-full text-white font-rounded font-semibold text-sm sm:text-base bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] shadow-lg shadow-pink-300/40 hover:shadow-xl hover:shadow-pink-400/50 hover:scale-105 active:scale-95 cursor-pointer transition-all duration-300 flex items-center gap-2"
+            className="group relative px-8 py-3 min-h-[48px] rounded-full text-white font-rounded font-semibold text-sm sm:text-base bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] shadow-lg shadow-pink-300/40 hover:shadow-xl hover:shadow-pink-400/50 hover:scale-105 active:scale-95 cursor-pointer transition-all duration-300 flex items-center justify-center gap-2"
           >
             <span>{buttonText ? buttonText.replace("♡", "").trim() : "Come inside, my love"}</span>
             <span className="text-xl group-hover:scale-125 transition-transform duration-300">♡</span>

@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { SharedInteractions } from "../interactions/SharedInteractions";
 import { RomanticCharacter } from "../RomanticCharacter";
@@ -175,6 +175,14 @@ function OpenLetterOverlay({
     } catch {}
   };
 
+  useEffect(() => {
+    const originalOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = originalOverflow;
+    };
+  }, []);
+
   return (
     <>
       {/* Backdrop */}
@@ -193,7 +201,7 @@ function OpenLetterOverlay({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 40 }}
         transition={{ type: "spring", stiffness: 300, damping: 25 }}
-        className="fixed inset-4 md:inset-x-auto md:inset-y-8 md:max-w-2xl md:mx-auto z-50 rounded-3xl overflow-y-auto"
+        className="fixed inset-4 md:inset-x-auto md:inset-y-8 md:max-w-2xl md:mx-auto z-50 rounded-3xl overflow-y-auto max-h-[85dvh] overscroll-contain"
         style={{
           background: "var(--white)",
           border: "1px solid var(--border-subtle)",

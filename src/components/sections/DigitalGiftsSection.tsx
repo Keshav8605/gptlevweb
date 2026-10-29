@@ -349,7 +349,7 @@ export function DigitalGiftsSection({ gifts = defaultGiftsList }: DigitalGiftsSe
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-md w-full z-50 bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-[var(--border-subtle)]"
+              className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-md w-auto sm:w-full z-50 bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-[var(--border-subtle)] max-h-[85dvh] overflow-y-auto overscroll-contain"
             >
               <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)] mb-4">
                 <div className="flex items-center gap-2.5">
@@ -360,7 +360,8 @@ export function DigitalGiftsSection({ gifts = defaultGiftsList }: DigitalGiftsSe
                 </div>
                 <button
                   onClick={() => setActiveClaimModalGift(null)}
-                  className="w-8 h-8 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-blush)]"
+                  className="w-10 h-10 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-blush)] transition-colors"
+                  aria-label="Close claim modal"
                 >
                   ✕
                 </button>
@@ -399,7 +400,7 @@ export function DigitalGiftsSection({ gifts = defaultGiftsList }: DigitalGiftsSe
                   </button>
                   <button
                     type="submit"
-                    className="px-6 py-2.5 rounded-2xl bg-[var(--pink-strong)] text-white text-xs font-semibold hover:bg-[var(--pink-deep)] shadow-sm hover:shadow-md cursor-pointer transition-all"
+                    className="px-6 py-2.5 min-h-[44px] rounded-2xl bg-[var(--pink-strong)] text-white text-xs font-semibold hover:bg-[var(--pink-deep)] shadow-sm hover:shadow-md cursor-pointer transition-all flex items-center justify-center"
                   >
                     I&apos;ll claim this one ♡
                   </button>

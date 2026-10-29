@@ -81,7 +81,7 @@ export function RomanticCharacter({
   return (
     <div
       onClick={onClick || sparkles ? handleClick : undefined}
-      className={`relative inline-flex items-center justify-center select-none ${
+      className={`relative inline-flex items-center justify-center select-none max-w-[45vw] max-h-[160px] sm:max-w-none sm:max-h-none ${
         onClick ? "cursor-pointer" : ""
       } ${className}`}
       style={{ width: computedWidth, height: computedHeight }}

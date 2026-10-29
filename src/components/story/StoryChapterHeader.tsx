@@ -72,7 +72,7 @@ export function StoryChapterHeader({ onOpenAccessModal }: StoryChapterHeaderProp
           </p>
 
           {/* Interactive Progress dots */}
-          <div className="flex items-center gap-1 mt-1">
+          <div className="flex items-center gap-0.5 mt-0.5">
             {STORY_CHAPTERS.map((ch) => {
               const isActive = ch.chapterNumber === currentChapter.chapterNumber;
               const isPast = ch.chapterNumber < currentChapter.chapterNumber;
@@ -81,15 +81,20 @@ export function StoryChapterHeader({ onOpenAccessModal }: StoryChapterHeaderProp
                   key={ch.slug}
                   onClick={() => navigateWithTransition(ch.slug)}
                   disabled={isTransitioning}
-                  className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
-                    isActive
-                      ? "w-4 bg-[var(--pink-primary)] shadow-xs"
-                      : isPast
-                      ? "w-1.5 bg-[var(--pink-light)] hover:bg-[var(--pink-primary)]"
-                      : "w-1.5 bg-[var(--border-medium)] hover:bg-[var(--pink-light)]"
-                  }`}
+                  className="relative py-3 px-1 flex items-center justify-center cursor-pointer disabled:opacity-50 group"
                   title={`Chapter ${ch.chapterNumber}: ${ch.title}`}
-                />
+                  aria-label={`Go to Chapter ${ch.chapterNumber}: ${ch.title}`}
+                >
+                  <span
+                    className={`h-1.5 rounded-full transition-all duration-300 block ${
+                      isActive
+                        ? "w-4 bg-[var(--pink-primary)] shadow-xs"
+                        : isPast
+                        ? "w-1.5 bg-[var(--pink-light)] group-hover:bg-[var(--pink-primary)]"
+                        : "w-1.5 bg-[var(--border-medium)] group-hover:bg-[var(--pink-light)]"
+                    }`}
+                  />
+                </button>
               );
             })}
           </div>
