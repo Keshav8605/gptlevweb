@@ -102,7 +102,7 @@ export function WizardPreferences({ config, onChange, onNext, onBack }: WizardPr
 
       <div className="space-y-8">
         {/* 1. Color Palette */}
-        <div className="bg-white/85 backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+        <div className="bg-white/85 backdrop-blur-sm sm:backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
           <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
             Color Palette
           </label>
@@ -141,7 +141,7 @@ export function WizardPreferences({ config, onChange, onNext, onBack }: WizardPr
         </div>
 
         {/* 2. Typography Preset */}
-        <div className="bg-white/85 backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
+        <div className="bg-white/85 backdrop-blur-sm sm:backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-6 sm:p-8 shadow-sm space-y-4">
           <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
             Typography Preset
           </label>
@@ -180,7 +180,7 @@ export function WizardPreferences({ config, onChange, onNext, onBack }: WizardPr
 
         {/* 3. Overall Mood & Animation */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-          <div className="bg-white/85 backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-6 shadow-sm space-y-3">
+          <div className="bg-white/85 backdrop-blur-sm sm:backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-6 shadow-sm space-y-3">
             <label className="block text-xs font-bold uppercase tracking-wider text-[var(--text-primary)] font-rounded">
               Overall Mood
             </label>

@@ -380,19 +380,30 @@ h2.font-rounded span.inline-block {
   animation: gradientShift 8s ease infinite;
 }
 
-/* Glass Effect */
+/* Glass Effect (mobile optimized 8px, restored at md:) */
 .glass {
   background: rgba(255, 248, 251, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(240, 221, 230, 0.5);
 }
 
 .glass-pink {
   background: rgba(250, 220, 232, 0.3);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(233, 139, 180, 0.2);
+}
+
+@media (min-width: 768px) {
+  .glass {
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+  .glass-pink {
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+  }
 }
 
 /* Cinematic Chapter Destination Highlight */

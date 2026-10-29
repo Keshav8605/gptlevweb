@@ -133,7 +133,7 @@ export function WizardGenerate({ config, onBack }: WizardGenerateProps) {
         <motion.div
           initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="bg-white/90 backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-8 sm:p-12 shadow-2xl space-y-6"
+          className="bg-white/90 backdrop-blur-sm sm:backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-8 sm:p-12 shadow-2xl space-y-6"
         >
           <div className="w-20 h-20 mx-auto rounded-full bg-gradient-to-tr from-[var(--pale-rose)] to-pink-100 flex items-center justify-center text-4xl shadow-inner border border-pink-200">
             💌
@@ -196,7 +196,7 @@ export function WizardGenerate({ config, onBack }: WizardGenerateProps) {
           initial={{ opacity: 0, scale: 0.92, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="bg-white/95 backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-8 sm:p-14 shadow-2xl space-y-6"
+          className="bg-white/95 backdrop-blur-sm sm:backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-8 sm:p-14 shadow-2xl space-y-6"
         >
           <div className="w-24 h-24 mx-auto rounded-full bg-gradient-to-tr from-pink-400 via-[var(--pink-primary)] to-[var(--pink-strong)] text-white flex items-center justify-center text-5xl shadow-xl shadow-pink-300/50">
             🎉

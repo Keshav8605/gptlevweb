@@ -164,7 +164,22 @@ export function LittleReasonsSection({
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   exit={{ opacity: 0, x: -direction * 40, scale: 0.95 }}
                   transition={{ duration: 0.35, ease: "easeInOut" }}
-                  className="w-full bg-white rounded-3xl p-6 sm:p-10 text-center border border-[var(--border-subtle)] shadow-md relative overflow-hidden space-y-4"
+                  drag="x"
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.25}
+                  onDragEnd={(_, info) => {
+                    if (info.offset.x > 50 || info.velocity.x > 250) {
+                      handlePrevious();
+                    } else if (info.offset.x < -50 || info.velocity.x < -250) {
+                      if (safeIndex < activeReasons.length - 1) {
+                        handleNext();
+                      } else {
+                        setDirection(1);
+                        setCurrentIndex(0);
+                      }
+                    }
+                  }}
+                  className="w-full bg-white rounded-3xl p-6 sm:p-10 text-center border border-[var(--border-subtle)] shadow-md relative overflow-hidden space-y-4 touch-pan-y cursor-grab active:cursor-grabbing select-none"
                 >
                   {/* Emoji badge */}
                   <div className="w-14 h-14 mx-auto rounded-full bg-[var(--soft-pink)] flex items-center justify-center text-3xl mb-2 shadow-2xs">

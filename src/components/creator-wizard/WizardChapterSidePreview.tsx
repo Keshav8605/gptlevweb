@@ -137,7 +137,7 @@ export function WizardChapterSidePreview({
   const photoSummary = getPhotoSummary();
 
   return (
-    <div className="w-full flex flex-col rounded-3xl border-2 border-pink-200/80 bg-white/95 shadow-2xl backdrop-blur-xl overflow-hidden">
+    <div className="w-full flex flex-col rounded-3xl border-2 border-pink-200/80 bg-white/95 shadow-2xl backdrop-blur-sm sm:backdrop-blur-xl overflow-hidden">
       {/* Top Window Bar */}
       <div className="bg-gradient-to-r from-pink-100/90 via-rose-50/90 to-pink-100/90 border-b border-pink-200/80 px-4 py-3 flex items-center justify-between gap-3 select-none">
         {/* Left: Window Dots & Title */}

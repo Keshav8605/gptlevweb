@@ -201,7 +201,15 @@ export function GiftNavigation({
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "100%", opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              className="fixed right-0 top-0 h-screen h-dvh w-80 max-w-[85vw] z-45 overflow-y-auto pt-[calc(3rem+env(safe-area-inset-top,0px))] pb-[calc(2rem+env(safe-area-inset-bottom,0px))] pr-[calc(1.5rem+env(safe-area-inset-right,0px))] pl-6 bg-gradient-to-b from-[var(--bg-main)] to-[var(--bg-surface)] border-l border-[var(--border-subtle)] shadow-2xl flex flex-col justify-between overscroll-contain"
+              drag="x"
+              dragConstraints={{ left: 0, right: 300 }}
+              dragElastic={{ left: 0, right: 0.5 }}
+              onDragEnd={(_, info) => {
+                if (info.offset.x > 70 || info.velocity.x > 350) {
+                  setIsOpen(false);
+                }
+              }}
+              className="fixed right-0 top-0 h-screen h-dvh w-80 max-w-[85vw] z-45 overflow-y-auto pt-[calc(3rem+env(safe-area-inset-top,0px))] pb-[calc(2rem+env(safe-area-inset-bottom,0px))] pr-[calc(1.5rem+env(safe-area-inset-right,0px))] pl-6 bg-gradient-to-b from-[var(--bg-main)] to-[var(--bg-surface)] border-l border-[var(--border-subtle)] shadow-2xl flex flex-col justify-between overscroll-contain touch-pan-y"
             >
               <div>
                 {/* Header & Subtitle */}

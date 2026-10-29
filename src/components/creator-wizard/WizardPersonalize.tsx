@@ -150,7 +150,7 @@ export function WizardPersonalize({
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8 items-start">
         {/* Left Column: Customization Window */}
         <div className={`lg:col-span-6 xl:col-span-6 ${mobileTab === "preview" ? "hidden lg:block" : "block"}`}>
-          <div className="bg-white/95 backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-5 sm:p-8 shadow-xl relative min-h-[500px]">
+          <div className="bg-white/95 backdrop-blur-sm sm:backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-5 sm:p-8 shadow-xl relative min-h-[500px]">
         {/* ==================== CHAPTER 1: WELCOME SURPRISE ==================== */}
         {activeChapterId === "welcome" && (
           <div className="space-y-6">

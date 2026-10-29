@@ -37,7 +37,7 @@ export function WizardBasics({ config, onChange, onNext, onBack }: WizardBasicsP
         </p>
       </motion.div>
 
-      <div className="bg-white/85 backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-6 sm:p-10 shadow-xl space-y-8">
+      <div className="bg-white/85 backdrop-blur-sm sm:backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-6 sm:p-10 shadow-xl space-y-8">
         {/* Names Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-2">
