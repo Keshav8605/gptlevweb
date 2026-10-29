@@ -100,23 +100,23 @@ export function FloatingHearts() {
       <style jsx global>{`
         @keyframes floatHeartGentle {
           0% {
-            transform: translate3d(0, 106vh, 0) rotate(0deg) scale(0.85);
+            transform: translate3d(0, 106dvh, 0) rotate(0deg) scale(0.85);
             opacity: 0;
           }
           8% {
             opacity: var(--target-opacity, 0.28);
           }
           32% {
-            transform: translate3d(var(--sway-x, 12px), 70vh, 0) rotate(var(--rot, 8deg)) scale(1);
+            transform: translate3d(var(--sway-x, 12px), 70dvh, 0) rotate(var(--rot, 8deg)) scale(1);
           }
           65% {
-            transform: translate3d(calc(var(--sway-x, 12px) * -0.7), 35vh, 0) rotate(calc(var(--rot, 8deg) * -0.8)) scale(1.03);
+            transform: translate3d(calc(var(--sway-x, 12px) * -0.7), 35dvh, 0) rotate(calc(var(--rot, 8deg) * -0.8)) scale(1.03);
           }
           88% {
             opacity: var(--target-opacity, 0.28);
           }
           100% {
-            transform: translate3d(calc(var(--sway-x, 12px) * 0.4), -10vh, 0) rotate(var(--rot, 8deg)) scale(0.9);
+            transform: translate3d(calc(var(--sway-x, 12px) * 0.4), -10dvh, 0) rotate(var(--rot, 8deg)) scale(0.9);
             opacity: 0;
           }
         }
@@ -125,7 +125,7 @@ export function FloatingHearts() {
           .fixed [style*="floatHeartGentle"] {
             animation: none !important;
             opacity: 0.15 !important;
-            transform: translate3d(0, 50vh, 0) !important;
+            transform: translate3d(0, 50dvh, 0) !important;
           }
         }
       `}</style>

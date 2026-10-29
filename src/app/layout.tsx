@@ -1,6 +1,14 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { FloatingHearts } from "@/components/FloatingHearts";
 import "./globals.css";
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
+  themeColor: "#FFF0F5",
+};
 
 export const metadata: Metadata = {
   title: "A Little World For You 💕 | With All My Heart",
@@ -18,7 +26,7 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full scroll-smooth antialiased" suppressHydrationWarning>
       <head>
-        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link

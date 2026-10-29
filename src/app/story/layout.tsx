@@ -37,7 +37,7 @@ function StoryLayoutInner({ children }: { children: React.ReactNode }) {
   }, []);
 
   return (
-    <div className="relative min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)]">
+    <div className="relative min-h-screen min-h-dvh bg-[var(--bg-main)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)]">
       {/* Delightful cursor heart trail */}
       <CursorHeartTrail />
 
@@ -51,7 +51,7 @@ function StoryLayoutInner({ children }: { children: React.ReactNode }) {
       <StoryTransitionOverlay />
 
       {/* Main Chapter Content Viewport */}
-      <main className="relative z-10 w-full min-h-screen">
+      <main className="relative z-10 w-full min-h-screen min-h-dvh">
         {children}
       </main>
 
@@ -72,7 +72,7 @@ function StoryLayoutInner({ children }: { children: React.ReactNode }) {
 
 export default function StoryLayout({ children }: { children: React.ReactNode }) {
   return (
-    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-[var(--bg-main)] text-[var(--pink-strong)]">Loading our story... ♡</div>}>
+    <Suspense fallback={<div className="min-h-screen min-h-dvh flex items-center justify-center bg-[var(--bg-main)] text-[var(--pink-strong)]">Loading our story... ♡</div>}>
       <StoryTransitionProvider>
         <StoryLayoutInner>{children}</StoryLayoutInner>
       </StoryTransitionProvider>

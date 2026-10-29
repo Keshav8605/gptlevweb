@@ -25,7 +25,7 @@ export function StoryChapterHeader({ onOpenAccessModal }: StoryChapterHeaderProp
   }, []);
 
   return (
-    <header className="sticky top-0 z-30 w-full bg-white/85 backdrop-blur-md border-b border-[var(--border-subtle)]/70 py-2.5 px-4 pr-16 sm:px-6 sm:pr-20 transition-all duration-300">
+    <header className="sticky top-0 z-30 w-full bg-white/85 backdrop-blur-md border-b border-[var(--border-subtle)]/70 pt-[calc(0.625rem+env(safe-area-inset-top,0px))] pb-2.5 px-4 pr-[calc(4rem+env(safe-area-inset-right,0px))] sm:px-6 sm:pr-20 transition-all duration-300">
       <div className="max-w-5xl mx-auto flex items-center justify-between gap-3">
         {/* Left: Previous Navigation or Recipient Badge */}
         <div className="flex items-center gap-2">

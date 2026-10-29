@@ -20,7 +20,7 @@ const STORAGE_KEY = "romantic_creator_draft";
 
 export default function CreatorWizardPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[var(--bg-main)] flex items-center justify-center font-serif text-[var(--pink-strong)]">Loading Creator... ♡</div>}>
+    <Suspense fallback={<div className="min-h-screen min-h-dvh bg-[var(--bg-main)] flex items-center justify-center font-serif text-[var(--pink-strong)]">Loading Creator... ♡</div>}>
       <CreatorWizardInner />
     </Suspense>
   );
@@ -81,7 +81,7 @@ function CreatorWizardInner() {
   ];
 
   return (
-    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)] relative overflow-x-hidden">
+    <div className="min-h-screen min-h-dvh bg-[var(--bg-main)] text-[var(--text-primary)] selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)] relative overflow-x-hidden">
       {/* Delicate floating cursor trail */}
       <CursorHeartTrail />
 
