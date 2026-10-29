@@ -341,6 +341,8 @@ export function MemoriesSection({
                       <img
                         src={item.photoUrl}
                         alt={item.caption}
+                        loading="lazy"
+                        decoding="async"
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-108"
                         onError={(e) => {
                           // Graceful fallback to lovely icon gradient if image fails
@@ -499,6 +501,8 @@ export function MemoriesSection({
                     <img
                       src={(selectedMemory as { photoUrl?: string }).photoUrl || (selectedMemory as { photos?: string[] }).photos![0]}
                       alt={selectedMemory.title}
+                      loading="lazy"
+                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   </div>

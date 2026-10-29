@@ -279,7 +279,7 @@ function OpenLetterOverlay({
             {letter.photo ? (
               <div className="max-w-[200px] max-h-[180px] rounded-2xl overflow-hidden shadow-sm border border-[var(--border-subtle)] bg-[var(--soft-pink)]">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src={letter.photo} alt={letter.title} className="w-full h-full object-cover" />
+                <img src={letter.photo} alt={letter.title} loading="lazy" decoding="async" className="w-full h-full object-cover" />
               </div>
             ) : (
               <RomanticCharacter
