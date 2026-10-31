@@ -149,7 +149,7 @@ export function MediaLibraryModal({
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="relative w-full max-w-3xl bg-white rounded-3xl p-6 sm:p-8 shadow-2xl z-10 space-y-6 border border-[var(--border-subtle)] max-h-[90vh] flex flex-col"
+          className="relative w-full max-w-3xl bg-white rounded-3xl p-6 sm:p-8 shadow-2xl z-10 space-y-6 border border-[var(--border-subtle)] max-h-[90dvh] overscroll-contain flex flex-col"
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
@@ -167,7 +167,7 @@ export function MediaLibraryModal({
 
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full border border-[var(--border-subtle)] flex items-center justify-center text-sm text-[var(--text-muted)] hover:bg-[var(--pale-rose)] cursor-pointer transition-colors"
+              className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full border border-[var(--border-subtle)] flex items-center justify-center text-sm text-[var(--text-muted)] hover:bg-[var(--pale-rose)] cursor-pointer transition-colors"
             >
               ✕
             </button>
@@ -179,7 +179,7 @@ export function MediaLibraryModal({
             <div className="inline-flex p-1 rounded-2xl bg-[var(--bg-surface)] border border-[var(--border-subtle)]">
               <button
                 onClick={() => setSelectedTypeFilter("all")}
-                className={`px-3 py-1.5 rounded-xl font-semibold cursor-pointer transition-all ${
+                className={`px-3 py-2 sm:py-1.5 min-h-[36px] rounded-xl font-semibold cursor-pointer transition-all ${
                   selectedTypeFilter === "all"
                     ? "bg-[var(--pink-primary)] text-white shadow-xs"
                     : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)]"
@@ -189,7 +189,7 @@ export function MediaLibraryModal({
               </button>
               <button
                 onClick={() => setSelectedTypeFilter("image")}
-                className={`px-3 py-1.5 rounded-xl font-semibold cursor-pointer transition-all ${
+                className={`px-3 py-2 sm:py-1.5 min-h-[36px] rounded-xl font-semibold cursor-pointer transition-all ${
                   selectedTypeFilter === "image"
                     ? "bg-[var(--pink-primary)] text-white shadow-xs"
                     : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)]"
@@ -199,7 +199,7 @@ export function MediaLibraryModal({
               </button>
               <button
                 onClick={() => setSelectedTypeFilter("audio")}
-                className={`px-3 py-1.5 rounded-xl font-semibold cursor-pointer transition-all ${
+                className={`px-3 py-2 sm:py-1.5 min-h-[36px] rounded-xl font-semibold cursor-pointer transition-all ${
                   selectedTypeFilter === "audio"
                     ? "bg-[var(--pink-primary)] text-white shadow-xs"
                     : "text-[var(--text-secondary)] hover:text-[var(--pink-strong)]"
@@ -221,7 +221,7 @@ export function MediaLibraryModal({
               />
               <label
                 htmlFor="media_upload_input"
-                className="px-5 py-2.5 rounded-full text-xs font-semibold text-white bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] hover:shadow-md cursor-pointer transition-all shadow-xs inline-flex items-center gap-1.5"
+                className="px-5 py-2.5 min-h-[44px] rounded-full text-xs font-semibold text-white bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] hover:shadow-md cursor-pointer transition-all shadow-xs inline-flex items-center justify-center gap-1.5 w-full sm:w-auto"
               >
                 <span>⬆️</span>
                 <span>{isUploading ? "Uploading..." : "Upload Photo or Audio"}</span>
@@ -293,7 +293,7 @@ export function MediaLibraryModal({
                       <button
                         type="button"
                         onClick={() => handleDeleteAsset(asset.id)}
-                        className="absolute top-2 right-2 w-6 h-6 rounded-full bg-black/60 text-white hover:bg-red-600 text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+                        className="absolute top-2 right-2 w-8 h-8 sm:w-6 sm:h-6 min-w-[32px] sm:min-w-0 min-h-[32px] sm:min-h-0 rounded-full bg-black/60 text-white hover:bg-red-600 text-xs flex items-center justify-center opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity cursor-pointer"
                         title="Delete asset"
                       >
                         ✕
@@ -318,7 +318,7 @@ export function MediaLibraryModal({
                             onSelectMedia(asset.dataUrl);
                             onClose();
                           }}
-                          className="w-full py-1.5 rounded-xl text-xs font-semibold text-[var(--pink-strong)] bg-[var(--pale-rose)] hover:bg-[var(--bg-blush)] transition-colors cursor-pointer"
+                          className="w-full py-2 sm:py-1.5 min-h-[40px] sm:min-h-0 rounded-xl text-xs font-semibold text-[var(--pink-strong)] bg-[var(--pale-rose)] hover:bg-[var(--bg-blush)] transition-colors cursor-pointer inline-flex items-center justify-center"
                         >
                           Use in Section ✓
                         </button>

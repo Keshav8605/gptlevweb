@@ -232,7 +232,7 @@ export default function CreatorStudioPage() {
   return (
     <div className="min-h-screen min-h-dvh bg-[var(--bg-main)] text-[var(--text-primary)] flex flex-col font-sans">
       {/* 1. STUDIO HEADER */}
-      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[var(--border-subtle)] px-4 sm:px-8 py-3.5 flex flex-wrap items-center justify-between gap-4 shadow-xs">
+      <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-md border-b border-[var(--border-subtle)] px-4 sm:px-8 py-3.5 pt-[calc(0.875rem+env(safe-area-inset-top,0px))] flex flex-wrap items-center justify-between gap-4 shadow-xs">
         <div className="flex items-center gap-3">
           <Link
             href="/"

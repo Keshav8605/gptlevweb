@@ -4000,11 +4000,11 @@ export function WizardPersonalize({
       </div>
 
       {/* Chapter Stepper Footer */}
-      <div className="mt-8 flex items-center justify-between pt-4">
+      <div className="sticky bottom-0 z-30 bg-white/95 sm:bg-transparent backdrop-blur-md sm:backdrop-blur-none border-t sm:border-0 border-[var(--border-subtle)] p-4 sm:p-0 sm:pt-4 -mx-3 sm:mx-0 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] sm:pb-0 flex items-center justify-between gap-3 shadow-sm sm:shadow-none">
         <button
           type="button"
           onClick={handlePrevChapter}
-          className="px-6 py-3 rounded-full border border-[var(--border-subtle)] bg-white text-xs font-rounded font-semibold text-[var(--text-secondary)] hover:bg-[var(--pale-rose)] cursor-pointer transition-colors"
+          className="px-4 sm:px-6 py-2.5 sm:py-3 min-h-[44px] rounded-full border border-[var(--border-subtle)] bg-white text-xs font-rounded font-semibold text-[var(--text-secondary)] hover:bg-[var(--pale-rose)] cursor-pointer transition-colors inline-flex items-center justify-center"
         >
           ← {selectedChapters.findIndex((c) => c.id === activeChapterId) === 0 ? "Back to Chapters" : "Previous Chapter"}
         </button>
@@ -4012,7 +4012,7 @@ export function WizardPersonalize({
         <button
           type="button"
           onClick={handleNextChapter}
-          className="px-8 py-3.5 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-sm font-rounded font-semibold shadow-md hover:shadow-lg cursor-pointer transition-all inline-flex items-center gap-2"
+          className="px-6 sm:px-8 py-2.5 sm:py-3.5 min-h-[44px] rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs sm:text-sm font-rounded font-semibold shadow-md hover:shadow-lg cursor-pointer transition-all inline-flex items-center justify-center gap-2"
         >
           <span>
             {selectedChapters.findIndex((c) => c.id === activeChapterId) === selectedChapters.length - 1

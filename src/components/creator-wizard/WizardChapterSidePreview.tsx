@@ -253,7 +253,7 @@ export function WizardChapterSidePreview({
       {/* Scrollable Preview Canvas */}
       <div
         ref={containerRef}
-        className="relative p-2 sm:p-4 bg-gradient-to-b from-[#FFF5F9] via-[#FFF9FB] to-[#FAF4FF] min-h-[580px] max-h-[calc(100vh-170px)] overflow-y-auto overflow-x-hidden scrollbar-thin"
+        className="relative p-2 sm:p-4 bg-gradient-to-b from-[#FFF5F9] via-[#FFF9FB] to-[#FAF4FF] min-h-[500px] sm:min-h-[580px] max-h-[calc(100dvh-170px)] sm:max-h-[calc(100vh-170px)] overflow-y-auto overflow-x-hidden scrollbar-thin"
       >
         {deviceMode === "desktop" ? (
           <div
@@ -266,7 +266,7 @@ export function WizardChapterSidePreview({
             {renderActiveChapterSection()}
           </div>
         ) : (
-          <div className="mx-auto max-w-[375px] bg-white rounded-[38px] p-2 shadow-2xl border-4 border-gray-800 ring-4 ring-pink-200/50 min-h-[580px] overflow-hidden">
+          <div className="mx-auto w-full max-w-[375px] bg-white rounded-[32px] sm:rounded-[38px] p-1.5 sm:p-2 shadow-2xl border-2 sm:border-4 border-gray-800 ring-2 sm:ring-4 ring-pink-200/50 min-h-[500px] sm:min-h-[580px] overflow-hidden overflow-x-hidden">
             {renderActiveChapterSection()}
           </div>
         )}

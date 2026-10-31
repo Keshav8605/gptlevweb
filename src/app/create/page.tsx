@@ -87,7 +87,7 @@ function CreatorWizardInner() {
 
       {/* Top Guided Navigation Bar */}
       {currentStep > 1 && (
-        <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-[var(--border-subtle)]/70 py-3 px-4 sm:px-8">
+        <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-[var(--border-subtle)]/70 py-3 pt-[calc(0.75rem+env(safe-area-inset-top,0px))] px-4 sm:px-8">
           <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
             <Link
               href="/"
