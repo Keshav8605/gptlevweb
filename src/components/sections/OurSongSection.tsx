@@ -77,6 +77,19 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
   }, [currentNoteIndex]);
 
   useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden && isPlaying) {
+        if (timeoutRef.current) clearTimeout(timeoutRef.current);
+        setIsPlaying(false);
+      }
+    };
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, [isPlaying]);
+
+  useEffect(() => {
     return () => {
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       if (audioCtxRef.current && audioCtxRef.current.state !== "closed") {
@@ -145,6 +158,21 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
       if (timeoutRef.current) clearTimeout(timeoutRef.current);
       setIsPlaying(false);
     } else {
+      // Resume or initialize Web Audio context on user gesture
+      try {
+        if (!audioCtxRef.current || audioCtxRef.current.state === "closed") {
+          const AudioCtx =
+            window.AudioContext ||
+            (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+          audioCtxRef.current = new AudioCtx();
+        }
+        if (audioCtxRef.current && audioCtxRef.current.state === "suspended") {
+          audioCtxRef.current.resume().catch(() => {});
+        }
+      } catch {
+        // AudioContext fallback
+      }
+
       // Play, Resume, or Replay
       if (isCompleted) {
         setIsCompleted(false);
@@ -210,7 +238,7 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
             {/* Play/Pause/Replay Button Overlay on Vinyl */}
             <button
               onClick={handleTogglePlay}
-              className="absolute inset-0 m-auto w-12 h-12 rounded-full bg-white/90 backdrop-blur-xs text-[var(--pink-strong)] flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-transform cursor-pointer z-10"
+              className="absolute inset-0 m-auto w-12 h-12 min-w-[48px] min-h-[48px] rounded-full bg-white/90 backdrop-blur-xs text-[var(--pink-strong)] flex items-center justify-center shadow-md hover:scale-110 active:scale-95 transition-transform cursor-pointer z-10"
               title={
                 isPlaying
                   ? "Pause our song"
@@ -290,7 +318,7 @@ export function OurSongSection({ featuredSong, additionalSongs }: OurSongSection
           <div className="pt-2 flex items-center justify-center">
             <button
               onClick={handleTogglePlay}
-              className="px-8 py-3 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs sm:text-sm font-rounded font-semibold shadow-xs hover:shadow-md hover:scale-102 active:scale-98 transition-all cursor-pointer inline-flex items-center gap-2"
+              className="px-8 py-3 min-h-[48px] rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs sm:text-sm font-rounded font-semibold shadow-xs hover:shadow-md hover:scale-102 active:scale-98 transition-all cursor-pointer inline-flex items-center justify-center gap-2"
             >
               {isPlaying ? (
                 <>
