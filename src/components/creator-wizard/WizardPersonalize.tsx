@@ -4,7 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ALL_18_CHAPTERS } from "@/lib/creator-defaults";
-import type { CreatorConfig, CreatorReasonItem } from "@/lib/creator-types";
+import type { CreatorConfig, CreatorReasonItem, CreatorBucketListItem } from "@/lib/creator-types";
 import type { CharacterIdentifier } from "@/config/characterAssets";
 import { WizardChapterSidePreview } from "./WizardChapterSidePreview";
 
