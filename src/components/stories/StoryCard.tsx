@@ -154,7 +154,7 @@ export function StoryCard({ story, onOpen }: StoryCardProps) {
         {/* Action Button: Open */}
         <button
           onClick={() => onOpen(story.id)}
-          className={`w-full py-3 px-5 rounded-2xl font-semibold text-xs sm:text-sm tracking-wide shadow-lg cursor-pointer transition-all duration-300 flex items-center justify-center gap-2 ${style.buttonClass}`}
+          className={`w-full py-3 px-5 min-h-[44px] rounded-2xl font-semibold text-xs sm:text-sm tracking-wide shadow-lg cursor-pointer transition-all duration-300 flex items-center justify-center gap-2 ${style.buttonClass}`}
           aria-label={`Open ${story.title}`}
           id={`btn-open-${story.id}`}
         >

@@ -150,7 +150,7 @@ export function StoryPlayer({
       <div className="flex items-center justify-between gap-4 mb-6 sm:mb-8 pb-4 border-b border-white/10">
         <button
           onClick={onBackToStories}
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl text-xs sm:text-sm font-medium text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all cursor-pointer"
+          className="inline-flex items-center gap-2 px-4 py-2 min-h-[40px] rounded-xl text-xs sm:text-sm font-medium text-zinc-300 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 transition-all cursor-pointer"
           id="btn-back-to-stories"
         >
           <span>←</span>
@@ -258,18 +258,22 @@ export function StoryPlayer({
                       setImageError(false);
                       onSceneChange?.(idx);
                     }}
-                    className="h-1.5 rounded-full transition-all duration-300 cursor-pointer"
-                    style={{
-                      width: idx === currentSceneIndex ? "2rem" : "0.5rem",
-                      background:
-                        idx === currentSceneIndex
-                          ? theme.dotActiveColor
-                          : idx < currentSceneIndex
-                          ? theme.dotPassedColor
-                          : "rgba(255, 255, 255, 0.15)",
-                    }}
+                    className="h-6 flex items-center justify-center transition-all duration-300 cursor-pointer px-1"
                     aria-label={`Jump to scene ${idx + 1}`}
-                  />
+                  >
+                    <span
+                      className="h-1.5 rounded-full block transition-all duration-300"
+                      style={{
+                        width: idx === currentSceneIndex ? "2rem" : "0.5rem",
+                        background:
+                          idx === currentSceneIndex
+                            ? theme.dotActiveColor
+                            : idx < currentSceneIndex
+                            ? theme.dotPassedColor
+                            : "rgba(255, 255, 255, 0.15)",
+                      }}
+                    />
+                  </button>
                 ))}
               </div>
 
@@ -279,7 +283,7 @@ export function StoryPlayer({
                 <button
                   onClick={handlePrev}
                   disabled={isFirstScene}
-                  className={`px-5 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all ${
+                  className={`px-5 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-medium transition-all inline-flex items-center justify-center ${
                     isFirstScene
                       ? "opacity-30 cursor-not-allowed text-zinc-500 border border-transparent"
                       : "text-zinc-200 hover:text-white bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 cursor-pointer"
@@ -294,7 +298,7 @@ export function StoryPlayer({
                 {isLastScene ? (
                   <button
                     onClick={onBackToStories}
-                    className={`px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wide text-white shadow-lg cursor-pointer transition-all flex items-center gap-2 ${theme.actionButtonClass}`}
+                    className={`px-6 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold tracking-wide text-white shadow-lg cursor-pointer transition-all inline-flex items-center justify-center gap-2 ${theme.actionButtonClass}`}
                     id="btn-scene-complete"
                   >
                     <span>Story Complete ♡ Back to Stories</span>
@@ -303,7 +307,7 @@ export function StoryPlayer({
                 ) : (
                   <button
                     onClick={handleNext}
-                    className={`px-6 py-2.5 rounded-xl text-xs sm:text-sm font-semibold tracking-wide text-white shadow-lg cursor-pointer transition-all flex items-center gap-2 ${theme.actionButtonClass}`}
+                    className={`px-6 py-2.5 min-h-[44px] rounded-xl text-xs sm:text-sm font-semibold tracking-wide text-white shadow-lg cursor-pointer transition-all inline-flex items-center justify-center gap-2 ${theme.actionButtonClass}`}
                     id="btn-scene-next"
                   >
                     <span>Next Scene</span>
