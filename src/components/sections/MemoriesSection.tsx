@@ -108,15 +108,6 @@ export function MemoriesSection({
   );
 
   useEffect(() => {
-    if (selectedIndex === null) return;
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, [selectedIndex]);
-
-  useEffect(() => {
     if (controlledCollageType) {
       setInternalCollageStyle(controlledCollageType);
     }
@@ -341,8 +332,6 @@ export function MemoriesSection({
                       <img
                         src={item.photoUrl}
                         alt={item.caption}
-                        loading="lazy"
-                        decoding="async"
                         className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-108"
                         onError={(e) => {
                           // Graceful fallback to lovely icon gradient if image fails
@@ -428,7 +417,7 @@ export function MemoriesSection({
               initial={{ opacity: 0, scale: 0.9, y: 30 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 30 }}
-              className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-xl w-auto sm:w-full z-50 bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-[var(--border-subtle)] max-h-[85dvh] overflow-y-auto overscroll-contain"
+              className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-xl w-full z-50 bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-[var(--border-subtle)] max-h-[90vh] overflow-y-auto"
             >
               {/* Top Bar: Emoji, Position Indicator, Close Button */}
               <div className="flex items-center justify-between mb-3">
@@ -441,7 +430,7 @@ export function MemoriesSection({
 
                 <button
                   onClick={() => setSelectedIndex(null)}
-                  className="w-10 h-10 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-blush)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
+                  className="w-8 h-8 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-blush)] transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
                   aria-label="Close memory lightbox"
                 >
                   ✕
@@ -501,8 +490,6 @@ export function MemoriesSection({
                     <img
                       src={(selectedMemory as { photoUrl?: string }).photoUrl || (selectedMemory as { photos?: string[] }).photos![0]}
                       alt={selectedMemory.title}
-                      loading="lazy"
-                      decoding="async"
                       className="w-full h-full object-cover"
                     />
                   </div>

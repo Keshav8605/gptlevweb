@@ -32,9 +32,6 @@ export function CursorHeartTrail() {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
     if (mediaQuery.matches) return;
 
-    // Detect touchscreens (skip battery-draining pointermove listeners on mobile phones)
-    const isCoarse = window.matchMedia("(pointer: coarse)").matches;
-
     const colors = [
       "var(--pink-primary, #FF5F96)",
       "var(--pink-strong, #E84D85)",
@@ -92,9 +89,7 @@ export function CursorHeartTrail() {
       spawnHeart(e.clientX, e.clientY, 3);
     };
 
-    if (!isCoarse) {
-      window.addEventListener("pointermove", handlePointerMove, { passive: true });
-    }
+    window.addEventListener("pointermove", handlePointerMove, { passive: true });
     window.addEventListener("pointerdown", handlePointerDown, { passive: true });
 
     return () => {

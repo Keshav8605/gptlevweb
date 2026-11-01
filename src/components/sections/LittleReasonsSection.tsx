@@ -164,22 +164,7 @@ export function LittleReasonsSection({
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   exit={{ opacity: 0, x: -direction * 40, scale: 0.95 }}
                   transition={{ duration: 0.35, ease: "easeInOut" }}
-                  drag="x"
-                  dragConstraints={{ left: 0, right: 0 }}
-                  dragElastic={0.25}
-                  onDragEnd={(_, info) => {
-                    if (info.offset.x > 50 || info.velocity.x > 250) {
-                      handlePrevious();
-                    } else if (info.offset.x < -50 || info.velocity.x < -250) {
-                      if (safeIndex < activeReasons.length - 1) {
-                        handleNext();
-                      } else {
-                        setDirection(1);
-                        setCurrentIndex(0);
-                      }
-                    }
-                  }}
-                  className="w-full bg-white rounded-3xl p-6 sm:p-10 text-center border border-[var(--border-subtle)] shadow-md relative overflow-hidden space-y-4 touch-pan-y cursor-grab active:cursor-grabbing select-none"
+                  className="w-full bg-white rounded-3xl p-6 sm:p-10 text-center border border-[var(--border-subtle)] shadow-md relative overflow-hidden space-y-4"
                 >
                   {/* Emoji badge */}
                   <div className="w-14 h-14 mx-auto rounded-full bg-[var(--soft-pink)] flex items-center justify-center text-3xl mb-2 shadow-2xs">
@@ -220,23 +205,21 @@ export function LittleReasonsSection({
             </div>
 
             {/* Controls: Prev, Surprise Me, Next */}
-            <div className="flex flex-col-reverse sm:flex-row items-stretch sm:items-center sm:justify-between gap-2.5 sm:gap-0 mt-6 pt-2">
-              <div className="flex items-center justify-between gap-2 w-full sm:w-auto">
-                <button
-                  onClick={handlePrevious}
-                  disabled={safeIndex === 0}
-                  className="px-4 py-2.5 min-h-[44px] rounded-2xl text-xs sm:text-sm font-rounded font-medium text-[var(--text-secondary)] hover:bg-white/60 disabled:opacity-30 cursor-pointer transition-colors flex-1 sm:flex-none flex items-center justify-center"
-                >
-                  ← Previous
-                </button>
+            <div className="flex items-center justify-between mt-6 pt-2">
+              <button
+                onClick={handlePrevious}
+                disabled={safeIndex === 0}
+                className="px-4 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-medium text-[var(--text-secondary)] hover:bg-white/60 disabled:opacity-30 cursor-pointer transition-colors"
+              >
+                ← Previous
+              </button>
 
-                <button
-                  onClick={handleRandom}
-                  className="px-5 py-2.5 min-h-[44px] rounded-full bg-white border border-[var(--border-medium)] text-[var(--pink-strong)] hover:bg-[var(--soft-pink)] text-xs font-rounded font-semibold cursor-pointer transition-all shadow-2xs hover:scale-105 active:scale-95 flex-1 sm:flex-none flex items-center justify-center"
-                >
-                  Surprise me ♡
-                </button>
-              </div>
+              <button
+                onClick={handleRandom}
+                className="px-6 py-2.5 rounded-full bg-white border border-[var(--border-medium)] text-[var(--pink-strong)] hover:bg-[var(--soft-pink)] text-xs font-rounded font-semibold cursor-pointer transition-all shadow-2xs hover:scale-105"
+              >
+                Surprise me ♡
+              </button>
 
               {safeIndex === activeReasons.length - 1 ? (
                 <button
@@ -244,7 +227,7 @@ export function LittleReasonsSection({
                     setDirection(1);
                     setCurrentIndex(0);
                   }}
-                  className="w-full sm:w-auto px-6 py-2.5 min-h-[44px] rounded-2xl text-xs sm:text-sm font-rounded font-semibold bg-gradient-to-r from-[var(--pink-strong)] to-[var(--pink-primary)] text-white hover:opacity-95 cursor-pointer transition-all shadow-xs hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)] flex items-center justify-center"
+                  className="px-6 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-semibold bg-gradient-to-r from-[var(--pink-strong)] to-[var(--pink-primary)] text-white hover:opacity-95 cursor-pointer transition-all shadow-xs hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
                   aria-label="Read from Reason 1"
                 >
                   Read from Reason 01 ↺
@@ -252,7 +235,7 @@ export function LittleReasonsSection({
               ) : (
                 <button
                   onClick={handleNext}
-                  className="w-full sm:w-auto px-6 py-2.5 min-h-[44px] rounded-2xl text-xs sm:text-sm font-rounded font-semibold bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white hover:opacity-95 cursor-pointer transition-all shadow-xs hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)] flex items-center justify-center"
+                  className="px-6 py-2.5 rounded-2xl text-xs sm:text-sm font-rounded font-semibold bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white hover:opacity-95 cursor-pointer transition-all shadow-xs hover:scale-105 active:scale-95 focus:outline-none focus-visible:ring-2 focus-visible:ring-[var(--pink-primary)]"
                   aria-label="Next reason"
                 >
                   Next reason →
@@ -287,7 +270,7 @@ export function LittleReasonsSection({
               initial={{ opacity: 0, scale: 0.95, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-lg w-auto sm:w-full z-50 bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-[var(--border-subtle)] max-h-[85dvh] flex flex-col overscroll-contain"
+              className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-lg w-full z-50 bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-[var(--border-subtle)] max-h-[85vh] flex flex-col"
             >
               <div className="flex items-center justify-between pb-4 border-b border-[var(--border-subtle)] mb-4">
                 <div>
@@ -300,8 +283,7 @@ export function LittleReasonsSection({
                 </div>
                 <button
                   onClick={() => setShowFavoritesModal(false)}
-                  className="w-10 h-10 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-blush)] transition-colors"
-                  aria-label="Close saved reasons modal"
+                  className="w-8 h-8 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-blush)]"
                 >
                   ✕
                 </button>

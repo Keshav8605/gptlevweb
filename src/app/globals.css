@@ -98,52 +98,6 @@ body {
   overflow-x: hidden;
 }
 
-/* Touch & Mobile UX Optimizations */
-button,
-a,
-input,
-select,
-textarea {
-  touch-action: manipulation;
-}
-
-* {
-  -webkit-tap-highlight-color: rgba(255, 95, 150, 0.15);
-}
-
-.overscroll-contain {
-  overscroll-behavior: contain;
-}
-
-/* iOS Input Auto-Zoom Prevention (requires >= 16px font-size) */
-@media (max-width: 767px) {
-  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
-  textarea,
-  select {
-    font-size: 16px !important;
-  }
-}
-
-/* Safe Area Insets Utilities */
-.pt-safe {
-  padding-top: env(safe-area-inset-top, 0px);
-}
-.pb-safe {
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-}
-.pl-safe {
-  padding-left: env(safe-area-inset-left, 0px);
-}
-.pr-safe {
-  padding-right: env(safe-area-inset-right, 0px);
-}
-.top-safe {
-  top: env(safe-area-inset-top, 0px);
-}
-.bottom-safe {
-  bottom: env(safe-area-inset-bottom, 0px);
-}
-
 /* Scrollbar Styling */
 ::-webkit-scrollbar {
   width: 6px;
@@ -286,42 +240,23 @@ button:not(.font-display):not(.font-serif):not(.font-handwritten) {
 .cute-love-sticker,
 .cute-love-outline,
 h2.font-rounded {
-  -webkit-text-stroke: 1.5px #ffffff;
+  -webkit-text-stroke: 3.5px #ffffff;
   paint-order: stroke fill;
   letter-spacing: 0.008em;
   text-shadow:
-    -0.75px -0.75px 0 #ffffff,
-     0.75px -0.75px 0 #ffffff,
-    -0.75px  0.75px 0 #ffffff,
-     0.75px  0.75px 0 #ffffff,
-    -1px  0   0 #ffffff,
-     1px  0   0 #ffffff,
-     0   -1px 0 #ffffff,
-     0    1px 0 #ffffff,
-     0    3px 8px rgba(255, 95, 150, 0.2);
-}
-
-@media (min-width: 640px) {
-  .cute-love-stroke,
-  .cute-love-sticker,
-  .cute-love-outline,
-  h2.font-rounded {
-    -webkit-text-stroke: 3.5px #ffffff;
-    text-shadow:
-      -1.5px -1.5px 0 #ffffff,
-       1.5px -1.5px 0 #ffffff,
-      -1.5px  1.5px 0 #ffffff,
-       1.5px  1.5px 0 #ffffff,
-      -2px  0   0 #ffffff,
-       2px  0   0 #ffffff,
-       0   -2px 0 #ffffff,
-       0    2px 0 #ffffff,
-      -2.5px -2.5px 0 #ffffff,
-       2.5px -2.5px 0 #ffffff,
-      -2.5px  2.5px 0 #ffffff,
-       2.5px  2.5px 0 #ffffff,
-       0    4px 12px rgba(255, 95, 150, 0.22);
-  }
+    -1.5px -1.5px 0 #ffffff,
+     1.5px -1.5px 0 #ffffff,
+    -1.5px  1.5px 0 #ffffff,
+     1.5px  1.5px 0 #ffffff,
+    -2px  0   0 #ffffff,
+     2px  0   0 #ffffff,
+     0   -2px 0 #ffffff,
+     0    2px 0 #ffffff,
+    -2.5px -2.5px 0 #ffffff,
+     2.5px -2.5px 0 #ffffff,
+    -2.5px  2.5px 0 #ffffff,
+     2.5px  2.5px 0 #ffffff,
+     0    4px 12px rgba(255, 95, 150, 0.22);
 }
 
 .cute-love-stroke span.inline-block,
@@ -380,30 +315,19 @@ h2.font-rounded span.inline-block {
   animation: gradientShift 8s ease infinite;
 }
 
-/* Glass Effect (mobile optimized 8px, restored at md:) */
+/* Glass Effect */
 .glass {
   background: rgba(255, 248, 251, 0.7);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid rgba(240, 221, 230, 0.5);
 }
 
 .glass-pink {
   background: rgba(250, 220, 232, 0.3);
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border: 1px solid rgba(233, 139, 180, 0.2);
-}
-
-@media (min-width: 768px) {
-  .glass {
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-  }
-  .glass-pink {
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-  }
 }
 
 /* Cinematic Chapter Destination Highlight */

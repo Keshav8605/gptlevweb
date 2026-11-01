@@ -118,7 +118,7 @@ export function WizardPhotoLibraryModal({
           initial={{ opacity: 0, scale: 0.95, y: 15 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 15 }}
-          className="bg-white rounded-3xl max-w-3xl w-full max-h-[85dvh] overscroll-contain flex flex-col border border-[var(--border-subtle)] shadow-2xl overflow-hidden"
+          className="bg-white rounded-3xl max-w-3xl w-full max-h-[85vh] flex flex-col border border-[var(--border-subtle)] shadow-2xl overflow-hidden"
         >
           {/* Header */}
           <div className="px-6 py-5 border-b border-[var(--border-subtle)] flex items-center justify-between">
@@ -132,7 +132,7 @@ export function WizardPhotoLibraryModal({
             </div>
             <button
               onClick={onClose}
-              className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full bg-[var(--bg-surface)] hover:bg-[var(--pale-rose)] text-[var(--text-secondary)] hover:text-[var(--pink-strong)] flex items-center justify-center text-sm font-bold cursor-pointer transition-colors"
+              className="w-8 h-8 rounded-full bg-[var(--bg-surface)] hover:bg-[var(--pale-rose)] text-[var(--text-secondary)] hover:text-[var(--pink-strong)] flex items-center justify-center text-sm font-bold cursor-pointer transition-colors"
             >
               ✕
             </button>
@@ -148,7 +148,7 @@ export function WizardPhotoLibraryModal({
                 ref={fileInputRef}
                 type="file"
                 multiple
-                accept="image/*,image/png,image/jpeg,image/webp,image/gif"
+                accept="image/png, image/jpeg, image/webp, image/gif"
                 onChange={handleFileChange}
                 className="hidden"
               />
@@ -216,7 +216,7 @@ export function WizardPhotoLibraryModal({
                           e.stopPropagation();
                           onRemovePhoto(photo.id);
                         }}
-                        className="w-8 h-8 min-w-[32px] min-h-[32px] flex items-center justify-center text-[var(--text-muted)] hover:text-rose-500 cursor-pointer p-1 rounded-full hover:bg-rose-50 transition-colors"
+                        className="text-[var(--text-muted)] hover:text-rose-500 cursor-pointer p-1"
                         title="Remove from library"
                       >
                         🗑️
@@ -233,7 +233,7 @@ export function WizardPhotoLibraryModal({
             <span>{photoLibrary.length} photographs in library</span>
             <button
               onClick={onClose}
-              className="px-6 py-2.5 min-h-[40px] rounded-full border border-[var(--border-subtle)] bg-white text-xs font-rounded font-semibold text-[var(--text-secondary)] hover:bg-[var(--pale-rose)] cursor-pointer transition-colors inline-flex items-center"
+              className="px-5 py-2 rounded-full border border-[var(--border-subtle)] bg-white text-xs font-rounded font-semibold text-[var(--text-secondary)] hover:bg-[var(--pale-rose)] cursor-pointer transition-colors"
             >
               Done
             </button>

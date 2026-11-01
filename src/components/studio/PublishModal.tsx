@@ -42,22 +42,6 @@ export function PublishModal({
     }
   };
 
-  const handleShare = async (url: string) => {
-    if (typeof navigator !== "undefined" && navigator.share) {
-      try {
-        await navigator.share({
-          title: gift.title || "A romantic gift made just for you ♡",
-          text: `I made a tiny digital universe just for you: ${gift.recipientNickname || gift.recipientName || "my love"} ♡`,
-          url,
-        });
-      } catch {
-        // User cancelled or share failed
-      }
-    } else {
-      handleCopy(url);
-    }
-  };
-
   const handlePublishClick = async (publish: boolean) => {
     setErrorMsg(null);
     setIsPublishing(true);
@@ -95,7 +79,7 @@ export function PublishModal({
           initial={{ scale: 0.95, opacity: 0 }}
           animate={{ scale: 1, opacity: 1 }}
           exit={{ scale: 0.95, opacity: 0 }}
-          className="relative w-full max-w-xl max-h-[85dvh] overflow-y-auto overscroll-contain bg-white rounded-3xl p-6 sm:p-8 shadow-2xl z-10 space-y-6 border border-[var(--border-subtle)]"
+          className="relative w-full max-w-xl bg-white rounded-3xl p-6 sm:p-8 shadow-2xl z-10 space-y-6 border border-[var(--border-subtle)]"
         >
           {/* Header */}
           <div className="flex items-center justify-between border-b border-[var(--border-subtle)] pb-4">
@@ -113,7 +97,7 @@ export function PublishModal({
 
             <button
               onClick={onClose}
-              className="w-10 h-10 min-w-[40px] min-h-[40px] rounded-full border border-[var(--border-subtle)] flex items-center justify-center text-sm text-[var(--text-muted)] hover:bg-[var(--pale-rose)] cursor-pointer"
+              className="w-8 h-8 rounded-full border border-[var(--border-subtle)] flex items-center justify-center text-sm text-[var(--text-muted)] hover:bg-[var(--pale-rose)] cursor-pointer"
             >
               ✕
             </button>
@@ -121,7 +105,7 @@ export function PublishModal({
 
           {/* Status Alert Banner */}
           <div
-            className={`p-4 rounded-2xl border text-xs flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 ${
+            className={`p-4 rounded-2xl border text-xs flex items-center justify-between gap-3 ${
               isPublished
                 ? "bg-emerald-50 border-emerald-200 text-emerald-800"
                 : "bg-amber-50 border-amber-200 text-amber-800"
@@ -142,7 +126,7 @@ export function PublishModal({
             <button
               onClick={() => handlePublishClick(!isPublished)}
               disabled={isPublishing}
-              className={`px-4 py-2.5 min-h-[40px] rounded-full font-bold text-xs transition-all cursor-pointer shadow-xs disabled:opacity-50 shrink-0 inline-flex items-center justify-center ${
+              className={`px-4 py-2 rounded-full font-bold text-xs transition-all cursor-pointer shadow-xs disabled:opacity-50 shrink-0 ${
                 isPublished
                   ? "bg-white text-rose-700 hover:bg-rose-50 border border-rose-200"
                   : "bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white hover:shadow-md"
@@ -165,38 +149,19 @@ export function PublishModal({
                 <span className="font-bold text-[var(--pink-strong)] tracking-wider uppercase text-[10px] block">
                   Dedicated Romantic Gift URL:
                 </span>
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <div className="flex items-center gap-2">
                   <input
                     type="text"
                     readOnly
                     value={giftUrl}
-                    className="flex-1 p-2.5 rounded-xl border border-[var(--border-medium)] bg-white text-xs font-mono text-[var(--text-secondary)] select-all break-all"
+                    className="flex-1 p-2.5 rounded-xl border border-[var(--border-medium)] bg-white text-xs font-mono text-[var(--text-secondary)] select-all truncate"
                   />
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => handleCopy(giftUrl)}
-                      className="flex-1 sm:flex-none px-4 py-2.5 min-h-[40px] rounded-xl bg-white border border-[var(--border-subtle)] font-bold text-[var(--pink-strong)] hover:bg-[var(--pale-rose)] cursor-pointer shadow-xs inline-flex items-center justify-center"
-                    >
-                      {copiedLink ? "✓ Copied!" : "📋 Copy"}
-                    </button>
-                    <button
-                      onClick={() => handleShare(giftUrl)}
-                      className="px-3.5 py-2.5 min-h-[40px] rounded-xl bg-[var(--pink-primary)] text-white font-bold hover:bg-[var(--pink-strong)] cursor-pointer shadow-xs inline-flex items-center justify-center gap-1"
-                      title="Share link"
-                    >
-                      <span>📤</span>
-                      <span>Share</span>
-                    </button>
-                    <a
-                      href={`https://api.whatsapp.com/send?text=${encodeURIComponent(`I made a tiny digital universe just for you: ${giftUrl}`)}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="px-3 py-2.5 min-h-[40px] rounded-xl bg-emerald-500 text-white font-bold hover:bg-emerald-600 cursor-pointer shadow-xs inline-flex items-center justify-center gap-1"
-                      title="Share via WhatsApp"
-                    >
-                      <span>💬</span>
-                    </a>
-                  </div>
+                  <button
+                    onClick={() => handleCopy(giftUrl)}
+                    className="px-4 py-2.5 rounded-xl bg-white border border-[var(--border-subtle)] font-bold text-[var(--pink-strong)] hover:bg-[var(--pale-rose)] cursor-pointer shadow-xs shrink-0"
+                  >
+                    {copiedLink ? "✓ Copied!" : "📋 Copy Link"}
+                  </button>
                 </div>
               </div>
 
@@ -205,27 +170,19 @@ export function PublishModal({
                 <span className="font-bold text-[var(--text-primary)] block">
                   Direct Magic Recipient Link (No login needed):
                 </span>
-                <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
+                <div className="flex items-center gap-2">
                   <input
                     type="text"
                     readOnly
                     value={inviteUrl}
-                    className="flex-1 p-2.5 rounded-xl border border-[var(--border-subtle)] bg-white text-xs font-mono text-[var(--text-muted)] select-all break-all"
+                    className="flex-1 p-2.5 rounded-xl border border-[var(--border-subtle)] bg-white text-xs font-mono text-[var(--text-muted)] select-all truncate"
                   />
-                  <div className="flex items-center gap-2 shrink-0">
-                    <button
-                      onClick={() => handleCopy(inviteUrl)}
-                      className="flex-1 sm:flex-none px-3.5 py-2 min-h-[38px] rounded-xl bg-white border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--pale-rose)] cursor-pointer text-xs inline-flex items-center justify-center"
-                    >
-                      Copy
-                    </button>
-                    <button
-                      onClick={() => handleShare(inviteUrl)}
-                      className="px-3 py-2 min-h-[38px] rounded-xl bg-[var(--pale-rose)] text-[var(--pink-strong)] font-semibold hover:bg-[var(--soft-pink)] cursor-pointer text-xs inline-flex items-center justify-center gap-1"
-                    >
-                      <span>📤 Share</span>
-                    </button>
-                  </div>
+                  <button
+                    onClick={() => handleCopy(inviteUrl)}
+                    className="px-3.5 py-2 rounded-xl bg-white border border-[var(--border-subtle)] text-[var(--text-secondary)] hover:bg-[var(--pale-rose)] cursor-pointer text-xs shrink-0"
+                  >
+                    Copy
+                  </button>
                 </div>
               </div>
 

@@ -137,7 +137,7 @@ export function SectionEditorRegistry({
                     type="button"
                     disabled={index === 0}
                     onClick={() => handleMoveSection(index, "up")}
-                    className="w-8 h-8 sm:w-6 sm:h-6 min-w-[32px] sm:min-w-0 min-h-[32px] sm:min-h-0 flex items-center justify-center rounded-md border border-[var(--border-subtle)] bg-white text-[11px] sm:text-[10px] disabled:opacity-20 hover:bg-[var(--pale-rose)] cursor-pointer"
+                    className="w-6 h-6 rounded-md border border-[var(--border-subtle)] bg-white text-[10px] disabled:opacity-20 hover:bg-[var(--pale-rose)] cursor-pointer"
                     title="Move up"
                   >
                     ▲
@@ -146,7 +146,7 @@ export function SectionEditorRegistry({
                     type="button"
                     disabled={index === sectionOrder.length - 1}
                     onClick={() => handleMoveSection(index, "down")}
-                    className="w-8 h-8 sm:w-6 sm:h-6 min-w-[32px] sm:min-w-0 min-h-[32px] sm:min-h-0 flex items-center justify-center rounded-md border border-[var(--border-subtle)] bg-white text-[11px] sm:text-[10px] disabled:opacity-20 hover:bg-[var(--pale-rose)] cursor-pointer"
+                    className="w-6 h-6 rounded-md border border-[var(--border-subtle)] bg-white text-[10px] disabled:opacity-20 hover:bg-[var(--pale-rose)] cursor-pointer"
                     title="Move down"
                   >
                     ▼
@@ -157,7 +157,7 @@ export function SectionEditorRegistry({
                     type="checkbox"
                     checked={isEnabled}
                     onChange={() => handleToggleSection(secId)}
-                    className="w-5 h-5 sm:w-4 sm:h-4 min-w-[20px] sm:min-w-0 min-h-[20px] sm:min-h-0 accent-[var(--pink-primary)] cursor-pointer ml-1"
+                    className="w-4 h-4 accent-[var(--pink-primary)] cursor-pointer ml-1"
                     title={isEnabled ? "Hide section" : "Show section"}
                   />
                 </div>

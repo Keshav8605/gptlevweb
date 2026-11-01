@@ -100,11 +100,11 @@ export function StoryUniverseView() {
 
       <div className="relative z-10 flex flex-col min-h-screen">
         {/* Navigation Bar */}
-        <header className="w-full px-4 sm:px-8 py-3.5 sm:py-5 pt-[calc(0.875rem+env(safe-area-inset-top,0px))] border-b border-white/10 backdrop-blur-md bg-black/40 flex items-center justify-between sticky top-0 z-40">
+        <header className="w-full px-4 sm:px-8 py-5 border-b border-white/10 backdrop-blur-md bg-black/40 flex items-center justify-between sticky top-0 z-40">
           <Link
             href={returnTarget}
             onClick={handleReturnClick}
-            className="inline-flex items-center gap-1.5 min-h-[44px] text-xs sm:text-sm font-semibold text-rose-200/90 hover:text-white transition-colors group cursor-pointer"
+            className="inline-flex items-center gap-1.5 text-xs sm:text-sm font-semibold text-rose-200/90 hover:text-white transition-colors group cursor-pointer"
             id="nav-back-to-delulu"
           >
             <span className="transition-transform duration-200 group-hover:-translate-x-1">

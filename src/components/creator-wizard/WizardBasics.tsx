@@ -37,7 +37,7 @@ export function WizardBasics({ config, onChange, onNext, onBack }: WizardBasicsP
         </p>
       </motion.div>
 
-      <div className="bg-white/85 backdrop-blur-sm sm:backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-6 sm:p-10 shadow-xl space-y-8">
+      <div className="bg-white/85 backdrop-blur-xl border border-[var(--border-subtle)] rounded-3xl p-6 sm:p-10 shadow-xl space-y-8">
         {/* Names Section */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
           <div className="space-y-2">
@@ -193,11 +193,11 @@ export function WizardBasics({ config, onChange, onNext, onBack }: WizardBasicsP
       </div>
 
       {/* Navigation Buttons */}
-      <div className="sticky bottom-0 z-30 bg-white/95 sm:bg-transparent backdrop-blur-md sm:backdrop-blur-none border-t sm:border-0 border-[var(--border-subtle)] p-4 sm:p-0 sm:pt-8 -mx-4 sm:mx-0 pb-[calc(1rem+env(safe-area-inset-bottom,0px))] sm:pb-0 flex items-center justify-between gap-3 shadow-sm sm:shadow-none">
+      <div className="flex items-center justify-between pt-8">
         <button
           type="button"
           onClick={onBack}
-          className="px-5 sm:px-6 py-2.5 sm:py-3 min-h-[44px] rounded-full border border-[var(--border-subtle)] bg-white text-xs font-rounded font-semibold text-[var(--text-secondary)] hover:bg-[var(--pale-rose)] cursor-pointer transition-colors inline-flex items-center justify-center"
+          className="px-6 py-3 rounded-full border border-[var(--border-subtle)] bg-white text-xs font-rounded font-semibold text-[var(--text-secondary)] hover:bg-[var(--pale-rose)] cursor-pointer transition-colors"
         >
           ← Back
         </button>
@@ -205,7 +205,7 @@ export function WizardBasics({ config, onChange, onNext, onBack }: WizardBasicsP
         <button
           type="button"
           onClick={onNext}
-          className="px-6 sm:px-8 py-2.5 sm:py-3.5 min-h-[44px] rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs sm:text-sm font-rounded font-semibold shadow-md hover:shadow-lg cursor-pointer transition-all inline-flex items-center justify-center gap-2"
+          className="px-8 py-3.5 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-sm font-rounded font-semibold shadow-md hover:shadow-lg cursor-pointer transition-all inline-flex items-center gap-2"
         >
           <span>Continue to Chapter Selection →</span>
         </button>

@@ -79,22 +79,19 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
 
   const moveNoButton = () => {
     setNoPosition((prev) => {
-      const isMobile = typeof window !== "undefined" && window.innerWidth < 640;
-      const minDistance = isMobile ? 35 : 80;
-      const distance = Math.floor(Math.random() * (isMobile ? 30 : 80) + minDistance);
+      const minDistance = 80;
       const angle = Math.random() * Math.PI * 2;
+      const distance = Math.floor(Math.random() * 80 + minDistance);
       let nextX = Math.round(Math.cos(angle) * distance);
       let nextY = Math.round(Math.sin(angle) * (distance * 0.65));
 
       // Clamp within safe margins so it stays playful and visible inside the card
-      const maxX = isMobile ? 60 : 130;
-      const maxY = isMobile ? 35 : 70;
-      nextX = Math.max(-maxX, Math.min(maxX, nextX));
-      nextY = Math.max(-maxY, Math.min(maxY, nextY));
+      nextX = Math.max(-130, Math.min(130, nextX));
+      nextY = Math.max(-70, Math.min(70, nextY));
 
-      if (Math.abs(nextX - prev.x) < 30 && Math.abs(nextY - prev.y) < 30) {
-        nextX = -prev.x || (isMobile ? 45 : 90);
-        nextY = -prev.y || (isMobile ? 25 : 45);
+      if (Math.abs(nextX - prev.x) < 45 && Math.abs(nextY - prev.y) < 45) {
+        nextX = -prev.x || 90;
+        nextY = -prev.y || 45;
       }
       return { x: nextX, y: nextY };
     });
@@ -237,10 +234,12 @@ export function QuizSection({ questions = defaultQuizQuestions }: QuizSectionPro
                 transition={{ type: "spring", stiffness: 450, damping: 20 }}
                 onMouseEnter={moveNoButton}
                 onPointerEnter={moveNoButton}
-                onTouchStart={() => {
+                onTouchStart={(e) => {
+                  e.preventDefault();
                   moveNoButton();
                 }}
                 onClick={(e) => {
+                  e.preventDefault();
                   e.stopPropagation();
                   moveNoButton();
                 }}

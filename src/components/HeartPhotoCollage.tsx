@@ -1,8 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { PhotoLightbox } from "./PhotoLightbox";
 
 export interface CollagePhoto {
   id: string;
@@ -391,8 +389,6 @@ export function HeartPhotoCollage({
     return tile;
   });
 
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-
   return (
     <div className="relative w-full max-w-4xl mx-auto py-4 sm:py-8 select-none">
       {/* Background romantic pink halo glow behind heart */}
@@ -434,7 +430,6 @@ export function HeartPhotoCollage({
               zIndex: 50,
               boxShadow: "0 8px 24px rgba(81, 36, 63, 0.25)",
             }}
-            onClick={() => setLightboxIndex(idx)}
             className={`relative overflow-hidden border border-white/95 sm:border-[1.5px] border-white rounded-[2px] sm:rounded-[3px] shadow-[0_2px_8px_rgba(81,36,63,0.12)] cursor-pointer transition-shadow duration-300 ${
               tile.isHero
                 ? "ring-2 ring-[var(--pink-strong)]/50 ring-offset-1 z-20 shadow-md"
@@ -450,8 +445,6 @@ export function HeartPhotoCollage({
             <img
               src={tile.src}
               alt={tile.caption}
-              loading="lazy"
-              decoding="async"
               className="w-full h-full object-cover transition-transform duration-500 hover:scale-106"
               style={{ objectPosition: tile.objectPosition || "center" }}
               onError={(e) => {
@@ -480,18 +473,6 @@ export function HeartPhotoCollage({
           {caption || "You & Me, Always & Forever ♡"}
         </div>
       </div>
-
-      {/* Lightbox for zooming into memories on click/tap */}
-      <PhotoLightbox
-        isOpen={lightboxIndex !== null}
-        initialIndex={lightboxIndex ?? 0}
-        photos={activeTiles.map((t) => ({
-          src: t.src,
-          caption: t.caption,
-          alt: t.caption,
-        }))}
-        onClose={() => setLightboxIndex(null)}
-      />
     </div>
   );
 }

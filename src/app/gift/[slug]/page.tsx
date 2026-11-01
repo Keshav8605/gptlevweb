@@ -106,7 +106,7 @@ function GiftRecipientContent({
   // 1. Loading State
   if (isLoading) {
     return (
-      <div className="min-h-screen min-h-dvh bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
         <div className="w-16 h-16 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center text-2xl animate-bounce mb-4 shadow-sm">
           💌
         </div>
@@ -123,7 +123,7 @@ function GiftRecipientContent({
   // 2. Draft / Unpublished or Not Found Error State
   if (errorStatus) {
     return (
-      <div className="min-h-screen min-h-dvh bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
         <div className="max-w-md w-full bg-white rounded-3xl p-8 border border-[var(--border-subtle)] shadow-xl space-y-5 relative z-10">
           <div className="w-16 h-16 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center text-3xl mx-auto">
             🎀
@@ -162,7 +162,7 @@ function GiftRecipientContent({
   // 3. Passcode Protected Lock Screen
   if (isLocked) {
     return (
-      <div className="min-h-screen min-h-dvh bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
+      <div className="min-h-screen bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -203,7 +203,7 @@ function GiftRecipientContent({
 
             <button
               type="submit"
-              className="w-full min-h-[44px] py-3 rounded-2xl bg-gradient-to-r from-[var(--pink-strong)] to-[var(--pink-primary)] text-white text-xs font-bold hover:opacity-95 shadow-md cursor-pointer transition-all flex items-center justify-center"
+              className="w-full py-3 rounded-2xl bg-gradient-to-r from-[var(--pink-strong)] to-[var(--pink-primary)] text-white text-xs font-bold hover:opacity-95 shadow-md cursor-pointer transition-all"
             >
               Unlock Our World ♡
             </button>
@@ -242,7 +242,7 @@ function GiftRecipientContent({
   ];
 
   return (
-    <main className="relative min-h-screen min-h-dvh bg-[var(--bg-main)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)]">
+    <main className="relative min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] overflow-x-hidden selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)]">
       {/* Delightful cursor heart trail */}
       <CursorHeartTrail />
 
@@ -254,7 +254,7 @@ function GiftRecipientContent({
 
       {/* Draft / Studio banner if in draft */}
       {gift.status !== "published" && (
-        <div className="sticky top-0 z-30 bg-amber-500/95 backdrop-blur-md text-white text-xs font-semibold pt-[calc(0.5rem+env(safe-area-inset-top,0px))] pb-2 px-4 text-center shadow-xs flex items-center justify-center gap-2">
+        <div className="sticky top-0 z-30 bg-amber-500/95 backdrop-blur-md text-white text-xs font-semibold py-2 px-4 text-center shadow-xs flex items-center justify-center gap-2">
           <span>⚠️ You are previewing a draft gift: &quot;{gift.title}&quot;</span>
           <Link
             href="/studio"
@@ -496,7 +496,7 @@ export default function GiftRecipientPage({
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen min-h-dvh bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
+        <div className="min-h-screen bg-[var(--bg-main)] flex flex-col items-center justify-center p-6 text-center">
           <div className="w-14 h-14 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center text-2xl animate-bounce mb-3 shadow-xs">
             💌
           </div>

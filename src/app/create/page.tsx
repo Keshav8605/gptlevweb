@@ -20,7 +20,7 @@ const STORAGE_KEY = "romantic_creator_draft";
 
 export default function CreatorWizardPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen min-h-dvh bg-[var(--bg-main)] flex items-center justify-center font-serif text-[var(--pink-strong)]">Loading Creator... ♡</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[var(--bg-main)] flex items-center justify-center font-serif text-[var(--pink-strong)]">Loading Creator... ♡</div>}>
       <CreatorWizardInner />
     </Suspense>
   );
@@ -81,13 +81,13 @@ function CreatorWizardInner() {
   ];
 
   return (
-    <div className="min-h-screen min-h-dvh bg-[var(--bg-main)] text-[var(--text-primary)] selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)] relative overflow-x-hidden">
+    <div className="min-h-screen bg-[var(--bg-main)] text-[var(--text-primary)] selection:bg-[var(--bg-blush)] selection:text-[var(--text-primary)] relative overflow-x-hidden">
       {/* Delicate floating cursor trail */}
       <CursorHeartTrail />
 
       {/* Top Guided Navigation Bar */}
       {currentStep > 1 && (
-        <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-[var(--border-subtle)]/70 py-3 pt-[calc(0.75rem+env(safe-area-inset-top,0px))] px-4 sm:px-8">
+        <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-md border-b border-[var(--border-subtle)]/70 py-3 px-4 sm:px-8">
           <div className="max-w-6xl mx-auto flex items-center justify-between gap-4">
             <Link
               href="/"

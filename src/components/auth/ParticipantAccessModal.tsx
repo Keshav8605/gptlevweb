@@ -38,15 +38,6 @@ export function ParticipantAccessModal({
   });
 
   useEffect(() => {
-    if (!isOpen) return;
-    const originalOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = originalOverflow;
-    };
-  }, [isOpen]);
-
-  useEffect(() => {
     const handleStorage = () => {
       const role = propRole || (localStorage.getItem("gift_participant_role") as "creator" | "recipient") || "recipient";
       const name = propName || localStorage.getItem("gift_participant_name") || (role === "creator" ? "Babe" : "Baby");
@@ -165,7 +156,7 @@ export function ParticipantAccessModal({
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-md w-auto sm:w-full z-50 bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-[var(--border-subtle)] space-y-6 max-h-[85dvh] overflow-y-auto overscroll-contain"
+            className="fixed inset-4 sm:inset-auto sm:top-1/2 sm:left-1/2 sm:-translate-x-1/2 sm:-translate-y-1/2 sm:max-w-md w-full z-50 bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-[var(--border-subtle)] space-y-6"
           >
             <div className="flex items-center justify-between pb-3 border-b border-[var(--border-subtle)]">
               <div>
@@ -178,8 +169,7 @@ export function ParticipantAccessModal({
               </div>
               <button
                 onClick={onClose}
-                className="w-10 h-10 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-blush)] transition-colors"
-                aria-label="Close participant modal"
+                className="w-8 h-8 rounded-full bg-[var(--pale-rose)] text-[var(--pink-strong)] flex items-center justify-center cursor-pointer hover:bg-[var(--bg-blush)]"
               >
                 ✕
               </button>

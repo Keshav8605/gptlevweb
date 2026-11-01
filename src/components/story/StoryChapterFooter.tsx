@@ -10,7 +10,7 @@ export function StoryChapterFooter() {
   const { prev, next } = getAdjacentChapters(currentChapter.slug);
 
   return (
-    <footer className="mt-16 pt-12 pb-[calc(4rem+env(safe-area-inset-bottom,0px))] px-4 border-t border-[var(--border-subtle)]/70 bg-gradient-to-b from-transparent via-white/50 to-white/80 relative z-10">
+    <footer className="mt-16 pt-12 pb-16 px-4 border-t border-[var(--border-subtle)]/70 bg-gradient-to-b from-transparent via-white/50 to-white/80 relative z-10">
       <div className="max-w-xl mx-auto flex flex-col items-center text-center space-y-6">
         {/* Decorative divider */}
         <div className="flex items-center justify-center gap-2">
@@ -38,7 +38,7 @@ export function StoryChapterFooter() {
             whileTap={{ scale: 0.96 }}
             onClick={() => navigateWithTransition(next.slug)}
             disabled={isTransitioning}
-            className="group relative px-8 py-3.5 min-h-[48px] rounded-full text-white font-rounded font-semibold text-base sm:text-lg bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] shadow-lg shadow-pink-300/40 hover:shadow-xl hover:shadow-pink-400/50 cursor-pointer transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-50"
+            className="group relative px-8 py-3.5 rounded-full text-white font-rounded font-semibold text-base sm:text-lg bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] shadow-lg shadow-pink-300/40 hover:shadow-xl hover:shadow-pink-400/50 cursor-pointer transition-all duration-300 flex items-center gap-3 disabled:opacity-50"
           >
             <span>{currentChapter.nextLabel || `Continue to ${next.title}`}</span>
             <span className="text-xl group-hover:scale-125 transition-transform duration-300">
@@ -53,7 +53,7 @@ export function StoryChapterFooter() {
             <button
               onClick={() => navigateWithTransition(prev.slug)}
               disabled={isTransitioning}
-              className="hover:text-[var(--pink-strong)] hover:underline cursor-pointer transition-colors min-h-[36px] inline-flex items-center gap-1"
+              className="hover:text-[var(--pink-strong)] hover:underline cursor-pointer transition-colors inline-flex items-center gap-1"
             >
               <span>← Back to {prev.title}</span>
             </button>
@@ -65,7 +65,7 @@ export function StoryChapterFooter() {
             <button
               onClick={() => navigateWithTransition("welcome")}
               disabled={isTransitioning}
-              className="hover:text-[var(--pink-strong)] hover:underline cursor-pointer transition-colors min-h-[36px] inline-flex items-center"
+              className="hover:text-[var(--pink-strong)] hover:underline cursor-pointer transition-colors"
             >
               Back to the beginning
             </button>

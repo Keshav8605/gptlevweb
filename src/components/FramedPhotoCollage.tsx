@@ -1,9 +1,6 @@
 "use client";
 
-import { useState } from "react";
 import { motion } from "framer-motion";
-import { PhotoLightbox } from "./PhotoLightbox";
-import { useIsMobile } from "@/hooks/useIsMobile";
 
 export interface BorderPhotoConfig {
   id: string;
@@ -1847,25 +1844,6 @@ export function FramedPhotoCollage({
     }
   );
 
-  const isMobile = useIsMobile();
-  const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
-
-  const curatedMobilePhotos = [
-    { ...activeBorderPhotos[0], rot: -2 },
-    { ...activeBorderPhotos[12], rot: 2 },
-    { ...activeBorderPhotos[28], rot: -1.5 },
-    { ...activeBorderPhotos[45], rot: 3 },
-    { ...activeBorderPhotos[62], rot: -2.5 },
-    { ...activeBorderPhotos[78], rot: 1.5 },
-    { ...activeBorderPhotos[95], rot: -3 },
-    { ...activeBorderPhotos[112], rot: 2 },
-  ].filter(Boolean);
-
-  const allLightboxPhotos = [
-    { src: heroSrc, caption: heroCaption, alt: "Our centerpiece photo" },
-    ...activeBorderPhotos.map((p) => ({ src: p.src, caption: p.caption, alt: p.caption })),
-  ];
-
   return (
     <div className="relative w-full max-w-4xl mx-auto py-4 sm:py-8 select-none">
       {/* Background romantic pink halo glow */}
@@ -1887,8 +1865,7 @@ export function FramedPhotoCollage({
         <div className="absolute inset-0 z-0">
           <svg
             viewBox="0 0 100 100"
-            onClick={() => setLightboxIndex(0)}
-            className="w-full h-full cursor-pointer"
+            className="w-full h-full"
             style={{
               filter: "drop-shadow(0 10px 24px rgba(81, 36, 63, 0.22))",
             }}
@@ -1932,60 +1909,55 @@ export function FramedPhotoCollage({
         </div>
 
         {/* ========================================================= */}
-        {/* LAYER B — SURROUNDING 129 POLAROID PRINTS (Desktop only)   */}
+        {/* LAYER B — SURROUNDING 129 POLAROID PRINTS                 */}
         {/* Dense Scrapbook Frame contouring tightly around heart     */}
         {/* ========================================================= */}
-        {!isMobile && (
-          <div className="absolute inset-0 pointer-events-auto">
-            {activeBorderPhotos.map((photo, idx) => (
-              <motion.div
-                key={photo.id}
-                onClick={() => setLightboxIndex(idx + 1)}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{
-                  duration: 0.35,
-                  delay: idx * 0.003,
-                  ease: "easeOut",
+        <div className="absolute inset-0 pointer-events-auto">
+          {activeBorderPhotos.map((photo, idx) => (
+            <motion.div
+              key={photo.id}
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                duration: 0.35,
+                delay: idx * 0.003,
+                ease: "easeOut",
+              }}
+              whileHover={{
+                scale: 1.25,
+                zIndex: 80,
+                rotate: 0,
+                boxShadow: "0 10px 28px rgba(81, 36, 63, 0.35)",
+              }}
+              className="absolute p-0.5 sm:p-1 bg-white border border-white rounded-[2px] sm:rounded-[3px] shadow-[0_2px_8px_rgba(40,20,30,0.22)] cursor-pointer transition-shadow duration-200"
+              style={{
+                top: `${photo.top}%`,
+                left: `${photo.left}%`,
+                width: `${photo.w}%`,
+                height: `${photo.h}%`,
+                transform: `rotate(${photo.rot}deg)`,
+                zIndex: photo.z,
+              }}
+            >
+              {/* Photo inside Polaroid white frame */}
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={photo.src}
+                alt={photo.caption}
+                className="w-full h-full object-cover rounded-[1px] transition-transform duration-300"
+                style={{ objectPosition: photo.objectPosition || "center" }}
+                onError={(e) => {
+                  e.currentTarget.style.display = "none";
                 }}
-                whileHover={{
-                  scale: 1.25,
-                  zIndex: 80,
-                  rotate: 0,
-                  boxShadow: "0 10px 28px rgba(81, 36, 63, 0.35)",
-                }}
-                className="absolute p-0.5 sm:p-1 bg-white border border-white rounded-[2px] sm:rounded-[3px] shadow-[0_2px_8px_rgba(40,20,30,0.22)] cursor-pointer transition-shadow duration-200"
-                style={{
-                  top: `${photo.top}%`,
-                  left: `${photo.left}%`,
-                  width: `${photo.w}%`,
-                  height: `${photo.h}%`,
-                  transform: `rotate(${photo.rot}deg)`,
-                  zIndex: photo.z,
-                }}
-              >
-                {/* Photo inside Polaroid white frame */}
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={photo.src}
-                  alt={photo.caption}
-                  loading="lazy"
-                  decoding="async"
-                  className="w-full h-full object-cover rounded-[1px] transition-transform duration-300"
-                  style={{ objectPosition: photo.objectPosition || "center" }}
-                  onError={(e) => {
-                    e.currentTarget.style.display = "none";
-                  }}
-                />
+              />
 
-                {/* Romantic soft pink fallback backdrop */}
-                <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#FFE0EA] to-[#EDE2FA] flex items-center justify-center text-[8px]">
-                  💕
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        )}
+              {/* Romantic soft pink fallback backdrop */}
+              <div className="absolute inset-0 -z-10 bg-gradient-to-br from-[#FFE0EA] to-[#EDE2FA] flex items-center justify-center text-[8px]">
+                💕
+              </div>
+            </motion.div>
+          ))}
+        </div>
       </div>
 
       {/* Universal Loving Caption underneath the framed collage */}
@@ -1994,51 +1966,6 @@ export function FramedPhotoCollage({
           {heroCaption}
         </div>
       </div>
-
-      {/* Curated Mobile Polaroid Cluster (Under 768px: touch-friendly, smooth 60fps) */}
-      {isMobile && (
-        <div className="mt-8 px-2 max-w-md mx-auto">
-          <p className="text-center font-handwritten text-xl text-[var(--pink-strong)] mb-4">
-            A few sweet moments from our scrapbook ♡
-          </p>
-          <div className="grid grid-cols-2 gap-3 sm:gap-4">
-            {curatedMobilePhotos.map((photo) => (
-              <motion.div
-                key={photo.id}
-                onClick={() => {
-                  const origIdx = activeBorderPhotos.findIndex((p) => p.id === photo.id);
-                  setLightboxIndex(origIdx !== -1 ? origIdx + 1 : 0);
-                }}
-                className="p-2.5 pb-3 bg-white rounded-2xl shadow-md border border-[var(--border-subtle)] cursor-pointer active:scale-95 transition-transform"
-                style={{ transform: `rotate(${photo.rot}deg)` }}
-              >
-                <div className="aspect-square w-full rounded-xl overflow-hidden bg-[var(--soft-pink)] relative">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={photo.src}
-                    alt={photo.caption}
-                    loading="lazy"
-                    decoding="async"
-                    className="w-full h-full object-cover"
-                    style={{ objectPosition: photo.objectPosition || "center" }}
-                  />
-                </div>
-                <p className="mt-2 font-handwritten text-center text-xs text-[var(--romantic-plum)] line-clamp-1">
-                  {photo.caption}
-                </p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Full-screen Photo Lightbox Modal */}
-      <PhotoLightbox
-        isOpen={lightboxIndex !== null}
-        initialIndex={lightboxIndex ?? 0}
-        photos={allLightboxPhotos}
-        onClose={() => setLightboxIndex(null)}
-      />
     </div>
   );
 }

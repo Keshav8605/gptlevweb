@@ -85,24 +85,9 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
       setParticipantName(localStorage.getItem("gift_participant_name") || (savedRole === "creator" ? "Babe" : "Baby"));
     };
     window.addEventListener("storage", handleStorage);
-
-    const handleVisibilityChange = () => {
-      if (document.hidden) {
-        if (activeAudioElementRef.current) {
-          activeAudioElementRef.current.pause();
-          setCurrentlyPlayingId(null);
-        }
-        if (previewAudioRef.current) {
-          previewAudioRef.current.pause();
-        }
-      }
-    };
-    document.addEventListener("visibilitychange", handleVisibilityChange);
-
     return () => {
       isMounted = false;
       window.removeEventListener("storage", handleStorage);
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
   }, []);
 
@@ -131,18 +116,13 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       audioChunksRef.current = [];
 
-      const candidates = [
-        "audio/webm;codecs=opus",
-        "audio/webm",
-        "audio/mp4",
-        "audio/aac",
-      ];
-      let mimeType = "";
-      if (typeof MediaRecorder !== "undefined" && typeof MediaRecorder.isTypeSupported === "function") {
-        for (const candidate of candidates) {
-          if (MediaRecorder.isTypeSupported(candidate)) {
-            mimeType = candidate;
-            break;
+      let mimeType = "audio/webm;codecs=opus";
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = "audio/webm";
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = "audio/mp4";
+          if (!MediaRecorder.isTypeSupported(mimeType)) {
+            mimeType = ""; // fallback to browser default
           }
         }
       }
@@ -157,9 +137,7 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
       };
 
       recorder.onstop = () => {
-        const fullBlob = new Blob(audioChunksRef.current, {
-          type: recorder.mimeType || mimeType || "audio/webm",
-        });
+        const fullBlob = new Blob(audioChunksRef.current, { type: recorder.mimeType || "audio/webm" });
         setAudioBlob(fullBlob);
         const url = URL.createObjectURL(fullBlob);
         setPreviewUrl(url);
@@ -355,7 +333,7 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
             {onOpenAccessModal && (
               <button
                 onClick={onOpenAccessModal}
-                className="text-xs text-[var(--pink-strong)] underline hover:opacity-80 cursor-pointer ml-1 py-1 px-1.5 inline-flex items-center min-h-[36px]"
+                className="text-xs text-[var(--pink-strong)] underline hover:opacity-80 cursor-pointer ml-1"
               >
                 Switch
               </button>
@@ -427,7 +405,7 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
               <button
                 onClick={startRecording}
                 id="btn-start-voice-recording"
-                className="inline-flex items-center justify-center gap-2 px-6 py-3 min-h-[48px] rounded-full bg-gradient-to-r from-[var(--pink-strong)] to-[var(--pink-hover)] text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all cursor-pointer transform hover:scale-[1.02]"
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-gradient-to-r from-[var(--pink-strong)] to-[var(--pink-hover)] text-white font-semibold text-sm shadow-md hover:shadow-lg transition-all cursor-pointer transform hover:scale-[1.02]"
               >
                 <span>🎙️</span>
                 <span>Record a voice note</span>
@@ -473,13 +451,13 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
                 <button
                   onClick={stopRecording}
                   id="btn-stop-voice-recording"
-                  className="px-6 py-2.5 min-h-[44px] rounded-full bg-red-500 text-white font-semibold text-sm shadow-md hover:bg-red-600 transition-all cursor-pointer inline-flex items-center justify-center gap-1.5"
+                  className="px-6 py-2.5 rounded-full bg-red-500 text-white font-semibold text-sm shadow-md hover:bg-red-600 transition-all cursor-pointer"
                 >
                   ⏹️ Finish recording
                 </button>
                 <button
                   onClick={cancelRecording}
-                  className="px-4 py-2.5 min-h-[44px] rounded-full bg-[var(--pale-rose)] text-[var(--text-secondary)] font-semibold text-sm hover:bg-zinc-200 transition-all cursor-pointer inline-flex items-center justify-center"
+                  className="px-4 py-2.5 rounded-full bg-[var(--pale-rose)] text-[var(--text-secondary)] font-semibold text-sm hover:bg-zinc-200 transition-all cursor-pointer"
                 >
                   Start again
                 </button>
@@ -509,7 +487,7 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
                 <button
                   onClick={cancelRecording}
                   disabled={isUploading}
-                  className="px-4 py-2 min-h-[44px] rounded-full border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-secondary)] hover:bg-zinc-100 cursor-pointer disabled:opacity-50 inline-flex items-center justify-center"
+                  className="px-4 py-2 rounded-full border border-[var(--border-subtle)] text-xs font-semibold text-[var(--text-secondary)] hover:bg-zinc-100 cursor-pointer disabled:opacity-50"
                 >
                   Start again
                 </button>
@@ -517,7 +495,7 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
                   onClick={sendVoiceNote}
                   disabled={isUploading}
                   id="btn-send-voice-recording"
-                  className="px-6 py-2.5 min-h-[44px] rounded-full bg-[var(--pink-strong)] text-white text-xs font-semibold shadow-md hover:bg-[var(--pink-hover)] cursor-pointer disabled:opacity-50 inline-flex items-center justify-center gap-2"
+                  className="px-6 py-2.5 rounded-full bg-[var(--pink-strong)] text-white text-xs font-semibold shadow-md hover:bg-[var(--pink-hover)] cursor-pointer disabled:opacity-50 flex items-center gap-2"
                 >
                   {isUploading ? (
                     <>
@@ -544,7 +522,7 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
             </h3>
             <button
               onClick={fetchMessages}
-              className="text-xs text-[var(--pink-strong)] font-semibold hover:underline cursor-pointer min-h-[44px] inline-flex items-center"
+              className="text-xs text-[var(--pink-strong)] font-semibold hover:underline cursor-pointer"
             >
               🔄 Refresh voice notes
             </button>
@@ -616,7 +594,7 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
                           <button
                             onClick={() => handleDelete(msg.id)}
                             title="Delete note"
-                            className="w-10 h-10 min-w-[40px] min-h-[40px] flex items-center justify-center text-xs text-zinc-400 hover:text-red-500 cursor-pointer p-1 rounded-full hover:bg-red-50 transition-colors"
+                            className="text-xs text-zinc-400 hover:text-red-500 cursor-pointer p-1"
                           >
                             🗑️
                           </button>
@@ -627,7 +605,7 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
                       <div className="flex items-center gap-3 p-3 rounded-2xl bg-[var(--pale-rose)]/60 border border-[var(--border-subtle)]">
                         <button
                           onClick={() => togglePlayMessage(msg)}
-                          className={`w-11 h-11 min-w-[44px] min-h-[44px] rounded-full flex items-center justify-center text-white transition-all cursor-pointer shadow-sm ${
+                          className={`w-10 h-10 rounded-full flex items-center justify-center text-white transition-all cursor-pointer shadow-sm ${
                             isPlaying
                               ? "bg-red-500 scale-105"
                               : "bg-[var(--pink-strong)] hover:bg-[var(--pink-hover)]"
@@ -669,7 +647,7 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
                             const target = document.getElementById("voice");
                             target?.scrollIntoView({ behavior: "smooth" });
                           }}
-                          className="text-[var(--pink-strong)] font-semibold hover:underline cursor-pointer min-h-[36px] inline-flex items-center"
+                          className="text-[var(--pink-strong)] font-semibold hover:underline cursor-pointer"
                         >
                           Send Voice Reply 💬
                         </button>

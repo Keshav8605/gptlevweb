@@ -126,7 +126,7 @@ export function GiftNavigation({
   return (
     <>
       {/* Discreet floating bottom-left pill for recipient switching (non-overlapping) */}
-      <div className="fixed bottom-[calc(1rem+env(safe-area-inset-bottom,0px))] left-[calc(1rem+env(safe-area-inset-left,0px))] z-40 hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[var(--border-subtle)] shadow-[var(--shadow-pink)] text-xs text-[var(--text-secondary)]">
+      <div className="fixed bottom-4 left-4 z-40 hidden sm:flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/90 backdrop-blur-md border border-[var(--border-subtle)] shadow-[var(--shadow-pink)] text-xs text-[var(--text-secondary)]">
         <span className="w-2 h-2 rounded-full bg-pink-400 animate-pulse" />
         <span>Made for you ♡</span>
         {onOpenAccessModal && (
@@ -146,7 +146,7 @@ export function GiftNavigation({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ delay: 0.5 }}
         onClick={() => setIsOpen(!isOpen)}
-        className="fixed top-[calc(1rem+env(safe-area-inset-top,0px))] right-[calc(1rem+env(safe-area-inset-right,0px))] z-50 w-12 h-12 rounded-full shadow-lg flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105"
+        className="fixed top-4 right-4 z-50 w-12 h-12 rounded-full shadow-lg flex items-center justify-center cursor-pointer transition-all duration-300 hover:scale-105"
         style={{
           background: isOpen
             ? "var(--pink-primary)"
@@ -201,15 +201,7 @@ export function GiftNavigation({
               animate={{ x: 0, opacity: 1 }}
               exit={{ x: "100%", opacity: 0 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
-              drag="x"
-              dragConstraints={{ left: 0, right: 300 }}
-              dragElastic={{ left: 0, right: 0.5 }}
-              onDragEnd={(_, info) => {
-                if (info.offset.x > 70 || info.velocity.x > 350) {
-                  setIsOpen(false);
-                }
-              }}
-              className="fixed right-0 top-0 h-screen h-dvh w-80 max-w-[85vw] z-45 overflow-y-auto pt-[calc(3rem+env(safe-area-inset-top,0px))] pb-[calc(2rem+env(safe-area-inset-bottom,0px))] pr-[calc(1.5rem+env(safe-area-inset-right,0px))] pl-6 bg-gradient-to-b from-[var(--bg-main)] to-[var(--bg-surface)] border-l border-[var(--border-subtle)] shadow-2xl flex flex-col justify-between overscroll-contain touch-pan-y"
+              className="fixed right-0 top-0 h-full w-80 max-w-[85vw] z-45 overflow-y-auto py-12 px-6 bg-gradient-to-b from-[var(--bg-main)] to-[var(--bg-surface)] border-l border-[var(--border-subtle)] shadow-2xl flex flex-col justify-between"
             >
               <div>
                 {/* Header & Subtitle */}
