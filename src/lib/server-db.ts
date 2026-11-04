@@ -20,6 +20,7 @@ export interface ParticipantSession {
 
 export interface ContentReaction {
   id: string;
+  giftId?: string;
   targetType: "observation" | "memory" | "letter" | "openWhen";
   targetId: string;
   emoji: string;
@@ -30,6 +31,7 @@ export interface ContentReaction {
 
 export interface ContentComment {
   id: string;
+  giftId?: string;
   targetType: "observation" | "memory" | "letter" | "openWhen";
   targetId: string;
   content: string;
@@ -50,6 +52,7 @@ export interface JournalReply {
 
 export interface JournalEntry {
   id: string;
+  giftId?: string;
   title?: string;
   content: string;
   prompt?: string;
@@ -65,6 +68,7 @@ export interface JournalEntry {
 
 export interface VoiceMessage {
   id: string;
+  giftId?: string;
   audioData: string; // Base64 audio data URI
   durationSeconds: number;
   sender: "creator" | "recipient";
@@ -177,6 +181,7 @@ export interface ChecklistItem {
 
 export interface DateProposal {
   id: string;
+  giftId?: string;
   title: string;
   description?: string;
   isSurprise: boolean;
@@ -209,6 +214,7 @@ export interface DateProposal {
 
 export interface DateMemory {
   id: string;
+  giftId?: string;
   proposalId?: string;
   dateTitle: string;
   completedDate: string;
@@ -253,6 +259,7 @@ export interface NotificationSettings {
 
 export interface GiftRecord {
   id: string;
+  creatorId?: string;
   slug: string;
   title: string;
   status: "draft" | "published" | "unpublished";
@@ -343,6 +350,7 @@ export interface GiftRecord {
 export interface MediaAsset {
   id: string;
   giftId?: string;
+  creatorId?: string;
   name: string;
   type: "image" | "audio";
   mimeType: string;
@@ -1247,6 +1255,16 @@ export function getCoupleConfig() {
   const db = loadDatabase();
   return {
     giftId: db.config.giftId,
+    invitationStatus: db.config.invitationStatus,
+    creatorName: db.config.creatorName,
+    recipientName: db.config.recipientName,
+  };
+}
+
+export function getFullCoupleConfigForCreator() {
+  const db = loadDatabase();
+  return {
+    giftId: db.config.giftId,
     recipientInviteToken: db.config.recipientInviteToken,
     invitationStatus: db.config.invitationStatus,
     creatorName: db.config.creatorName,
@@ -1263,9 +1281,10 @@ export function updateCoupleConfig(updates: Partial<RelationshipDatabase["config
 
 // ==================== REACTIONS ====================
 
-export function getReactions(targetType?: string, targetId?: string) {
+export function getReactions(targetType?: string, targetId?: string, giftId?: string) {
   const db = loadDatabase();
   let list = db.reactions;
+  if (giftId) list = list.filter((r) => r.giftId === giftId);
   if (targetType) list = list.filter((r) => r.targetType === targetType);
   if (targetId) list = list.filter((r) => r.targetId === targetId);
   return list;
@@ -1276,7 +1295,8 @@ export function toggleReaction(
   targetId: string,
   emoji: string,
   author: "creator" | "recipient",
-  authorName: string
+  authorName: string,
+  giftId?: string
 ) {
   const db = loadDatabase();
   const existingIdx = db.reactions.findIndex(
@@ -1288,6 +1308,7 @@ export function toggleReaction(
   } else {
     db.reactions.push({
       id: `rx_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+      giftId,
       targetType,
       targetId,
       emoji,
@@ -1303,9 +1324,10 @@ export function toggleReaction(
 
 // ==================== COMMENTS ====================
 
-export function getComments(targetType?: string, targetId?: string) {
+export function getComments(targetType?: string, targetId?: string, giftId?: string) {
   const db = loadDatabase();
   let list = db.comments;
+  if (giftId) list = list.filter((c) => c.giftId === giftId);
   if (targetType) list = list.filter((c) => c.targetType === targetType);
   if (targetId) list = list.filter((c) => c.targetId === targetId);
   return list;
@@ -1316,11 +1338,13 @@ export function addComment(
   targetId: string,
   content: string,
   author: "creator" | "recipient",
-  authorName: string
+  authorName: string,
+  giftId?: string
 ) {
   const db = loadDatabase();
   const newComment: ContentComment = {
     id: `cm_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    giftId,
     targetType,
     targetId,
     content: content.trim(),
@@ -1350,14 +1374,17 @@ export function deleteComment(id: string, role: "creator" | "recipient") {
 
 // ==================== NOTEBOOK ====================
 
-export function getJournalEntries(): JournalEntry[] {
+export function getJournalEntries(giftId?: string): JournalEntry[] {
   const db = loadDatabase();
-  return [...db.journalEntries].sort(
+  let list = db.journalEntries;
+  if (giftId) list = list.filter((j) => j.giftId === giftId);
+  return [...list].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 }
 
 export function addJournalEntry(entry: {
+  giftId?: string;
   title?: string;
   content: string;
   prompt?: string;
@@ -1368,6 +1395,7 @@ export function addJournalEntry(entry: {
   const db = loadDatabase();
   const newEntry: JournalEntry = {
     id: `jn_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    giftId: entry.giftId,
     title: entry.title?.trim() || undefined,
     content: entry.content.trim(),
     prompt: entry.prompt?.trim() || undefined,
@@ -1550,9 +1578,11 @@ export function deleteJournalReply(
 
 // ==================== VOICE MESSAGES ====================
 
-export function getVoiceMessages(): VoiceMessage[] {
+export function getVoiceMessages(giftId?: string): VoiceMessage[] {
   const db = loadDatabase();
-  return [...db.voiceMessages].sort(
+  let list = db.voiceMessages;
+  if (giftId) list = list.filter((v) => v.giftId === giftId);
+  return [...list].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 }
@@ -1561,11 +1591,13 @@ export function addVoiceMessage(
   audioData: string,
   durationSeconds: number,
   sender: "creator" | "recipient",
-  senderName: string
+  senderName: string,
+  giftId?: string
 ): VoiceMessage {
   const db = loadDatabase();
   const newMsg: VoiceMessage = {
     id: `vm_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    giftId,
     audioData,
     durationSeconds: Math.round(durationSeconds) || 5,
     sender,
@@ -1809,6 +1841,7 @@ export function createDateProposal(
 
   const newProposal: DateProposal = {
     id: `prop_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    giftId: data.giftId,
     title: (data.title || "Our Next Little Adventure").trim(),
     description: data.description?.trim(),
     isSurprise: data.isSurprise ?? false,
@@ -2127,6 +2160,7 @@ export function addDateMemory(
 
   const newMemory: DateMemory = {
     id: `dmem_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    giftId: data.giftId,
     proposalId: data.proposalId,
     dateTitle: (data.dateTitle || "Our Little Adventure").trim(),
     completedDate: data.completedDate || new Date().toISOString().split("T")[0],
@@ -2244,52 +2278,108 @@ export function updateNotificationSettings(updates: Partial<NotificationSettings
 
 // ==================== CREATOR RESPONSE CENTER ====================
 
-export function getCreatorResponseSummary() {
+export function getCreatorResponseSummary(creatorId?: string, giftId?: string) {
   const db = loadDatabase();
 
-  const unreadComments = db.comments.filter((c) => c.author === "recipient" && !c.isViewedByCreator);
-  const unreadEntries = db.journalEntries.filter((j) => j.author === "recipient" && !j.isViewedByCreator);
-  const unlistenedVoice = db.voiceMessages.filter((v) => v.sender === "recipient" && !v.isListened);
+  const creatorGifts = creatorId
+    ? db.gifts.filter((g) => Boolean(g.creatorId) && g.creatorId === creatorId)
+    : db.gifts;
+  const creatorGiftIds = new Set(creatorGifts.map((g) => g.id));
+
+  // If specific giftId is requested, verify the creator owns it
+  if (giftId && !creatorGiftIds.has(giftId)) {
+    return {
+      totalRecipientReactions: 0,
+      totalRecipientComments: 0,
+      unreadCommentsCount: 0,
+      totalJournalEntries: 0,
+      unreadJournalCount: 0,
+      totalVoiceMessages: 0,
+      unreadVoiceCount: 0,
+      totalDateProposals: 0,
+      activeProposalsCount: 0,
+      confirmedEventsCount: 0,
+      totalDateMemories: 0,
+      recentComments: [],
+      recentJournal: [],
+      voiceMessages: [],
+      invitationStatus: "active" as const,
+    };
+  }
+
+  const targetGiftIds = giftId ? new Set([giftId]) : creatorGiftIds;
+  const matchGift = (itemGiftId?: string) => {
+    if (itemGiftId) return targetGiftIds.has(itemGiftId);
+    return targetGiftIds.has("gift_world_demo");
+  };
+
+  const scopedComments = db.comments.filter((c) => matchGift(c.giftId));
+  const unreadComments = scopedComments.filter((c) => c.author === "recipient" && !c.isViewedByCreator);
+  const scopedEntries = db.journalEntries.filter((j) => matchGift(j.giftId));
+  const unreadEntries = scopedEntries.filter((j) => j.author === "recipient" && !j.isViewedByCreator);
+  const scopedVoice = db.voiceMessages.filter((v) => matchGift(v.giftId));
+  const unlistenedVoice = scopedVoice.filter((v) => v.sender === "recipient" && !v.isListened);
+  const scopedProposals = db.dateProposals.filter((p) => matchGift(p.giftId));
+  const scopedMemories = db.dateMemories.filter((m) => matchGift(m.giftId));
+  const scopedReactions = db.reactions.filter((r) => matchGift(r.giftId));
 
   return {
-    totalRecipientReactions: db.reactions.filter((r) => r.author === "recipient").length,
-    totalRecipientComments: db.comments.filter((c) => c.author === "recipient").length,
+    totalRecipientReactions: scopedReactions.filter((r) => r.author === "recipient").length,
+    totalRecipientComments: scopedComments.filter((c) => c.author === "recipient").length,
     unreadCommentsCount: unreadComments.length,
-    totalJournalEntries: db.journalEntries.length,
+    totalJournalEntries: scopedEntries.length,
     unreadJournalCount: unreadEntries.length,
-    totalVoiceMessages: db.voiceMessages.length,
+    totalVoiceMessages: scopedVoice.length,
     unreadVoiceCount: unlistenedVoice.length,
-    totalDateProposals: db.dateProposals.length,
-    activeProposalsCount: db.dateProposals.filter((p) => p.status === "proposed" || p.status === "changes_requested").length,
-    confirmedEventsCount: db.dateProposals.filter((p) => p.status === "confirmed").length,
-    totalDateMemories: db.dateMemories.length,
-    recentComments: db.comments.filter((c) => c.author === "recipient").slice(-10).reverse(),
-    recentJournal: db.journalEntries.slice(-10),
-    voiceMessages: db.voiceMessages,
+    totalDateProposals: scopedProposals.length,
+    activeProposalsCount: scopedProposals.filter((p) => p.status === "proposed" || p.status === "changes_requested").length,
+    confirmedEventsCount: scopedProposals.filter((p) => p.status === "confirmed").length,
+    totalDateMemories: scopedMemories.length,
+    recentComments: scopedComments.filter((c) => c.author === "recipient").slice(-10).reverse(),
+    recentJournal: scopedEntries.slice(-10),
+    voiceMessages: scopedVoice,
     invitationStatus: db.config.invitationStatus,
-    recipientInviteToken: db.config.recipientInviteToken,
-    creatorPasscode: db.config.creatorPasscode,
   };
 }
 
-export function markResponsesAsViewed() {
+export function markResponsesAsViewed(creatorId?: string, giftId?: string) {
   const db = loadDatabase();
+  const creatorGifts = creatorId
+    ? db.gifts.filter((g) => Boolean(g.creatorId) && g.creatorId === creatorId)
+    : db.gifts;
+  const creatorGiftIds = new Set(creatorGifts.map((g) => g.id));
+  const targetGiftIds = giftId ? new Set([giftId]) : creatorGiftIds;
+  const matchGift = (itemGiftId?: string) => {
+    if (itemGiftId) return targetGiftIds.has(itemGiftId);
+    return targetGiftIds.has("gift_world_demo");
+  };
+
+  let markedCount = 0;
   db.comments.forEach((c) => {
-    if (c.author === "recipient") c.isViewedByCreator = true;
+    if (c.author === "recipient" && matchGift(c.giftId) && !c.isViewedByCreator) {
+      c.isViewedByCreator = true;
+      markedCount++;
+    }
   });
   db.journalEntries.forEach((j) => {
-    if (j.author === "recipient") j.isViewedByCreator = true;
+    if (j.author === "recipient" && matchGift(j.giftId) && !j.isViewedByCreator) {
+      j.isViewedByCreator = true;
+      markedCount++;
+    }
   });
   db.voiceMessages.forEach((v) => {
-    if (v.sender === "recipient") v.isListened = true;
+    if (v.sender === "recipient" && matchGift(v.giftId) && !v.isListened) {
+      v.isListened = true;
+      markedCount++;
+    }
   });
-  saveDatabase(db);
-  return { success: true };
+  if (markedCount > 0) saveDatabase(db);
+  return { success: true, markedCount };
 }
 
 // ==================== PHASE 5: GIFT MANAGEMENT ====================
 
-export function getGifts() {
+export function getGifts(creatorId?: string) {
   const db = loadDatabase();
   const totalResponses =
     db.comments.length +
@@ -2298,8 +2388,14 @@ export function getGifts() {
     db.voiceMessages.length +
     db.dateProposals.length;
 
-  return db.gifts.map((g) => ({
+  let list = db.gifts;
+  if (creatorId) {
+    list = list.filter((g) => g.creatorId === creatorId || (!g.creatorId && g.id === "gift_world_demo"));
+  }
+
+  return list.map((g) => ({
     id: g.id,
+    creatorId: g.creatorId,
     slug: g.slug,
     title: g.title,
     status: g.status,
@@ -2313,7 +2409,13 @@ export function getGifts() {
     enabledSections: g.enabledSections || [],
     sectionCount: g.enabledSections?.length || 15,
     responseActivityCount: g.id === "gift_world_demo" ? totalResponses : 0,
-    privacy: g.privacy,
+    privacy: {
+      isPasswordProtected: g.privacy.isPasswordProtected,
+      invitationStatus: g.privacy.invitationStatus,
+      allowResponses: g.privacy.allowResponses,
+      allowRecipientContributions: g.privacy.allowRecipientContributions,
+      // recipientInviteToken is NOT leaked in the gifts list
+    },
   })).sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 }
 
@@ -2343,7 +2445,7 @@ function generateSlug(title: string, db: RelationshipDatabase): string {
   return candidate;
 }
 
-export function createGift(data: Partial<GiftRecord>): GiftRecord {
+export function createGift(data: Partial<GiftRecord>, creatorId?: string): GiftRecord {
   const db = loadDatabase();
   const title = (data.title || "My Romantic Gift ♡").trim();
   const slug = data.slug ? data.slug.trim().toLowerCase() : generateSlug(title, db);
@@ -2369,6 +2471,7 @@ export function createGift(data: Partial<GiftRecord>): GiftRecord {
 
   const newGift: GiftRecord = {
     id: `gift_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    creatorId: creatorId || data.creatorId,
     slug,
     title,
     status: data.status || "draft",
@@ -2431,7 +2534,7 @@ export function createGift(data: Partial<GiftRecord>): GiftRecord {
       isPasswordProtected: data.privacy?.isPasswordProtected ?? false,
       passcode: data.privacy?.passcode || "love2024",
       recipientInviteToken: data.privacy?.recipientInviteToken || `sweetheart-${Math.random().toString(36).slice(2, 6)}`,
-      invitationStatus: "active",
+      invitationStatus: data.privacy?.invitationStatus || "active",
       allowResponses: data.privacy?.allowResponses ?? true,
       allowRecipientContributions: data.privacy?.allowRecipientContributions ?? true,
     },
@@ -2441,6 +2544,57 @@ export function createGift(data: Partial<GiftRecord>): GiftRecord {
   saveDatabase(db);
   return newGift;
 }
+
+export const EDITABLE_GIFT_FIELDS = [
+  "title",
+  "slug",
+  "senderName",
+  "senderNickname",
+  "recipientName",
+  "recipientNickname",
+  "dateFirstMet",
+  "dateOfficialCouple",
+  "welcomeTitle",
+  "welcomeSubtitle",
+  "welcomeMessage",
+  "welcomePolaroids",
+  "welcomeEyebrow",
+  "welcomeHandwrittenNote",
+  "memoriesCollageType",
+  "memoriesHeartCollage",
+  "memoriesPolaroidCollage",
+  "enabledSections",
+  "sectionOrder",
+  "customMilestones",
+  "secretPassword",
+  "secretHint",
+  "secretContent",
+  "featuredSong",
+  "finalLetter",
+  "finalMessage",
+  "customObservations",
+  "customMemories",
+  "customLetters",
+  "customOpenWhenLetters",
+  "customLittleReasons",
+  "customDeluluScenarios",
+  "customQuizQuestions",
+  "customDigitalGifts",
+  "customBucketListItems",
+  "customPersonalCards",
+  "customDateIdeas",
+  "lastSecretHeading",
+  "lastSecretMessage",
+  "lastSecretPhoto",
+  "lastSecretButtonLabel",
+  "lastSecretFinalNote",
+  "finalHeading",
+  "finalSignature",
+  "finalPhoto",
+  "finalCenterPhoto",
+  "finalCollagePhotos",
+  "designPreferences",
+] as const;
 
 export function updateGift(id: string, updates: Partial<GiftRecord>): GiftRecord | null {
   const db = loadDatabase();
@@ -2452,7 +2606,7 @@ export function updateGift(id: string, updates: Partial<GiftRecord>): GiftRecord
 
   // If slug is being updated, ensure uniqueness
   let slug = existing.slug;
-  if (updates.slug && updates.slug.trim() !== existing.slug) {
+  if (updates.slug && typeof updates.slug === "string" && updates.slug.trim() !== existing.slug) {
     const candidate = updates.slug.trim().toLowerCase();
     const isTaken = db.gifts.some((g) => g.id !== id && g.slug.toLowerCase() === candidate);
     if (!isTaken) {
@@ -2460,15 +2614,48 @@ export function updateGift(id: string, updates: Partial<GiftRecord>): GiftRecord
     }
   }
 
+  // Validate and sanitize privacy settings without allowing recipientInviteToken tampering
+  const safePrivacy = {
+    ...existing.privacy,
+    ...(updates.privacy?.isPasswordProtected !== undefined
+      ? { isPasswordProtected: Boolean(updates.privacy.isPasswordProtected) }
+      : {}),
+    ...(typeof updates.privacy?.passcode === "string"
+      ? { passcode: updates.privacy.passcode.slice(0, 50) }
+      : {}),
+    ...(updates.privacy?.allowResponses !== undefined
+      ? { allowResponses: Boolean(updates.privacy.allowResponses) }
+      : {}),
+    ...(updates.privacy?.allowRecipientContributions !== undefined
+      ? { allowRecipientContributions: Boolean(updates.privacy.allowRecipientContributions) }
+      : {}),
+    ...(updates.privacy?.invitationStatus === "active" || updates.privacy?.invitationStatus === "revoked"
+      ? { invitationStatus: updates.privacy.invitationStatus }
+      : {}),
+    // CRITICAL: recipientInviteToken cannot be overwritten by client updates
+    recipientInviteToken: existing.privacy.recipientInviteToken,
+  };
+
+  // Pick ONLY allowlisted editable fields
+  const sanitizedUpdates: Partial<GiftRecord> = {};
+  for (const field of EDITABLE_GIFT_FIELDS) {
+    if (field in updates && (updates as Record<string, unknown>)[field] !== undefined) {
+      (sanitizedUpdates as Record<string, unknown>)[field] = (updates as Record<string, unknown>)[field];
+    }
+  }
+
   const updated: GiftRecord = {
     ...existing,
-    ...updates,
-    slug,
+    ...sanitizedUpdates,
+    // Explicitly lock protected system fields
+    id: existing.id,
+    creatorId: existing.creatorId,
+    createdAt: existing.createdAt,
     updatedAt: now,
-    privacy: {
-      ...existing.privacy,
-      ...(updates.privacy || {}),
-    },
+    publishedAt: existing.publishedAt,
+    status: existing.status,
+    slug,
+    privacy: safePrivacy,
   };
 
   db.gifts[idx] = updated;
@@ -2476,7 +2663,7 @@ export function updateGift(id: string, updates: Partial<GiftRecord>): GiftRecord
   return updated;
 }
 
-export function duplicateGift(id: string): GiftRecord | null {
+export function duplicateGift(id: string, newCreatorId?: string): GiftRecord | null {
   const db = loadDatabase();
   const existing = db.gifts.find((g) => g.id === id);
   if (!existing) return null;
@@ -2488,6 +2675,7 @@ export function duplicateGift(id: string): GiftRecord | null {
   const cloned: GiftRecord = {
     ...JSON.parse(JSON.stringify(existing)),
     id: `gift_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+    creatorId: newCreatorId || existing.creatorId,
     title,
     slug,
     status: "draft",
@@ -2560,7 +2748,6 @@ const ALLOWED_IMAGE_MIMES = [
   "image/png",
   "image/webp",
   "image/gif",
-  "image/svg+xml",
 ];
 
 const ALLOWED_AUDIO_MIMES = [
@@ -2578,7 +2765,8 @@ export function getMediaAssets(giftId?: string): MediaAsset[] {
   const db = loadDatabase();
   let list = db.mediaAssets || [];
   if (giftId) {
-    list = list.filter((a) => !a.giftId || a.giftId === giftId);
+    // Strictly return only assets belonging to this specific gift; never include unassigned assets
+    list = list.filter((a) => a.giftId === giftId);
   }
   return [...list].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
@@ -2614,6 +2802,7 @@ export function addMediaAsset(
   const newAsset: MediaAsset = {
     id: `media_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     giftId: asset.giftId,
+    creatorId: asset.creatorId,
     name: asset.name.trim() || (isImage ? "Uploaded Image" : "Uploaded Audio"),
     type: isImage ? "image" : "audio",
     mimeType: asset.mimeType,
@@ -2631,6 +2820,11 @@ export function addMediaAsset(
 
   saveDatabase(db);
   return { success: true, asset: newAsset };
+}
+
+export function getMediaAssetById(id: string): MediaAsset | null {
+  const db = loadDatabase();
+  return (db.mediaAssets || []).find((a) => a.id === id) || null;
 }
 
 export function deleteMediaAsset(id: string): boolean {

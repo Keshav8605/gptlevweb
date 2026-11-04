@@ -1,8 +1,10 @@
 import { NextResponse } from "next/server";
 import { getVoiceMessages, addVoiceMessage, deleteVoiceMessage, verifyAccess } from "@/lib/server-db";
 
-export async function GET() {
-  const messages = getVoiceMessages();
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const giftId = url.searchParams.get("giftId") || undefined;
+  const messages = getVoiceMessages(giftId);
   return NextResponse.json({ success: true, messages });
 }
 
@@ -23,7 +25,8 @@ export async function POST(request: Request) {
       body.audioData,
       body.durationSeconds || 5,
       role as "creator" | "recipient",
-      name
+      name,
+      body.giftId
     );
 
     return NextResponse.json({ success: true, message });

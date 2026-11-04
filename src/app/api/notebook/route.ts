@@ -11,8 +11,10 @@ import {
   verifyAccess,
 } from "@/lib/server-db";
 
-export async function GET() {
-  const entries = getJournalEntries();
+export async function GET(request: Request) {
+  const url = new URL(request.url);
+  const giftId = url.searchParams.get("giftId") || undefined;
+  const entries = getJournalEntries(giftId);
   return NextResponse.json({ success: true, entries });
 }
 
@@ -49,6 +51,7 @@ export async function POST(request: Request) {
     }
 
     const newEntry = addJournalEntry({
+      giftId: body.giftId,
       title: body.title,
       content: body.content,
       prompt: body.prompt,

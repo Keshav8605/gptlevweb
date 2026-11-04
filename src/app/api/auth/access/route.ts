@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { verifyAccess, updateCoupleConfig, getCoupleConfig } from "@/lib/server-db";
+import { getAuthenticatedCreator } from "@/lib/auth-guard";
 
 export async function POST(request: Request) {
   try {
@@ -26,7 +27,7 @@ export async function GET(request: Request) {
     return NextResponse.json(result);
   }
 
-  // Return public couple info (names, invitation status)
+  // Return public couple info only — zero invitation tokens or passcodes
   const config = getCoupleConfig();
   return NextResponse.json({
     success: true,
@@ -39,13 +40,15 @@ export async function GET(request: Request) {
 // Creator can update invitation status / token
 export async function PATCH(request: Request) {
   try {
-    const body = await request.json();
-    const creatorPasscode = body.creatorPasscode;
-
-    const auth = verifyAccess(creatorPasscode);
-    if (!auth.authorized || auth.role !== "creator") {
-      return NextResponse.json({ error: "Unauthorized. Creator access required." }, { status: 403 });
+    const auth = await getAuthenticatedCreator(request);
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json(
+        { error: auth.error || "Unauthorized. Verified creator access required." },
+        { status: auth.statusCode || 401 }
+      );
     }
+
+    const body = await request.json();
 
     const updated = updateCoupleConfig({
       recipientInviteToken: body.recipientInviteToken,
@@ -54,7 +57,16 @@ export async function PATCH(request: Request) {
       recipientName: body.recipientName,
     });
 
-    return NextResponse.json({ success: true, config: updated });
+    // Return sanitized configuration without master passcodes
+    return NextResponse.json({
+      success: true,
+      config: {
+        giftId: updated.giftId,
+        invitationStatus: updated.invitationStatus,
+        creatorName: updated.creatorName,
+        recipientName: updated.recipientName,
+      },
+    });
   } catch {
     return NextResponse.json({ error: "Failed to update configuration" }, { status: 400 });
   }

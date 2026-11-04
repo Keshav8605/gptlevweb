@@ -17,6 +17,27 @@ function assert(condition, message) {
   }
 }
 
+function makeTestJwt(sub, email) {
+  const header = Buffer.from(JSON.stringify({ alg: "HS256", typ: "JWT" })).toString("base64url");
+  const exp = Math.floor(Date.now() / 1000) + 7200;
+  const payload = Buffer.from(
+    JSON.stringify({
+      sub,
+      email,
+      role: "authenticated",
+      aud: "authenticated",
+      exp,
+    })
+  ).toString("base64url");
+  return `${header}.${payload}.signature_test`;
+}
+
+const creatorToken = makeTestJwt("test_creator_e2e", "creator@example.com");
+const creatorHeaders = {
+  "Content-Type": "application/json",
+  Authorization: `Bearer ${creatorToken}`,
+};
+
 async function runTestSuite() {
   console.log("==========================================================");
   console.log("  ROMANTIC GIFTING APPLICATION — AUTOMATED TEST SUITE    ");
@@ -48,7 +69,7 @@ async function runTestSuite() {
     // 1. Create a draft gift
     const createRes = await fetch(`${BASE_URL}/api/gifts`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: creatorHeaders,
       body: JSON.stringify({
         title: "Test Romantic Sanctuary ♡",
         senderName: "Romeo",
@@ -80,7 +101,7 @@ async function runTestSuite() {
     // 2. Update Draft (Autosave / Manual Save)
     const updateRes = await fetch(`${BASE_URL}/api/gifts/${testGiftId}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: creatorHeaders,
       body: JSON.stringify({
         welcomeMessage: "Updated love message with more tenderness.",
       }),
@@ -95,14 +116,17 @@ async function runTestSuite() {
     // 3. Duplicate Gift
     const dupRes = await fetch(`${BASE_URL}/api/gifts`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: creatorHeaders,
       body: JSON.stringify({ sourceGiftId: testGiftId }),
     });
     assert(dupRes.status === 200, "Gift duplication via sourceGiftId succeeds");
     const dupData = await dupRes.json();
     assert(dupData.gift.title.includes("Copy"), "Duplicated gift receives proper title");
     // Clean up duplicate
-    await fetch(`${BASE_URL}/api/gifts/${dupData.gift.id}`, { method: "DELETE" });
+    await fetch(`${BASE_URL}/api/gifts/${dupData.gift.id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${creatorToken}` },
+    });
 
     // 4. Verify Draft Protection: Attempt to access draft publicly without auth
     const draftPublicRes = await fetch(`${BASE_URL}/api/gifts/by-slug/${testGiftSlug}`);
@@ -114,7 +138,7 @@ async function runTestSuite() {
     // 5. Publish the Gift
     const pubRes = await fetch(`${BASE_URL}/api/gifts/${testGiftId}/publish`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: creatorHeaders,
       body: JSON.stringify({ status: "published" }),
     });
     assert(pubRes.status === 200, "POST /api/gifts/[id]/publish succeeds");
@@ -217,7 +241,9 @@ async function runTestSuite() {
     assert(journalRes.status === 200, "POST /api/notebook adds journal entry");
 
     // 4. Verify Creator Response Center sees the submitted feedback
-    const responseCenterRes = await fetch(`${BASE_URL}/api/creator/responses`);
+    const responseCenterRes = await fetch(`${BASE_URL}/api/creator/responses`, {
+      headers: { Authorization: `Bearer ${creatorToken}` },
+    });
     assert(responseCenterRes.status === 200, "GET /api/creator/responses returns 200");
     const responseJson = await responseCenterRes.json();
     const responseSummary = responseJson.summary || responseJson;
@@ -391,7 +417,7 @@ async function runTestSuite() {
     // 1. Unpublish gift
     const unpubRes = await fetch(`${BASE_URL}/api/gifts/${testGiftId}/publish`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: creatorHeaders,
       body: JSON.stringify({ status: "unpublished" }),
     });
     assert(unpubRes.status === 200, "POST /api/gifts/[id]/publish unpublish succeeds");
@@ -407,7 +433,10 @@ async function runTestSuite() {
     // CLEANUP: Delete Test Gift
     // ----------------------------------------------------
     console.log("\n► [Cleanup] Removing test gift");
-    const cleanupRes = await fetch(`${BASE_URL}/api/gifts/${testGiftId}`, { method: "DELETE" });
+    const cleanupRes = await fetch(`${BASE_URL}/api/gifts/${testGiftId}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${creatorToken}` },
+    });
     assert(cleanupRes.status === 200, "Test gift cleaned up successfully");
 
     console.log("\n==========================================================");

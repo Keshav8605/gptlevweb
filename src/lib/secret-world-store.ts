@@ -1,5 +1,6 @@
 // Server-side store for Secret World verification, hints, and content.
 // Private content is verified on the server and never exposed in client bundles.
+// Isolated per creator to prevent cross-customer leakage.
 
 export interface SecretWorldConfig {
   password: string;
@@ -9,8 +10,7 @@ export interface SecretWorldConfig {
   photos: string[];
 }
 
-// In-memory server state with defaults
-let secretConfig: SecretWorldConfig = {
+const defaultSecretConfig: SecretWorldConfig = {
   password: "iloveyou",
   hint: "Three words, no spaces, all lowercase — the simplest truth I know 💕",
   title: "You found your way in, my love. ♡",
@@ -21,6 +21,11 @@ let secretConfig: SecretWorldConfig = {
     "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800&auto=format&fit=crop&q=80",
   ],
 };
+
+// Tenant-isolated store mapping creatorId/giftId -> SecretWorldConfig
+const secretConfigMap = new Map<string, SecretWorldConfig>();
+secretConfigMap.set("default", defaultSecretConfig);
+secretConfigMap.set("gift_world_demo", defaultSecretConfig);
 
 // Rate limiting state: IP/Client -> { attempts: number, lockedUntil: number }
 interface RateLimitRecord {
@@ -33,15 +38,17 @@ const rateLimitMap = new Map<string, RateLimitRecord>();
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS = 30 * 1000; // 30 second cooldown
 
-export function getPublicSecretHint(): { hint: string } {
+export function getPublicSecretHint(key: string = "default"): { hint: string } {
+  const config = secretConfigMap.get(key) || defaultSecretConfig;
   return {
-    hint: secretConfig.hint,
+    hint: config.hint,
   };
 }
 
 export function verifySecretPassword(
   attempt: string,
-  clientKey: string = "default_client"
+  clientKey: string = "default_client",
+  ownerKey: string = "default"
 ): {
   success: boolean;
   content?: {
@@ -72,9 +79,11 @@ export function verifySecretPassword(
     };
   }
 
+  const targetConfig = secretConfigMap.get(ownerKey) || defaultSecretConfig;
+
   // Normalize comparison
   const normalizedAttempt = attempt.trim().toLowerCase();
-  const normalizedTarget = secretConfig.password.trim().toLowerCase();
+  const normalizedTarget = targetConfig.password.trim().toLowerCase();
 
   if (normalizedAttempt === normalizedTarget) {
     // Reset rate limiting on success
@@ -82,9 +91,9 @@ export function verifySecretPassword(
     return {
       success: true,
       content: {
-        title: secretConfig.title,
-        letter: secretConfig.letter,
-        photos: secretConfig.photos,
+        title: targetConfig.title,
+        letter: targetConfig.letter,
+        photos: targetConfig.photos,
       },
     };
   }
@@ -110,15 +119,18 @@ export function verifySecretPassword(
 }
 
 export function updateSecretConfig(
-  newConfig: Partial<SecretWorldConfig>
+  newConfig: Partial<SecretWorldConfig>,
+  ownerKey: string = "default"
 ): { success: boolean; config: SecretWorldConfig } {
-  secretConfig = {
-    ...secretConfig,
+  const current = secretConfigMap.get(ownerKey) || { ...defaultSecretConfig };
+  const updated = {
+    ...current,
     ...newConfig,
   };
-  return { success: true, config: secretConfig };
+  secretConfigMap.set(ownerKey, updated);
+  return { success: true, config: updated };
 }
 
-export function getFullSecretConfigForCreator(): SecretWorldConfig {
-  return secretConfig;
+export function getFullSecretConfigForCreator(ownerKey: string = "default"): SecretWorldConfig {
+  return secretConfigMap.get(ownerKey) || { ...defaultSecretConfig };
 }

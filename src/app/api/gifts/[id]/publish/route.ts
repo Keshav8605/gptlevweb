@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { publishGift, verifyAccess } from "@/lib/server-db";
+import { publishGift, getGiftById } from "@/lib/server-db";
+import { getAuthenticatedCreator } from "@/lib/auth-guard";
 
 export async function POST(
   request: Request,
@@ -7,16 +8,33 @@ export async function POST(
 ) {
   try {
     const { id } = await context.params;
-    const body = await request.json();
-    const { publish, status, token } = body;
-    const isPublish = publish !== undefined ? !!publish : status === "published";
 
-    if (token) {
-      const auth = verifyAccess(token);
-      if (!auth.authorized || auth.role !== "creator") {
-        return NextResponse.json({ error: "Creator access required" }, { status: 403 });
-      }
+    // 1. Enforce verified creator authentication
+    const auth = await getAuthenticatedCreator(request);
+    if (!auth.authenticated || !auth.userId) {
+      return NextResponse.json(
+        { error: auth.error || "Authentication required. Creator credentials must be provided." },
+        { status: auth.statusCode || 401 }
+      );
     }
+
+    // 2. Verify gift exists
+    const gift = getGiftById(id);
+    if (!gift) {
+      return NextResponse.json({ error: "Gift not found" }, { status: 404 });
+    }
+
+    // 3. Verify gift ownership
+    if (gift.creatorId && gift.creatorId !== auth.userId) {
+      return NextResponse.json(
+        { error: "Forbidden. You do not have permission to publish or unpublish this gift." },
+        { status: 403 }
+      );
+    }
+
+    const body = await request.json();
+    const { publish, status } = body;
+    const isPublish = publish !== undefined ? !!publish : status === "published";
 
     const result = publishGift(id, isPublish);
     if (!result.success) {

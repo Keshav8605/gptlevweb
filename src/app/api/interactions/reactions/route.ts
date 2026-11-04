@@ -5,8 +5,9 @@ export async function GET(request: Request) {
   const url = new URL(request.url);
   const targetType = url.searchParams.get("targetType") || undefined;
   const targetId = url.searchParams.get("targetId") || undefined;
+  const giftId = url.searchParams.get("giftId") || undefined;
 
-  const reactions = getReactions(targetType, targetId);
+  const reactions = getReactions(targetType, targetId, giftId);
   return NextResponse.json({ success: true, reactions });
 }
 
@@ -29,7 +30,8 @@ export async function POST(request: Request) {
       body.targetId,
       body.emoji,
       role as "creator" | "recipient",
-      name
+      name,
+      body.giftId
     );
 
     return NextResponse.json({ success: true, reactions: updated });
