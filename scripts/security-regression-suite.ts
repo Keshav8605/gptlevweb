@@ -2,11 +2,14 @@
 // Verifies cryptographic JWT enforcement, media upload controls, tenant isolation,
 // legacy gift protections, secret configuration controls, and field immutability.
 
+import fs from "fs";
+import path from "path";
 import crypto from "crypto";
 import { ReadableStream } from "stream/web";
 import { GET as getGifts, POST as postGifts } from "../src/app/api/gifts/route";
 import {
   GET as getGiftById,
+  POST as postGiftById,
   PUT as putGiftById,
   DELETE as deleteGiftById,
 } from "../src/app/api/gifts/[id]/route";
@@ -19,10 +22,28 @@ import {
   GET as getSecretConfig,
   POST as postSecretConfig,
 } from "../src/app/api/secret/config/route";
-import { GET as getGiftBySlug } from "../src/app/api/gifts/by-slug/[slug]/route";
+import {
+  GET as getGiftBySlug,
+  POST as postGiftBySlug,
+} from "../src/app/api/gifts/by-slug/[slug]/route";
 import { GET as getMedia, DELETE as deleteMedia } from "../src/app/api/media/route";
 import { POST as postMediaUpload } from "../src/app/api/media/upload/route";
-import { createGift, addMediaAsset, deleteMediaAsset } from "../src/lib/server-db";
+import {
+  createGift,
+  addMediaAsset,
+  deleteMediaAsset,
+  loadDatabase,
+  deleteGift,
+  updateGift,
+  publishGift,
+  validateGiftUpdates,
+  addComment,
+  toggleReaction,
+  addJournalEntry,
+  addVoiceMessage,
+  createDateProposal,
+  addDateMemory,
+} from "../src/lib/server-db";
 import {
   createGiftUnlockToken,
   verifyGiftUnlockToken,
@@ -1456,6 +1477,745 @@ async function runSecurityAudit() {
     const defaultToken = createGiftUnlockToken("gift_test_safe_integer");
     const defaultVerify = verifyGiftUnlockToken(defaultToken, "gift_test_safe_integer");
     assert(defaultVerify.valid === true, "Token generated with default lifetime (7200s) verifies successfully");
+
+    // ----------------------------------------------------
+    // TEST 14: Gift ID Password Protection, Strict Update Validation & Cascade Deletion
+    // ----------------------------------------------------
+    console.log("\n► [Test 14] Gift ID Password Protection, Strict Update Validation & Cascade Deletion");
+
+    // 14.1 Create a published password-protected gift (Gift P1) owned by Alice
+    const giftP1 = createGift({
+      creatorId: aliceId,
+      title: "Alice's Protected Mystery Gift",
+      slug: `alice-protected-mystery-${Date.now()}`,
+      senderName: "Alice",
+      senderNickname: "Ali",
+      recipientName: "Bob",
+      recipientNickname: "Bobby",
+      welcomeTitle: "Welcome Bob",
+      welcomeSubtitle: "A special mystery for you",
+      welcomeMessage: "This message is private.",
+      secretPassword: "super-secret-password-123",
+      secretContent: "Alice's secret love confession.",
+      enabledSections: ["welcome", "memories", "letters"],
+      sectionOrder: ["welcome", "memories", "letters"],
+      privacy: {
+        isPasswordProtected: true,
+        passcode: "alice_passcode_999",
+        recipientInviteToken: `invite-token-${Date.now()}`,
+        invitationStatus: "active",
+        allowResponses: true,
+        allowRecipientContributions: true,
+      },
+    });
+    giftP1.status = "published";
+    giftP1.publishedAt = new Date().toISOString();
+
+    // 14.1 Password-protected gift accessed through ID without passcode or token
+    const reqP1Locked = new Request(`http://localhost:3000/api/gifts/${giftP1.id}`);
+    const resP1Locked = await getGiftById(reqP1Locked, { params: Promise.resolve({ id: giftP1.id }) });
+    assert(resP1Locked.status === 200, "Accessing password-protected gift via ID returns HTTP 200");
+    const jsonP1Locked = await resP1Locked.json();
+    assert(jsonP1Locked.isLocked === true, "Password-protected gift accessed via ID without passcode returns isLocked: true");
+    assert(jsonP1Locked.gift === undefined, "Locked gift response does not expose gift content");
+    assert(jsonP1Locked.unlockToken === undefined, "Locked gift response does not provide an unlockToken");
+    assert(jsonP1Locked.giftId === giftP1.id, "Locked response includes giftId for UI lock screen");
+    assert(jsonP1Locked.title === giftP1.title, "Locked response includes title for UI lock screen");
+
+    // 14.2 Correct passcode authorization via ID
+    const reqP1Unlocked = new Request(
+      `http://localhost:3000/api/gifts/${giftP1.id}?passcode=alice_passcode_999`
+    );
+    const resP1Unlocked = await getGiftById(reqP1Unlocked, { params: Promise.resolve({ id: giftP1.id }) });
+    assert(resP1Unlocked.status === 200, "Correct passcode via ID returns HTTP 200");
+    const jsonP1Unlocked = await resP1Unlocked.json();
+    assert(!jsonP1Unlocked.isLocked, "Correct passcode returns unlocked gift");
+    assert(Boolean(jsonP1Unlocked.gift), "Unlocked response contains gift object");
+    assert(jsonP1Unlocked.gift.secretPassword === undefined, "Unlocked non-owner response strips secretPassword");
+    assert(jsonP1Unlocked.gift.privacy?.passcode === undefined, "Unlocked non-owner response strips passcode");
+    assert(jsonP1Unlocked.gift.privacy?.recipientInviteToken === undefined, "Unlocked non-owner response strips recipientInviteToken");
+    assert(typeof jsonP1Unlocked.unlockToken === "string", "Unlocked response provides unlockToken");
+    const p1TokenVerify = verifyGiftUnlockToken(jsonP1Unlocked.unlockToken, giftP1.id);
+    assert(p1TokenVerify.valid === true, "Unlock token issued upon correct passcode is valid for the gift");
+
+    // 14.3 Invalid passcode via ID
+    const reqP1WrongPass = new Request(
+      `http://localhost:3000/api/gifts/${giftP1.id}?passcode=wrong_passcode_xyz`
+    );
+    const resP1WrongPass = await getGiftById(reqP1WrongPass, { params: Promise.resolve({ id: giftP1.id }) });
+    assert(resP1WrongPass.status === 200, "Invalid passcode via ID returns HTTP 200");
+    const jsonP1WrongPass = await resP1WrongPass.json();
+    assert(jsonP1WrongPass.isLocked === true, "Invalid passcode via ID returns isLocked: true");
+    assert(jsonP1WrongPass.gift === undefined, "Invalid passcode via ID exposes no gift content");
+    assert(jsonP1WrongPass.unlockToken === undefined, "Invalid passcode via ID provides no unlock token");
+
+    // 14.4 Valid creator access via ID
+    const reqP1Owner = new Request(`http://localhost:3000/api/gifts/${giftP1.id}`, {
+      headers: { Authorization: `Bearer ${aliceToken}` },
+    });
+    const resP1Owner = await getGiftById(reqP1Owner, { params: Promise.resolve({ id: giftP1.id }) });
+    assert(resP1Owner.status === 200, "Valid creator access via ID returns HTTP 200");
+    const jsonP1Owner = await resP1Owner.json();
+    assert(!jsonP1Owner.isLocked, "Creator session is never locked");
+    assert(Boolean(jsonP1Owner.gift), "Creator session receives gift");
+    assert(jsonP1Owner.gift.secretPassword === "super-secret-password-123", "Creator receives full unsanitized gift");
+    assert(jsonP1Owner.gift.privacy?.passcode === "alice_passcode_999", "Creator receives passcode");
+
+    // 14.5 Valid recipient invitation access via ID
+    const reqP1Recipient = new Request(
+      `http://localhost:3000/api/gifts/${giftP1.id}?token=${giftP1.privacy.recipientInviteToken}`
+    );
+    const resP1Recipient = await getGiftById(reqP1Recipient, { params: Promise.resolve({ id: giftP1.id }) });
+    assert(resP1Recipient.status === 200, "Valid recipient invitation token via ID returns HTTP 200");
+    const jsonP1Recipient = await resP1Recipient.json();
+    assert(!jsonP1Recipient.isLocked, "Recipient invitation token unlocks gift");
+    assert(Boolean(jsonP1Recipient.gift), "Recipient receives gift data");
+    assert(typeof jsonP1Recipient.unlockToken === "string", "Recipient receives valid unlock token");
+    assert(verifyGiftUnlockToken(jsonP1Recipient.unlockToken, giftP1.id).valid === true, "Recipient unlock token is valid");
+
+    // 14.6 Cross-gift authorization attempts: passcode or token from Gift A cannot unlock Gift B via ID
+    const giftP2 = createGift({
+      creatorId: bobId,
+      title: "Bob's Second Gift",
+      slug: `bob-second-gift-${Date.now()}`,
+      senderName: "Bob",
+      senderNickname: "Bobby",
+      recipientName: "Alice",
+      recipientNickname: "Ali",
+      welcomeTitle: "Welcome Alice",
+      welcomeSubtitle: "From Bob",
+      welcomeMessage: "Bob's message",
+      privacy: {
+        isPasswordProtected: true,
+        passcode: "bob_different_passcode_777",
+        recipientInviteToken: `bob-token-${Date.now()}`,
+        invitationStatus: "active",
+        allowResponses: true,
+        allowRecipientContributions: true,
+      },
+    });
+    giftP2.status = "published";
+
+    // Attempt to unlock Gift P2 with Gift P1's passcode
+    const reqCrossPass = new Request(
+      `http://localhost:3000/api/gifts/${giftP2.id}?passcode=alice_passcode_999`
+    );
+    const resCrossPass = await getGiftById(reqCrossPass, { params: Promise.resolve({ id: giftP2.id }) });
+    const jsonCrossPass = await resCrossPass.json();
+    assert(jsonCrossPass.isLocked === true, "Passcode from Gift P1 cannot unlock Gift P2 via ID");
+    assert(jsonCrossPass.gift === undefined, "Cross-gift passcode does not expose content");
+
+    // Attempt to unlock Gift P2 with Gift P1's recipient invite token
+    const reqCrossToken = new Request(
+      `http://localhost:3000/api/gifts/${giftP2.id}?token=${giftP1.privacy.recipientInviteToken}`
+    );
+    const resCrossToken = await getGiftById(reqCrossToken, { params: Promise.resolve({ id: giftP2.id }) });
+    const jsonCrossToken = await resCrossToken.json();
+    assert(jsonCrossToken.isLocked === true, "Invite token from Gift P1 cannot unlock Gift P2 via ID");
+
+    // 14.7 Attempting to change protected fields in PUT /api/gifts/[id] does not overwrite them
+    const originalP1 = JSON.parse(JSON.stringify(giftP1));
+    const reqTamperProtected = new Request(`http://localhost:3000/api/gifts/${giftP1.id}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${aliceToken}`,
+      },
+      body: JSON.stringify({
+        title: "Legitimate Alice Title Update",
+        creatorId: "forged_creator_id",
+        id: "forged_gift_id",
+        createdAt: "1970-01-01T00:00:00.000Z",
+        status: "draft",
+        publishedAt: "2099-01-01T00:00:00.000Z",
+        privacy: {
+          recipientInviteToken: "forged_invite_token_123",
+          isPasswordProtected: true,
+        },
+      }),
+    });
+    const resTamperProtected = await putGiftById(reqTamperProtected, { params: Promise.resolve({ id: giftP1.id }) });
+    assert(resTamperProtected.status === 200, "Update request succeeds (HTTP 200)");
+    const jsonTamperProtected = await resTamperProtected.json();
+    assert(jsonTamperProtected.gift.title === "Legitimate Alice Title Update", "Allowlisted title field updated");
+    assert(jsonTamperProtected.gift.creatorId === originalP1.creatorId, "Protected creatorId preserved and NOT overwritten");
+    assert(jsonTamperProtected.gift.id === originalP1.id, "Protected id preserved and NOT overwritten");
+    assert(jsonTamperProtected.gift.createdAt === originalP1.createdAt, "Protected createdAt preserved and NOT overwritten");
+    assert(jsonTamperProtected.gift.status === originalP1.status, "Protected status preserved and NOT overwritten");
+    assert(jsonTamperProtected.gift.publishedAt === originalP1.publishedAt, "Protected publishedAt preserved and NOT overwritten");
+    assert(jsonTamperProtected.gift.privacy.recipientInviteToken === originalP1.privacy.recipientInviteToken, "Protected recipientInviteToken preserved and NOT overwritten");
+
+    // 14.8 Invalid field types or malformed payloads in PUT /api/gifts/[id] return HTTP 400
+    const invalidPayloads = [
+      { body: [1, 2, 3], desc: "Array payload" },
+      { body: "string payload", desc: "Primitive string payload" },
+      { body: { title: 12345 }, desc: "Number for string field title" },
+      { body: { enabledSections: "not-an-array" }, desc: "String for array field enabledSections" },
+      { body: { enabledSections: [123] }, desc: "Non-string element in enabledSections" },
+      { body: { customObservations: "not-an-array" }, desc: "String for object collection customObservations" },
+      { body: { customObservations: ["not-an-object"] }, desc: "Primitive inside object collection" },
+      { body: { memoriesCollageType: "circular" }, desc: "Invalid memoriesCollageType enum" },
+      { body: { privacy: { isPasswordProtected: "true" } }, desc: "String for boolean isPasswordProtected" },
+      { body: { privacy: { passcode: "x".repeat(51) } }, desc: "Passcode exceeding 50 characters" },
+      { body: { privacy: { invitationStatus: "unknown_status" } }, desc: "Invalid invitationStatus enum" },
+    ];
+
+    for (const { body, desc } of invalidPayloads) {
+      const reqInvalid = new Request(`http://localhost:3000/api/gifts/${giftP1.id}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${aliceToken}`,
+        },
+        body: JSON.stringify(body),
+      });
+      const resInvalid = await putGiftById(reqInvalid, { params: Promise.resolve({ id: giftP1.id }) });
+      assert(resInvalid.status === 400, `Invalid update payload (${desc}) rejected with HTTP 400 (got ${resInvalid.status})`);
+      const jsonInvalid = await resInvalid.json();
+      assert(Boolean(jsonInvalid.error), `Error message returned for ${desc}: ${jsonInvalid.error}`);
+    }
+
+    // 14.9 Deleting a gift cascades and cleans up all associated records for that gift
+    const giftC = createGift({
+      creatorId: aliceId,
+      title: "Alice's Cascade Test Gift",
+      slug: `alice-cascade-test-${Date.now()}`,
+      senderName: "Alice",
+      senderNickname: "Ali",
+      recipientName: "Bob",
+      recipientNickname: "Bobby",
+      welcomeTitle: "Welcome",
+      welcomeSubtitle: "Cascade test",
+      welcomeMessage: "Test",
+    });
+
+    // Add associated records across collections
+    addComment("memory", "mem_1", "Lovely memory", "creator", "Alice", giftC.id);
+    toggleReaction("memory", "mem_1", "❤️", "creator", "Alice", giftC.id);
+    addJournalEntry({ giftId: giftC.id, title: "Day 1", content: "Great day", author: "creator", authorName: "Alice" });
+    addVoiceMessage("data:audio/webm;base64,GkXfo59ChoEBQveBAULygQETH", 10, "creator", "Alice", giftC.id);
+    const cProposal = createDateProposal({ giftId: giftC.id, title: "Stargazing Picnic", proposedDate: "2026-12-01", proposedStartTime: "20:00" }, "creator", "Alice", "Bob");
+    addDateMemory({ giftId: giftC.id, proposalId: cProposal?.id, dateTitle: "Stargazing Memory", description: "Amazing stars" }, "creator", "Alice");
+    addMediaAsset({ giftId: giftC.id, creatorId: aliceId, name: "stars.jpg", type: "image", mimeType: "image/jpeg", sizeBytes: 1024, dataUrl: "https://images.unsplash.com/stars.jpg" });
+
+    // Verify before deletion
+    const dbBeforeCascade = loadDatabase();
+    assert(dbBeforeCascade.comments.some((c) => c.giftId === giftC.id), "Comment for Gift C inserted");
+    assert(dbBeforeCascade.reactions.some((r) => r.giftId === giftC.id), "Reaction for Gift C inserted");
+    assert(dbBeforeCascade.journalEntries.some((j) => j.giftId === giftC.id), "Journal entry for Gift C inserted");
+    assert(dbBeforeCascade.voiceMessages.some((v) => v.giftId === giftC.id), "Voice message for Gift C inserted");
+    assert(dbBeforeCascade.dateProposals.some((p) => p.giftId === giftC.id), "Date proposal for Gift C inserted");
+    assert(dbBeforeCascade.dateMemories.some((m) => m.giftId === giftC.id), "Date memory for Gift C inserted");
+    assert(dbBeforeCascade.dateNotifications.some((n) => n.proposalId === cProposal?.id), "Notification for Gift C proposal inserted");
+    assert(dbBeforeCascade.mediaAssets.some((m) => m.giftId === giftC.id), "Media asset for Gift C inserted");
+
+    // Also ensure Bob's Gift P2 has child records that must NOT be deleted
+    addComment("memory", "mem_p2", "Bob's memory comment", "creator", "Bob", giftP2.id);
+    toggleReaction("memory", "mem_p2", "🎉", "creator", "Bob", giftP2.id);
+    addMediaAsset({ giftId: giftP2.id, creatorId: bobId, name: "bob.jpg", type: "image", mimeType: "image/jpeg", sizeBytes: 2048, dataUrl: "https://images.unsplash.com/bob.jpg" });
+
+    // Execute deletion of Gift C
+    const reqDelGiftC = new Request(`http://localhost:3000/api/gifts/${giftC.id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${aliceToken}` },
+    });
+    const resDelGiftC = await deleteGiftById(reqDelGiftC, { params: Promise.resolve({ id: giftC.id }) });
+    assert(resDelGiftC.status === 200, "DELETE /api/gifts/[id] for Gift C returns HTTP 200");
+
+    // Verify all child records for Gift C were removed
+    const dbAfterCascade = loadDatabase();
+    assert(!dbAfterCascade.gifts.some((g) => g.id === giftC.id), "Gift C removed from gifts collection");
+    assert(!dbAfterCascade.comments.some((c) => c.giftId === giftC.id), "All comments for Gift C cascade-deleted");
+    assert(!dbAfterCascade.reactions.some((r) => r.giftId === giftC.id), "All reactions for Gift C cascade-deleted");
+    assert(!dbAfterCascade.journalEntries.some((j) => j.giftId === giftC.id), "All journal entries for Gift C cascade-deleted");
+    assert(!dbAfterCascade.voiceMessages.some((v) => v.giftId === giftC.id), "All voice messages for Gift C cascade-deleted");
+    assert(!dbAfterCascade.dateProposals.some((p) => p.giftId === giftC.id), "All date proposals for Gift C cascade-deleted");
+    assert(!dbAfterCascade.dateMemories.some((m) => m.giftId === giftC.id), "All date memories for Gift C cascade-deleted");
+    assert(!dbAfterCascade.dateNotifications.some((n) => n.proposalId === cProposal?.id), "All notifications linked to Gift C proposals cascade-deleted");
+    assert(!dbAfterCascade.mediaAssets.some((m) => m.giftId === giftC.id), "All media assets for Gift C cascade-deleted");
+
+    // 14.10 Other gifts and default demo records remain completely intact after deletion
+    assert(dbAfterCascade.gifts.some((g) => g.id === giftP2.id), "Gift P2 still present in gifts collection");
+    assert(dbAfterCascade.comments.some((c) => c.giftId === giftP2.id), "Gift P2 comments remain completely intact");
+    assert(dbAfterCascade.reactions.some((r) => r.giftId === giftP2.id), "Gift P2 reactions remain completely intact");
+    assert(dbAfterCascade.mediaAssets.some((m) => m.giftId === giftP2.id), "Gift P2 media assets remain completely intact");
+    assert(dbAfterCascade.gifts.some((g) => g.id === "gift_world_demo"), "Demo gift remains intact");
+
+    // 14.11 Demo gift cannot be deleted (HTTP 403) and last remaining gift cannot be deleted (HTTP 400)
+    const reqDelDemo = new Request(`http://localhost:3000/api/gifts/gift_world_demo`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${aliceToken}` },
+    });
+    const resDelDemo = await deleteGiftById(reqDelDemo, { params: Promise.resolve({ id: "gift_world_demo" }) });
+    assert(resDelDemo.status === 403, "Attempting to delete default demo gift returns HTTP 403 (got 403)");
+
+    // Clean up test gifts P1 and P2
+    const reqDelP1 = new Request(`http://localhost:3000/api/gifts/${giftP1.id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${aliceToken}` },
+    });
+    const resDelP1 = await deleteGiftById(reqDelP1, { params: Promise.resolve({ id: giftP1.id }) });
+    assert(resDelP1.status === 200, "Cleaned up Gift P1");
+
+    const reqDelP2 = new Request(`http://localhost:3000/api/gifts/${giftP2.id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${bobToken}` },
+    });
+    const resDelP2 = await deleteGiftById(reqDelP2, { params: Promise.resolve({ id: giftP2.id }) });
+    assert(resDelP2.status === 200, "Cleaned up Gift P2");
+
+    // Test last remaining gift protection via endpoint (HTTP 400)
+    const tempDb = loadDatabase();
+    const savedGifts = [...tempDb.gifts];
+    const singleGift = createGift({ creatorId: aliceId, title: "Alice's Only Gift" });
+    tempDb.gifts = [singleGift];
+
+    const reqDelLast = new Request(`http://localhost:3000/api/gifts/${singleGift.id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${aliceToken}` },
+    });
+    const resDelLast = await deleteGiftById(reqDelLast, { params: Promise.resolve({ id: singleGift.id }) });
+    assert(resDelLast.status === 400, "Attempting to delete the last remaining gift returns HTTP 400 (got 400)");
+    const jsonDelLast = await resDelLast.json();
+    assert(jsonDelLast.error.includes("At least one gift must remain"), "Returns descriptive error that at least one gift must remain");
+
+    // Restore saved gifts
+    tempDb.gifts = savedGifts;
+
+    // ----------------------------------------------------
+    // TEST 15: Persistence Reliability, Strict Nested Validation & Credential Transport
+    // ----------------------------------------------------
+    console.log("\n► [Test 15] Persistence Reliability, Strict Nested Validation & Credential Transport");
+
+    const DATA_DIR = path.join(process.cwd(), ".data");
+    const DATA_FILE = path.join(DATA_DIR, "relationship-database.json");
+
+    // 15.1 Create test gift for Persistence and Nested Validation (Gift T1)
+    const giftT1 = createGift({
+      creatorId: aliceId,
+      title: "Persistence & Validation Test Gift",
+      slug: `persistence-test-gift-${Date.now()}`,
+      senderName: "Alice",
+      senderNickname: "Ali",
+      recipientName: "Bob",
+      recipientNickname: "Bobby",
+      welcomeTitle: "Welcome",
+      welcomeSubtitle: "Persistence Testing",
+      welcomeMessage: "Message",
+      enabledSections: ["welcome", "observations", "memories"],
+      sectionOrder: ["welcome", "observations", "memories"],
+      privacy: {
+        isPasswordProtected: true,
+        passcode: "test_persist_passcode_123",
+        recipientInviteToken: `persist-invite-${Date.now()}`,
+        invitationStatus: "active",
+        allowResponses: true,
+        allowRecipientContributions: true,
+      },
+    });
+
+    // 15.2 Persistence write failure during update (fs.renameSync simulation)
+    const originalRenameSync = fs.renameSync;
+    let renameSyncShouldFail = true;
+
+    // Spy to simulate disk failure on renameSync
+    fs.renameSync = ((oldPath: fs.PathLike, newPath: fs.PathLike) => {
+      if (renameSyncShouldFail) {
+        throw new Error("Disk IO atomic rename failure simulation");
+      }
+      return originalRenameSync(oldPath, newPath);
+    }) as typeof fs.renameSync;
+
+    let updateFailedAsExpected = false;
+    try {
+      updateGift(giftT1.id, { title: "Unpersisted Malicious Title Change" });
+    } catch (err: unknown) {
+      updateFailedAsExpected = true;
+      const msg = err instanceof Error ? err.message : String(err);
+      assert(
+        msg.includes("Database persistence failed"),
+        "Persistence failure throws error with 'Database persistence failed'"
+      );
+    }
+    assert(updateFailedAsExpected, "updateGift throws when persistence renameSync fails");
+
+    // Check temp-file cleanup: no temp files left behind in DATA_DIR
+    const tempFilesAfterFailedUpdate = fs
+      .readdirSync(DATA_DIR)
+      .filter((f) => f.startsWith(".tmp-db-"));
+    assert(
+      tempFilesAfterFailedUpdate.length === 0,
+      "Temporary files are safely cleaned up after failed update persistence"
+    );
+
+    // Check memory and disk consistency: title was NOT mutated in memory
+    const dbAfterFailedUpdate = loadDatabase();
+    const giftAfterFailedUpdate = dbAfterFailedUpdate.gifts.find((g) => g.id === giftT1.id);
+    assert(
+      giftAfterFailedUpdate?.title === "Persistence & Validation Test Gift",
+      "In-memory database remained intact and was not corrupted by failed update"
+    );
+
+    // Verify PUT endpoint returns HTTP 500 when persistence fails
+    const reqPutPersistenceFail = new Request(`http://localhost:3000/api/gifts/${giftT1.id}`, {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${aliceToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ title: "HTTP Title Update Attempt" }),
+    });
+    const resPutPersistenceFail = await putGiftById(reqPutPersistenceFail, {
+      params: Promise.resolve({ id: giftT1.id }),
+    });
+    assert(
+      resPutPersistenceFail.status === 500,
+      "PUT endpoint returns HTTP 500 when database persistence fails (got 500)"
+    );
+
+    // 15.3 Persistence write failure during deletion
+    const delResultFailed = deleteGift(giftT1.id);
+    assert(
+      delResultFailed === false,
+      "deleteGift returns false when database persistence fails"
+    );
+    const dbAfterFailedDelete = loadDatabase();
+    assert(
+      dbAfterFailedDelete.gifts.some((g) => g.id === giftT1.id),
+      "Gift was not removed from memoryDb after failed delete persistence"
+    );
+    const tempFilesAfterFailedDelete = fs
+      .readdirSync(DATA_DIR)
+      .filter((f) => f.startsWith(".tmp-db-"));
+    assert(
+      tempFilesAfterFailedDelete.length === 0,
+      "Temporary files are safely cleaned up after failed delete persistence"
+    );
+
+    // Restore fs.renameSync
+    renameSyncShouldFail = false;
+    fs.renameSync = originalRenameSync;
+
+    // Verify normal update succeeds now
+    const normalUpdated = updateGift(giftT1.id, { title: "Restored Working Title" });
+    assert(normalUpdated !== null && normalUpdated.title === "Restored Working Title", "updateGift succeeds normally after restoring disk IO");
+
+    // 15.4 Invalid nested object fields in update payload
+    // A: Non-string in customObservations
+    const reqBadObs = new Request(`http://localhost:3000/api/gifts/${giftT1.id}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${aliceToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        customObservations: [{ id: "ob_1", title: 12345, content: "Valid content" }],
+      }),
+    });
+    const resBadObs = await putGiftById(reqBadObs, { params: Promise.resolve({ id: giftT1.id }) });
+    assert(resBadObs.status === 400, "Invalid type in customObservations.title returns HTTP 400");
+    const jsonBadObs = await resBadObs.json();
+    assert(jsonBadObs.error.includes("must be a string"), "Returns descriptive error about string type requirement");
+
+    // B: Non-string item in customMemories.photos
+    const reqBadMemPhotos = new Request(`http://localhost:3000/api/gifts/${giftT1.id}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${aliceToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        customMemories: [
+          {
+            id: "mem_1",
+            title: "Memory 1",
+            description: "Desc",
+            photos: [999], // Invalid non-string photo
+          },
+        ],
+      }),
+    });
+    const resBadMemPhotos = await putGiftById(reqBadMemPhotos, { params: Promise.resolve({ id: giftT1.id }) });
+    assert(resBadMemPhotos.status === 400, "Non-string in customMemories.photos returns HTTP 400");
+
+    // C: Malformed featuredSong (non-object)
+    const reqBadSong = new Request(`http://localhost:3000/api/gifts/${giftT1.id}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${aliceToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ featuredSong: "invalid-string-instead-of-object" }),
+    });
+    const resBadSong = await putGiftById(reqBadSong, { params: Promise.resolve({ id: giftT1.id }) });
+    assert(resBadSong.status === 400, "Malformed non-object featuredSong returns HTTP 400");
+
+    // D: Non-boolean in designPreferences.backgroundMusicEnabled
+    const reqBadDesign = new Request(`http://localhost:3000/api/gifts/${giftT1.id}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${aliceToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ designPreferences: { backgroundMusicEnabled: "yes" } }),
+    });
+    const resBadDesign = await putGiftById(reqBadDesign, { params: Promise.resolve({ id: giftT1.id }) });
+    assert(resBadDesign.status === 400, "Non-boolean in designPreferences.backgroundMusicEnabled returns HTTP 400");
+
+    // E: Invalid memoriesCollageType
+    const reqBadCollage = new Request(`http://localhost:3000/api/gifts/${giftT1.id}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${aliceToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ memoriesCollageType: "random_invalid_shape" }),
+    });
+    const resBadCollage = await putGiftById(reqBadCollage, { params: Promise.resolve({ id: giftT1.id }) });
+    assert(resBadCollage.status === 400, "Invalid memoriesCollageType returns HTTP 400");
+
+    // F: Invalid privacy.invitationStatus
+    const reqBadPrivStatus = new Request(`http://localhost:3000/api/gifts/${giftT1.id}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${aliceToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ privacy: { invitationStatus: "banned" } }),
+    });
+    const resBadPrivStatus = await putGiftById(reqBadPrivStatus, { params: Promise.resolve({ id: giftT1.id }) });
+    assert(resBadPrivStatus.status === 400, "Invalid privacy.invitationStatus returns HTTP 400");
+
+    // 15.5 Oversized nested collections and payload size limit
+    // A: Oversized collection (> 100 observations)
+    const oversizedObservations = Array.from({ length: 101 }, (_, i) => ({
+      id: `ob_${i}`,
+      title: `Observation ${i}`,
+      content: `Content ${i}`,
+    }));
+    const reqOversizedObs = new Request(`http://localhost:3000/api/gifts/${giftT1.id}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${aliceToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ customObservations: oversizedObservations }),
+    });
+    const resOversizedObs = await putGiftById(reqOversizedObs, { params: Promise.resolve({ id: giftT1.id }) });
+    assert(resOversizedObs.status === 400, "customObservations with > 100 items returns HTTP 400");
+
+    // B: String exceeding length limit (title > 200 chars)
+    const reqOversizedTitle = new Request(`http://localhost:3000/api/gifts/${giftT1.id}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${aliceToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ title: "A".repeat(201) }),
+    });
+    const resOversizedTitle = await putGiftById(reqOversizedTitle, { params: Promise.resolve({ id: giftT1.id }) });
+    assert(resOversizedTitle.status === 400, "title exceeding 200 chars returns HTTP 400");
+
+    // 15.6 Unknown top-level fields rejected
+    const reqUnknownField = new Request(`http://localhost:3000/api/gifts/${giftT1.id}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${aliceToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify({
+        hackerInjectedField: "malicious_payload",
+        title: "Legitimate Title",
+      }),
+    });
+    const resUnknownField = await putGiftById(reqUnknownField, { params: Promise.resolve({ id: giftT1.id }) });
+    assert(resUnknownField.status === 400, "Unknown top-level field rejected with HTTP 400");
+    const jsonUnknown = await resUnknownField.json();
+    assert(
+      jsonUnknown.error.includes("Unknown top-level field 'hackerInjectedField'"),
+      "Error identifies unknown top-level field"
+    );
+
+    // 15.7 Valid Creator Studio payload accepted
+    const validStudioPayload = {
+      title: "Alice & Bob: Studio Edition",
+      welcomeTitle: "Welcome to our story",
+      welcomeSubtitle: "Crafted with all my heart",
+      welcomeMessage: "Every moment with you is magic.",
+      sectionCount: 8,
+      responseActivityCount: 3,
+      status: "draft",
+      featuredSong: {
+        title: "Golden Hour",
+        artist: "JVKE",
+        dedication: "Our golden sunset memories.",
+      },
+      designPreferences: {
+        colorPalette: "blush",
+        typographyPreset: "elegant-serif",
+        animationIntensity: "subtle",
+        backgroundMusicEnabled: true,
+      },
+      customObservations: [
+        {
+          id: "ob_studio_1",
+          title: "Your laugh",
+          content: "It lights up every single room.",
+          emoji: "✨",
+        },
+      ],
+      privacy: {
+        isPasswordProtected: true,
+        passcode: "new_studio_passcode_2026",
+        allowResponses: true,
+        allowRecipientContributions: true,
+      },
+    };
+    const reqValidStudio = new Request(`http://localhost:3000/api/gifts/${giftT1.id}`, {
+      method: "PUT",
+      headers: { Authorization: `Bearer ${aliceToken}`, "Content-Type": "application/json" },
+      body: JSON.stringify(validStudioPayload),
+    });
+    const resValidStudio = await putGiftById(reqValidStudio, { params: Promise.resolve({ id: giftT1.id }) });
+    assert(resValidStudio.status === 200, "Valid Creator Studio payload updates successfully with HTTP 200");
+    const jsonValidStudio = await resValidStudio.json();
+    assert(jsonValidStudio.gift.title === "Alice & Bob: Studio Edition", "Gift title updated properly");
+    assert(jsonValidStudio.gift.creatorId === aliceId, "creatorId preserved and untouched");
+    assert(
+      jsonValidStudio.gift.privacy.recipientInviteToken === giftT1.privacy.recipientInviteToken,
+      "recipientInviteToken strictly preserved against client overwrite"
+    );
+
+    // Publish giftT1 for credential transport tests
+    publishGift(giftT1.id, true);
+    updateGift(giftT1.id, {
+      privacy: {
+        ...giftT1.privacy,
+        isPasswordProtected: true,
+        passcode: "secure_transport_passcode_999",
+        allowResponses: true,
+        allowRecipientContributions: true,
+      },
+    });
+
+    // 15.8 Credential Transport: Header-based flow on GET and POST
+    // Intercept console to verify no credential logging
+    const loggedMessages: string[] = [];
+    const origLog = console.log;
+    const origWarn = console.warn;
+    const origError = console.error;
+    const logSpy = (...args: unknown[]) => {
+      loggedMessages.push(args.map(String).join(" "));
+      origLog(...args);
+    };
+    const warnSpy = (...args: unknown[]) => {
+      loggedMessages.push(args.map(String).join(" "));
+      origWarn(...args);
+    };
+    const errSpy = (...args: unknown[]) => {
+      loggedMessages.push(args.map(String).join(" "));
+      origError(...args);
+    };
+    console.log = logSpy;
+    console.warn = warnSpy;
+    console.error = errSpy;
+
+    // A: Header-based passcode via GET by-slug
+    const reqHeaderSlug = new Request(`http://localhost:3000/api/gifts/by-slug/${giftT1.slug}`, {
+      headers: { "x-gift-passcode": "secure_transport_passcode_999" },
+    });
+    const resHeaderSlug = await getGiftBySlug(reqHeaderSlug, { params: Promise.resolve({ slug: giftT1.slug }) });
+    assert(resHeaderSlug.status === 200, "Header-based passcode on GET by-slug returns HTTP 200");
+    const jsonHeaderSlug = await resHeaderSlug.json();
+    assert(!jsonHeaderSlug.isLocked, "Header passcode unlocks gift without URL credentials");
+    assert(typeof jsonHeaderSlug.unlockToken === "string", "Header unlock returns valid unlockToken");
+
+    // B: Header-based passcode via GET [id]
+    const reqHeaderId = new Request(`http://localhost:3000/api/gifts/${giftT1.id}`, {
+      headers: { "x-gift-passcode": "secure_transport_passcode_999" },
+    });
+    const resHeaderId = await getGiftById(reqHeaderId, { params: Promise.resolve({ id: giftT1.id }) });
+    assert(resHeaderId.status === 200, "Header-based passcode on GET [id] returns HTTP 200");
+    const jsonHeaderId = await resHeaderId.json();
+    assert(!jsonHeaderId.isLocked, "Header passcode unlocks gift via ID");
+    assert(typeof jsonHeaderId.unlockToken === "string", "ID header unlock returns valid unlockToken");
+
+    // 15.9 Credential Transport: POST-based flow
+    // A: POST by-slug with JSON body
+    const reqPostSlug = new Request(`http://localhost:3000/api/gifts/by-slug/${giftT1.slug}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ passcode: "secure_transport_passcode_999" }),
+    });
+    const resPostSlug = await postGiftBySlug(reqPostSlug, { params: Promise.resolve({ slug: giftT1.slug }) });
+    assert(resPostSlug.status === 200, "POST /api/gifts/by-slug/[slug] returns HTTP 200");
+    const jsonPostSlug = await resPostSlug.json();
+    assert(!jsonPostSlug.isLocked, "POST body passcode unlocks gift successfully");
+    assert(typeof jsonPostSlug.unlockToken === "string", "POST slug returns valid unlockToken");
+
+    // B: POST [id] with JSON body
+    const reqPostId = new Request(`http://localhost:3000/api/gifts/${giftT1.id}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ passcode: "secure_transport_passcode_999" }),
+    });
+    const resPostId = await postGiftById(reqPostId, { params: Promise.resolve({ id: giftT1.id }) });
+    assert(resPostId.status === 200, "POST /api/gifts/[id] returns HTTP 200");
+    const jsonPostId = await resPostId.json();
+    assert(!jsonPostId.isLocked, "POST body passcode unlocks gift via ID");
+    assert(typeof jsonPostId.unlockToken === "string", "POST ID returns valid unlockToken");
+
+    // 15.10 Backward-compatible query parameters
+    const reqQueryFallback = new Request(
+      `http://localhost:3000/api/gifts/by-slug/${giftT1.slug}?passcode=secure_transport_passcode_999`
+    );
+    const resQueryFallback = await getGiftBySlug(reqQueryFallback, { params: Promise.resolve({ slug: giftT1.slug }) });
+    assert(resQueryFallback.status === 200, "Backward-compatible query parameter returns HTTP 200");
+    const jsonQueryFallback = await resQueryFallback.json();
+    assert(!jsonQueryFallback.isLocked, "Backward-compatible query parameter successfully unlocks gift");
+
+    // Restore console
+    console.log = origLog;
+    console.warn = origWarn;
+    console.error = origError;
+
+    // 15.11 Verify NO credentials leaked in logs
+    const fullLogText = loggedMessages.join("\n");
+    assert(
+      !fullLogText.includes("secure_transport_passcode_999"),
+      "Passcodes are NEVER logged to console or logs"
+    );
+    assert(
+      !fullLogText.includes(giftT1.privacy.recipientInviteToken),
+      "Recipient invitation tokens are NEVER logged to console or logs"
+    );
+    assert(
+      !fullLogText.includes(jsonHeaderSlug.unlockToken),
+      "Unlock tokens are NEVER logged to console or logs"
+    );
+
+    // 15.12 Media Asset deletion persistence failure handling
+    const mediaT1 = addMediaAsset({
+      giftId: giftT1.id,
+      creatorId: aliceId,
+      name: "alice_temp_photo.jpg",
+      type: "image",
+      mimeType: "image/jpeg",
+      sizeBytes: 1024,
+      dataUrl: "https://images.unsplash.com/alice_temp.jpg",
+    });
+    assert(mediaT1.success && Boolean(mediaT1.asset), "Created media asset for persistence test");
+
+    // Simulate persistence failure during media deletion
+    renameSyncShouldFail = true;
+    fs.renameSync = ((oldPath: fs.PathLike, newPath: fs.PathLike) => {
+      if (renameSyncShouldFail) {
+        throw new Error("Disk IO media delete failure simulation");
+      }
+      return originalRenameSync(oldPath, newPath);
+    }) as typeof fs.renameSync;
+
+    const mediaDelFail = deleteMediaAsset(mediaT1.asset!.id);
+    assert(mediaDelFail === false, "deleteMediaAsset returns false when database persistence fails");
+    const dbAfterMediaFail = loadDatabase();
+    assert(
+      dbAfterMediaFail.mediaAssets.some((m) => m.id === mediaT1.asset!.id),
+      "Media asset remains in database after failed persistence"
+    );
+
+    renameSyncShouldFail = false;
+    fs.renameSync = originalRenameSync;
+
+    // Successfully delete media asset now
+    const reqDelMediaT1 = new Request(`http://localhost:3000/api/media?id=${mediaT1.asset!.id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${aliceToken}` },
+    });
+    const resDelMediaT1 = await deleteMedia(reqDelMediaT1);
+    assert(resDelMediaT1.status === 200, "Media asset successfully deleted by authorized owner");
+
+    // Clean up giftT1
+    const reqDelGiftT1 = new Request(`http://localhost:3000/api/gifts/${giftT1.id}`, {
+      method: "DELETE",
+      headers: { Authorization: `Bearer ${aliceToken}` },
+    });
+    await deleteGiftById(reqDelGiftT1, { params: Promise.resolve({ id: giftT1.id }) });
+
+    // Restore saved gifts
+    tempDb.gifts = savedGifts;
 
     // ----------------------------------------------------
     // CLEANUP

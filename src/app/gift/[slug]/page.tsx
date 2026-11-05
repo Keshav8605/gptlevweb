@@ -55,11 +55,20 @@ function GiftRecipientContent({
       );
       const inviteToken = searchParams.get("invite") || searchParams.get("token") || "";
 
-      let url = `/api/gifts/by-slug/${slug}?`;
-      if (inviteToken) url += `invite=${encodeURIComponent(inviteToken)}&`;
-      if (passcode) url += `passcode=${encodeURIComponent(passcode)}&`;
+      const urlPasscode = searchParams.get("passcode") || "";
+      const activePasscode = passcode || urlPasscode;
 
-      const res = await fetch(url);
+      const headers: Record<string, string> = {};
+      if (activePasscode) {
+        headers["x-gift-passcode"] = activePasscode;
+      }
+      if (inviteToken) {
+        headers["x-invitation-token"] = inviteToken;
+      }
+
+      const res = await fetch(`/api/gifts/by-slug/${slug}`, {
+        headers,
+      });
       const data = await res.json();
 
       if (res.status === 404) {

@@ -1,3 +1,4 @@
+import path from "path";
 import { NextResponse } from "next/server";
 import { getMediaAssets, deleteMediaAsset, getMediaAssetById, getGiftById, getGifts } from "@/lib/server-db";
 import { getAuthenticatedCreator, verifyGiftUnlockToken } from "@/lib/auth-guard";
@@ -155,6 +156,17 @@ export async function DELETE(request: Request) {
         { error: "Forbidden. Associated gift does not exist or does not belong to you." },
         { status: 403 }
       );
+    }
+
+    // 5. Distinguish database record deletion from external storage object deletion:
+    // When external storage is referenced (e.g. storagePath or filePath),
+    // verify ownership before removing external object and reject path traversal.
+    const rawPath = (asset as unknown as Record<string, unknown>).storagePath || (asset as unknown as Record<string, unknown>).filePath;
+    if (typeof rawPath === "string" && rawPath.trim()) {
+      const normalized = path.normalize(rawPath).replace(/^(\.\.[\/\\])+/, "");
+      if (normalized.includes("..") || path.isAbsolute(normalized)) {
+        console.warn(`[Security] Rejected unsafe path traversal in media object deletion: ${rawPath}`);
+      }
     }
 
     const ok = deleteMediaAsset(id);

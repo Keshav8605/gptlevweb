@@ -1150,7 +1150,7 @@ const DATA_FILE = path.join(DATA_DIR, "relationship-database.json");
 
 let memoryDb: RelationshipDatabase | null = null;
 
-function loadDatabase(): RelationshipDatabase {
+export function loadDatabase(): RelationshipDatabase {
   if (memoryDb) return memoryDb;
 
   try {
@@ -1208,15 +1208,37 @@ function loadDatabase(): RelationshipDatabase {
   return memoryDb!;
 }
 
-function saveDatabase(db: RelationshipDatabase) {
-  memoryDb = db;
+export function saveDatabase(db: RelationshipDatabase): void {
   try {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
     }
-    fs.writeFileSync(DATA_FILE, JSON.stringify(db, null, 2), "utf-8");
+
+    const payload = JSON.stringify(db, null, 2);
+    const tempFile = path.join(
+      DATA_DIR,
+      `.tmp-db-${Date.now()}-${Math.random().toString(36).slice(2, 8)}.json`
+    );
+
+    try {
+      fs.writeFileSync(tempFile, payload, "utf-8");
+      fs.renameSync(tempFile, DATA_FILE);
+      memoryDb = db;
+    } catch (writeErr) {
+      if (fs.existsSync(tempFile)) {
+        try {
+          fs.unlinkSync(tempFile);
+        } catch {
+          // Ignore temp cleanup error
+        }
+      }
+      throw writeErr;
+    }
   } catch (err) {
     console.error("Failed to write database file:", err);
+    throw new Error(
+      `Database persistence failed: ${err instanceof Error ? err.message : String(err)}`
+    );
   }
 }
 
@@ -2596,19 +2618,646 @@ export const EDITABLE_GIFT_FIELDS = [
   "designPreferences",
 ] as const;
 
+const ALLOWED_TOP_LEVEL_FIELDS = new Set<string>([
+  ...EDITABLE_GIFT_FIELDS,
+  "privacy",
+  "id",
+  "creatorId",
+  "createdAt",
+  "updatedAt",
+  "status",
+  "publishedAt",
+  "sectionCount",
+  "responseActivityCount",
+]);
+
+function isRecord(val: unknown): val is Record<string, unknown> {
+  return typeof val === "object" && val !== null && !Array.isArray(val);
+}
+
+function validateStringField(
+  val: unknown,
+  fieldName: string,
+  maxLen: number,
+  required = false
+): string | null {
+  if (val === undefined || val === null) {
+    if (required) return `Field '${fieldName}' is required.`;
+    return null;
+  }
+  if (typeof val !== "string") {
+    return `Field '${fieldName}' must be a string.`;
+  }
+  if (val.length > maxLen) {
+    return `Field '${fieldName}' exceeds maximum length of ${maxLen} characters.`;
+  }
+  return null;
+}
+
+function validateBooleanField(
+  val: unknown,
+  fieldName: string
+): string | null {
+  if (val === undefined || val === null) return null;
+  if (typeof val !== "boolean") {
+    return `Field '${fieldName}' must be a boolean.`;
+  }
+  return null;
+}
+
+function validateNumberField(
+  val: unknown,
+  fieldName: string,
+  min = -10000,
+  max = 1000000
+): string | null {
+  if (val === undefined || val === null) return null;
+  if (typeof val !== "number" || Number.isNaN(val) || !Number.isFinite(val)) {
+    return `Field '${fieldName}' must be a valid number.`;
+  }
+  if (val < min || val > max) {
+    return `Field '${fieldName}' must be between ${min} and ${max}.`;
+  }
+  return null;
+}
+
+function validateStringArray(
+  arr: unknown,
+  fieldName: string,
+  maxCount: number,
+  maxItemLen: number
+): string | null {
+  if (arr === undefined || arr === null) return null;
+  if (!Array.isArray(arr)) {
+    return `Field '${fieldName}' must be an array of strings.`;
+  }
+  if (arr.length > maxCount) {
+    return `Field '${fieldName}' exceeds maximum limit of ${maxCount} items.`;
+  }
+  for (let i = 0; i < arr.length; i++) {
+    const item = arr[i];
+    if (typeof item !== "string") {
+      return `Item at index ${i} in '${fieldName}' must be a string.`;
+    }
+    if (item.length > maxItemLen) {
+      return `Item at index ${i} in '${fieldName}' exceeds maximum length of ${maxItemLen} characters.`;
+    }
+  }
+  return null;
+}
+
+export function validateGiftUpdates(updates: unknown): { valid: boolean; error?: string } {
+  if (!updates || typeof updates !== "object" || Array.isArray(updates)) {
+    return { valid: false, error: "Request body must be a valid JSON object." };
+  }
+
+  // Check overall payload size to prevent DOS
+  try {
+    const jsonStr = JSON.stringify(updates);
+    if (jsonStr.length > 25 * 1024 * 1024) {
+      return { valid: false, error: "Update payload exceeds maximum allowed size of 25MB." };
+    }
+  } catch {
+    return { valid: false, error: "Failed to serialize update payload." };
+  }
+
+  const record = updates as Record<string, unknown>;
+
+  // Reject unknown top-level fields
+  for (const key of Object.keys(record)) {
+    if (!ALLOWED_TOP_LEVEL_FIELDS.has(key)) {
+      return { valid: false, error: `Unknown top-level field '${key}' in update payload.` };
+    }
+  }
+
+  // 1. Validate String Fields
+  const STRING_FIELD_LIMITS: Record<string, number> = {
+    title: 200,
+    slug: 100,
+    senderName: 100,
+    senderNickname: 100,
+    recipientName: 100,
+    recipientNickname: 100,
+    dateFirstMet: 100,
+    dateOfficialCouple: 100,
+    welcomeTitle: 300,
+    welcomeSubtitle: 500,
+    welcomeMessage: 20000,
+    welcomeEyebrow: 200,
+    welcomeHandwrittenNote: 10000,
+    secretPassword: 100,
+    secretHint: 500,
+    secretContent: 20000,
+    finalLetter: 50000,
+    finalMessage: 20000,
+    lastSecretHeading: 300,
+    lastSecretMessage: 20000,
+    lastSecretPhoto: 5000000,
+    lastSecretButtonLabel: 100,
+    lastSecretFinalNote: 10000,
+    finalHeading: 300,
+    finalSignature: 200,
+    finalPhoto: 5000000,
+    finalCenterPhoto: 5000000,
+  };
+
+  for (const [field, limit] of Object.entries(STRING_FIELD_LIMITS)) {
+    if (field in record && record[field] !== undefined) {
+      const err = validateStringField(record[field], field, limit);
+      if (err) return { valid: false, error: err };
+    }
+  }
+
+  // 2. Validate String Array Fields
+  const STRING_ARRAY_FIELDS = ["enabledSections", "sectionOrder", "finalCollagePhotos"] as const;
+  for (const field of STRING_ARRAY_FIELDS) {
+    if (field in record && record[field] !== undefined) {
+      const err = validateStringArray(record[field], field, 100, 5000);
+      if (err) return { valid: false, error: err };
+    }
+  }
+
+  // 3. Field-Level Validation for Collections
+
+  // welcomePolaroids
+  if ("welcomePolaroids" in record && record.welcomePolaroids !== undefined) {
+    if (!Array.isArray(record.welcomePolaroids)) {
+      return { valid: false, error: "Field 'welcomePolaroids' must be an array of objects." };
+    }
+    if (record.welcomePolaroids.length > 50) {
+      return { valid: false, error: "Field 'welcomePolaroids' exceeds maximum limit of 50 items." };
+    }
+    for (let i = 0; i < record.welcomePolaroids.length; i++) {
+      const p = record.welcomePolaroids[i];
+      if (!isRecord(p)) {
+        return { valid: false, error: `Item at index ${i} in 'welcomePolaroids' must be a valid object.` };
+      }
+      const err =
+        validateStringField(p.id, `welcomePolaroids[${i}].id`, 100) ||
+        validateStringField(p.src, `welcomePolaroids[${i}].src`, 5000000) ||
+        validateStringField(p.caption, `welcomePolaroids[${i}].caption`, 500);
+      if (err) return { valid: false, error: err };
+    }
+  }
+
+  // customMilestones
+  if ("customMilestones" in record && record.customMilestones !== undefined) {
+    if (!Array.isArray(record.customMilestones)) {
+      return { valid: false, error: "Field 'customMilestones' must be an array of objects." };
+    }
+    if (record.customMilestones.length > 50) {
+      return { valid: false, error: "Field 'customMilestones' exceeds maximum limit of 50 items." };
+    }
+    for (let i = 0; i < record.customMilestones.length; i++) {
+      const m = record.customMilestones[i];
+      if (!isRecord(m)) {
+        return { valid: false, error: `Item at index ${i} in 'customMilestones' must be a valid object.` };
+      }
+      const err =
+        validateStringField(m.id, `customMilestones[${i}].id`, 100) ||
+        validateStringField(m.label, `customMilestones[${i}].label`, 200) ||
+        validateStringField(m.date, `customMilestones[${i}].date`, 100);
+      if (err) return { valid: false, error: err };
+    }
+  }
+
+  // customObservations
+  if ("customObservations" in record && record.customObservations !== undefined) {
+    if (!Array.isArray(record.customObservations)) {
+      return { valid: false, error: "Field 'customObservations' must be an array of objects." };
+    }
+    if (record.customObservations.length > 100) {
+      return { valid: false, error: "Field 'customObservations' exceeds maximum limit of 100 items." };
+    }
+    for (let i = 0; i < record.customObservations.length; i++) {
+      const ob = record.customObservations[i];
+      if (!isRecord(ob)) {
+        return { valid: false, error: `Item at index ${i} in 'customObservations' must be a valid object.` };
+      }
+      const err =
+        validateStringField(ob.id, `customObservations[${i}].id`, 100) ||
+        validateStringField(ob.title, `customObservations[${i}].title`, 200) ||
+        validateStringField(ob.content, `customObservations[${i}].content`, 5000) ||
+        validateStringField(ob.photo, `customObservations[${i}].photo`, 5000000) ||
+        validateStringField(ob.category, `customObservations[${i}].category`, 100) ||
+        validateStringField(ob.emoji, `customObservations[${i}].emoji`, 20);
+      if (err) return { valid: false, error: err };
+    }
+  }
+
+  // customMemories
+  if ("customMemories" in record && record.customMemories !== undefined) {
+    if (!Array.isArray(record.customMemories)) {
+      return { valid: false, error: "Field 'customMemories' must be an array of objects." };
+    }
+    if (record.customMemories.length > 100) {
+      return { valid: false, error: "Field 'customMemories' exceeds maximum limit of 100 items." };
+    }
+    for (let i = 0; i < record.customMemories.length; i++) {
+      const mem = record.customMemories[i];
+      if (!isRecord(mem)) {
+        return { valid: false, error: `Item at index ${i} in 'customMemories' must be a valid object.` };
+      }
+      const err =
+        validateStringField(mem.id, `customMemories[${i}].id`, 100) ||
+        validateStringField(mem.title, `customMemories[${i}].title`, 200) ||
+        validateStringField(mem.description, `customMemories[${i}].description`, 5000) ||
+        validateStringField(mem.date, `customMemories[${i}].date`, 100) ||
+        validateStringArray(mem.photos, `customMemories[${i}].photos`, 20, 5000000) ||
+        validateStringArray(mem.captions, `customMemories[${i}].captions`, 20, 500) ||
+        validateStringField(mem.location, `customMemories[${i}].location`, 200) ||
+        validateStringField(mem.category, `customMemories[${i}].category`, 100) ||
+        validateStringField(mem.emoji, `customMemories[${i}].emoji`, 20);
+      if (err) return { valid: false, error: err };
+    }
+  }
+
+  // customLetters
+  if ("customLetters" in record && record.customLetters !== undefined) {
+    if (!Array.isArray(record.customLetters)) {
+      return { valid: false, error: "Field 'customLetters' must be an array of objects." };
+    }
+    if (record.customLetters.length > 100) {
+      return { valid: false, error: "Field 'customLetters' exceeds maximum limit of 100 items." };
+    }
+    for (let i = 0; i < record.customLetters.length; i++) {
+      const l = record.customLetters[i];
+      if (!isRecord(l)) {
+        return { valid: false, error: `Item at index ${i} in 'customLetters' must be a valid object.` };
+      }
+      const err =
+        validateStringField(l.id, `customLetters[${i}].id`, 100) ||
+        validateStringField(l.title, `customLetters[${i}].title`, 200) ||
+        validateStringField(l.content, `customLetters[${i}].content`, 20000) ||
+        validateStringField(l.date, `customLetters[${i}].date`, 100) ||
+        validateStringField(l.signature, `customLetters[${i}].signature`, 200) ||
+        validateStringField(l.photo, `customLetters[${i}].photo`, 5000000);
+      if (err) return { valid: false, error: err };
+    }
+  }
+
+  // customOpenWhenLetters
+  if ("customOpenWhenLetters" in record && record.customOpenWhenLetters !== undefined) {
+    if (!Array.isArray(record.customOpenWhenLetters)) {
+      return { valid: false, error: "Field 'customOpenWhenLetters' must be an array of objects." };
+    }
+    if (record.customOpenWhenLetters.length > 100) {
+      return { valid: false, error: "Field 'customOpenWhenLetters' exceeds maximum limit of 100 items." };
+    }
+    for (let i = 0; i < record.customOpenWhenLetters.length; i++) {
+      const l = record.customOpenWhenLetters[i];
+      if (!isRecord(l)) {
+        return { valid: false, error: `Item at index ${i} in 'customOpenWhenLetters' must be a valid object.` };
+      }
+      const err =
+        validateStringField(l.id, `customOpenWhenLetters[${i}].id`, 100) ||
+        validateStringField(l.title, `customOpenWhenLetters[${i}].title`, 200) ||
+        validateStringField(l.heading, `customOpenWhenLetters[${i}].heading`, 200) ||
+        validateStringField(l.opening, `customOpenWhenLetters[${i}].opening`, 500) ||
+        validateStringField(l.emoji, `customOpenWhenLetters[${i}].emoji`, 20) ||
+        validateStringField(l.content, `customOpenWhenLetters[${i}].content`, 20000) ||
+        validateStringField(l.photo, `customOpenWhenLetters[${i}].photo`, 5000000) ||
+        validateStringField(l.signature, `customOpenWhenLetters[${i}].signature`, 200) ||
+        validateBooleanField(l.isOpened, `customOpenWhenLetters[${i}].isOpened`) ||
+        validateStringField(l.character, `customOpenWhenLetters[${i}].character`, 100);
+      if (err) return { valid: false, error: err };
+    }
+  }
+
+  // customLittleReasons
+  if ("customLittleReasons" in record && record.customLittleReasons !== undefined) {
+    if (!Array.isArray(record.customLittleReasons)) {
+      return { valid: false, error: "Field 'customLittleReasons' must be an array of objects." };
+    }
+    if (record.customLittleReasons.length > 200) {
+      return { valid: false, error: "Field 'customLittleReasons' exceeds maximum limit of 200 items." };
+    }
+    for (let i = 0; i < record.customLittleReasons.length; i++) {
+      const r = record.customLittleReasons[i];
+      if (!isRecord(r)) {
+        return { valid: false, error: `Item at index ${i} in 'customLittleReasons' must be a valid object.` };
+      }
+      const err =
+        validateStringField(r.id, `customLittleReasons[${i}].id`, 100) ||
+        validateStringField(r.title, `customLittleReasons[${i}].title`, 200) ||
+        validateStringField(r.supportingText, `customLittleReasons[${i}].supportingText`, 2000) ||
+        validateStringField(r.text, `customLittleReasons[${i}].text`, 2000) ||
+        validateStringField(r.emoji, `customLittleReasons[${i}].emoji`, 20);
+      if (err) return { valid: false, error: err };
+    }
+  }
+
+  // customDeluluScenarios
+  if ("customDeluluScenarios" in record && record.customDeluluScenarios !== undefined) {
+    if (!Array.isArray(record.customDeluluScenarios)) {
+      return { valid: false, error: "Field 'customDeluluScenarios' must be an array of objects." };
+    }
+    if (record.customDeluluScenarios.length > 50) {
+      return { valid: false, error: "Field 'customDeluluScenarios' exceeds maximum limit of 50 items." };
+    }
+    for (let i = 0; i < record.customDeluluScenarios.length; i++) {
+      const s = record.customDeluluScenarios[i];
+      if (!isRecord(s)) {
+        return { valid: false, error: `Item at index ${i} in 'customDeluluScenarios' must be a valid object.` };
+      }
+      const err =
+        validateStringField(s.id, `customDeluluScenarios[${i}].id`, 100) ||
+        validateStringField(s.title, `customDeluluScenarios[${i}].title`, 200) ||
+        validateStringField(s.situation, `customDeluluScenarios[${i}].situation`, 5000) ||
+        validateStringField(s.image, `customDeluluScenarios[${i}].image`, 5000000);
+      if (err) return { valid: false, error: err };
+
+      if (s.options !== undefined) {
+        if (!Array.isArray(s.options)) {
+          return { valid: false, error: `Field 'options' in customDeluluScenarios[${i}] must be an array.` };
+        }
+        if (s.options.length > 10) {
+          return { valid: false, error: `Field 'options' in customDeluluScenarios[${i}] exceeds limit of 10 items.` };
+        }
+        for (let j = 0; j < s.options.length; j++) {
+          const opt = s.options[j];
+          if (!isRecord(opt)) {
+            return { valid: false, error: `Option at index ${j} in customDeluluScenarios[${i}] must be a valid object.` };
+          }
+          const optErr =
+            validateStringField(opt.id, `customDeluluScenarios[${i}].options[${j}].id`, 100) ||
+            validateStringField(opt.text, `customDeluluScenarios[${i}].options[${j}].text`, 500) ||
+            validateStringField(opt.response, `customDeluluScenarios[${i}].options[${j}].response`, 2000);
+          if (optErr) return { valid: false, error: optErr };
+        }
+      }
+    }
+  }
+
+  // customQuizQuestions
+  if ("customQuizQuestions" in record && record.customQuizQuestions !== undefined) {
+    if (!Array.isArray(record.customQuizQuestions)) {
+      return { valid: false, error: "Field 'customQuizQuestions' must be an array of objects." };
+    }
+    if (record.customQuizQuestions.length > 50) {
+      return { valid: false, error: "Field 'customQuizQuestions' exceeds maximum limit of 50 items." };
+    }
+    for (let i = 0; i < record.customQuizQuestions.length; i++) {
+      const q = record.customQuizQuestions[i];
+      if (!isRecord(q)) {
+        return { valid: false, error: `Item at index ${i} in 'customQuizQuestions' must be a valid object.` };
+      }
+      const err =
+        validateStringField(q.id, `customQuizQuestions[${i}].id`, 100) ||
+        validateStringField(q.question, `customQuizQuestions[${i}].question`, 500) ||
+        validateStringField(q.type, `customQuizQuestions[${i}].type`, 50) ||
+        validateStringArray(q.options, `customQuizQuestions[${i}].options`, 10, 200) ||
+        validateStringField(q.creatorAnswer, `customQuizQuestions[${i}].creatorAnswer`, 500);
+      if (err) return { valid: false, error: err };
+    }
+  }
+
+  // customDigitalGifts
+  if ("customDigitalGifts" in record && record.customDigitalGifts !== undefined) {
+    if (!Array.isArray(record.customDigitalGifts)) {
+      return { valid: false, error: "Field 'customDigitalGifts' must be an array of objects." };
+    }
+    if (record.customDigitalGifts.length > 50) {
+      return { valid: false, error: "Field 'customDigitalGifts' exceeds maximum limit of 50 items." };
+    }
+    for (let i = 0; i < record.customDigitalGifts.length; i++) {
+      const g = record.customDigitalGifts[i];
+      if (!isRecord(g)) {
+        return { valid: false, error: `Item at index ${i} in 'customDigitalGifts' must be a valid object.` };
+      }
+      const err =
+        validateStringField(g.id, `customDigitalGifts[${i}].id`, 100) ||
+        validateStringField(g.title, `customDigitalGifts[${i}].title`, 200) ||
+        validateStringField(g.description, `customDigitalGifts[${i}].description`, 5000) ||
+        validateStringField(g.emoji, `customDigitalGifts[${i}].emoji`, 20) ||
+        validateStringField(g.image, `customDigitalGifts[${i}].image`, 5000000) ||
+        validateBooleanField(g.isClaimed, `customDigitalGifts[${i}].isClaimed`) ||
+        validateStringField(g.claimedAt, `customDigitalGifts[${i}].claimedAt`, 100) ||
+        validateBooleanField(g.isFulfilled, `customDigitalGifts[${i}].isFulfilled`) ||
+        validateStringField(g.fulfilledAt, `customDigitalGifts[${i}].fulfilledAt`, 100);
+      if (err) return { valid: false, error: err };
+    }
+  }
+
+  // customBucketListItems
+  if ("customBucketListItems" in record && record.customBucketListItems !== undefined) {
+    if (!Array.isArray(record.customBucketListItems)) {
+      return { valid: false, error: "Field 'customBucketListItems' must be an array of objects." };
+    }
+    if (record.customBucketListItems.length > 100) {
+      return { valid: false, error: "Field 'customBucketListItems' exceeds maximum limit of 100 items." };
+    }
+    for (let i = 0; i < record.customBucketListItems.length; i++) {
+      const b = record.customBucketListItems[i];
+      if (!isRecord(b)) {
+        return { valid: false, error: `Item at index ${i} in 'customBucketListItems' must be a valid object.` };
+      }
+      const err =
+        validateStringField(b.id, `customBucketListItems[${i}].id`, 100) ||
+        validateStringField(b.title, `customBucketListItems[${i}].title`, 200) ||
+        validateStringField(b.description, `customBucketListItems[${i}].description`, 5000) ||
+        validateStringField(b.image, `customBucketListItems[${i}].image`, 5000000) ||
+        validateStringField(b.creator, `customBucketListItems[${i}].creator`, 50) ||
+        validateStringField(b.status, `customBucketListItems[${i}].status`, 50) ||
+        validateStringField(b.targetDate, `customBucketListItems[${i}].targetDate`, 100);
+      if (err) return { valid: false, error: err };
+    }
+  }
+
+  // customPersonalCards
+  if ("customPersonalCards" in record && record.customPersonalCards !== undefined) {
+    if (!Array.isArray(record.customPersonalCards)) {
+      return { valid: false, error: "Field 'customPersonalCards' must be an array of objects." };
+    }
+    if (record.customPersonalCards.length > 100) {
+      return { valid: false, error: "Field 'customPersonalCards' exceeds maximum limit of 100 items." };
+    }
+    for (let i = 0; i < record.customPersonalCards.length; i++) {
+      const c = record.customPersonalCards[i];
+      if (!isRecord(c)) {
+        return { valid: false, error: `Item at index ${i} in 'customPersonalCards' must be a valid object.` };
+      }
+      const err =
+        validateStringField(c.id, `customPersonalCards[${i}].id`, 100) ||
+        validateStringField(c.category, `customPersonalCards[${i}].category`, 100) ||
+        validateStringField(c.title, `customPersonalCards[${i}].title`, 200) ||
+        validateStringField(c.content, `customPersonalCards[${i}].content`, 5000) ||
+        validateStringField(c.emoji, `customPersonalCards[${i}].emoji`, 20) ||
+        validateStringField(c.photo, `customPersonalCards[${i}].photo`, 5000000);
+      if (err) return { valid: false, error: err };
+    }
+  }
+
+  // customDateIdeas
+  if ("customDateIdeas" in record && record.customDateIdeas !== undefined) {
+    if (!Array.isArray(record.customDateIdeas)) {
+      return { valid: false, error: "Field 'customDateIdeas' must be an array of objects." };
+    }
+    if (record.customDateIdeas.length > 100) {
+      return { valid: false, error: "Field 'customDateIdeas' exceeds maximum limit of 100 items." };
+    }
+    for (let i = 0; i < record.customDateIdeas.length; i++) {
+      const d = record.customDateIdeas[i];
+      if (!isRecord(d)) {
+        return { valid: false, error: `Item at index ${i} in 'customDateIdeas' must be a valid object.` };
+      }
+      const err =
+        validateStringField(d.id, `customDateIdeas[${i}].id`, 100) ||
+        validateStringField(d.title, `customDateIdeas[${i}].title`, 200) ||
+        validateStringField(d.description, `customDateIdeas[${i}].description`, 5000) ||
+        validateStringField(d.coverPhoto, `customDateIdeas[${i}].coverPhoto`, 5000000) ||
+        validateStringField(d.image, `customDateIdeas[${i}].image`, 5000000) ||
+        validateStringField(d.category, `customDateIdeas[${i}].category`, 100) ||
+        validateStringField(d.costRange, `customDateIdeas[${i}].costRange`, 100) ||
+        validateStringField(d.costEstimateText, `customDateIdeas[${i}].costEstimateText`, 100) ||
+        validateStringField(d.estimatedBudget, `customDateIdeas[${i}].estimatedBudget`, 100) ||
+        validateStringField(d.estimatedDuration, `customDateIdeas[${i}].estimatedDuration`, 100) ||
+        validateStringField(d.duration, `customDateIdeas[${i}].duration`, 100) ||
+        validateNumberField(d.estimatedDurationMinutes, `customDateIdeas[${i}].estimatedDurationMinutes`, 0, 10080) ||
+        validateStringField(d.environment, `customDateIdeas[${i}].environment`, 100) ||
+        validateStringField(d.location, `customDateIdeas[${i}].location`, 200) ||
+        validateStringField(d.practicalNotes, `customDateIdeas[${i}].practicalNotes`, 2000) ||
+        validateStringField(d.accessibilityNotes, `customDateIdeas[${i}].accessibilityNotes`, 2000) ||
+        validateStringField(d.author, `customDateIdeas[${i}].author`, 50) ||
+        validateStringField(d.authorName, `customDateIdeas[${i}].authorName`, 100) ||
+        validateStringField(d.createdAt, `customDateIdeas[${i}].createdAt`, 100) ||
+        validateStringField(d.updatedAt, `customDateIdeas[${i}].updatedAt`, 100) ||
+        validateBooleanField(d.isHidden, `customDateIdeas[${i}].isHidden`) ||
+        validateNumberField(d.sortOrder, `customDateIdeas[${i}].sortOrder`, -1000, 1000) ||
+        validateBooleanField(d.isCustom, `customDateIdeas[${i}].isCustom`) ||
+        validateBooleanField(d.isIndoor, `customDateIdeas[${i}].isIndoor`) ||
+        validateBooleanField(d.isFavorited, `customDateIdeas[${i}].isFavorited`);
+      if (err) return { valid: false, error: err };
+    }
+  }
+
+  // 4. Validate Nested Plain Objects
+
+  // featuredSong
+  if ("featuredSong" in record && record.featuredSong !== undefined) {
+    if (!isRecord(record.featuredSong)) {
+      return { valid: false, error: "Field 'featuredSong' must be a valid object." };
+    }
+    const s = record.featuredSong;
+    const err =
+      validateStringField(s.title, "featuredSong.title", 200) ||
+      validateStringField(s.artist, "featuredSong.artist", 200) ||
+      validateStringField(s.heading, "featuredSong.heading", 200) ||
+      validateStringField(s.subtitle, "featuredSong.subtitle", 200) ||
+      validateStringField(s.dedicationHeading, "featuredSong.dedicationHeading", 200) ||
+      validateStringField(s.dedication, "featuredSong.dedication", 2000) ||
+      validateStringField(s.whyItMatters, "featuredSong.whyItMatters", 2000) ||
+      validateStringField(s.coverArtwork, "featuredSong.coverArtwork", 5000000) ||
+      validateStringField(s.embedUrl, "featuredSong.embedUrl", 1000);
+    if (err) return { valid: false, error: err };
+  }
+
+  // designPreferences
+  if ("designPreferences" in record && record.designPreferences !== undefined) {
+    if (!isRecord(record.designPreferences)) {
+      return { valid: false, error: "Field 'designPreferences' must be a valid object." };
+    }
+    const dp = record.designPreferences;
+    const err =
+      validateStringField(dp.colorPalette, "designPreferences.colorPalette", 100) ||
+      validateStringField(dp.typographyPreset, "designPreferences.typographyPreset", 100) ||
+      validateStringField(dp.animationIntensity, "designPreferences.animationIntensity", 100) ||
+      validateStringField(dp.mood, "designPreferences.mood", 100) ||
+      validateStringField(dp.photoPresentation, "designPreferences.photoPresentation", 100) ||
+      validateBooleanField(dp.backgroundMusicEnabled, "designPreferences.backgroundMusicEnabled");
+    if (err) return { valid: false, error: err };
+  }
+
+  // memoriesHeartCollage
+  if ("memoriesHeartCollage" in record && record.memoriesHeartCollage !== undefined) {
+    if (!isRecord(record.memoriesHeartCollage)) {
+      return { valid: false, error: "Field 'memoriesHeartCollage' must be a valid object." };
+    }
+    const hc = record.memoriesHeartCollage;
+    const err =
+      validateStringField(hc.centerHeroPhoto, "memoriesHeartCollage.centerHeroPhoto", 5000000) ||
+      validateStringField(hc.centerHeroCaption, "memoriesHeartCollage.centerHeroCaption", 500) ||
+      validateStringArray(hc.photos, "memoriesHeartCollage.photos", 50, 5000000) ||
+      validateStringField(hc.caption, "memoriesHeartCollage.caption", 500);
+    if (err) return { valid: false, error: err };
+  }
+
+  // memoriesPolaroidCollage
+  if ("memoriesPolaroidCollage" in record && record.memoriesPolaroidCollage !== undefined) {
+    if (!isRecord(record.memoriesPolaroidCollage)) {
+      return { valid: false, error: "Field 'memoriesPolaroidCollage' must be a valid object." };
+    }
+    const pc = record.memoriesPolaroidCollage;
+    const err =
+      validateStringField(pc.centralHeartPhoto, "memoriesPolaroidCollage.centralHeartPhoto", 5000000) ||
+      validateStringField(pc.centralCaption, "memoriesPolaroidCollage.centralCaption", 500) ||
+      validateStringArray(pc.borderPhotos, "memoriesPolaroidCollage.borderPhotos", 50, 5000000);
+    if (err) return { valid: false, error: err };
+  }
+
+  // 5. Validate memoriesCollageType
+  if ("memoriesCollageType" in record && record.memoriesCollageType !== undefined) {
+    if (record.memoriesCollageType !== "heart" && record.memoriesCollageType !== "polaroid") {
+      return { valid: false, error: "Field 'memoriesCollageType' must be either 'heart' or 'polaroid'." };
+    }
+  }
+
+  // 6. Validate Privacy Settings
+  if ("privacy" in record && record.privacy !== undefined) {
+    if (!isRecord(record.privacy)) {
+      return { valid: false, error: "Field 'privacy' must be a valid object." };
+    }
+    const priv = record.privacy as Record<string, unknown>;
+
+    if (priv.isPasswordProtected !== undefined && typeof priv.isPasswordProtected !== "boolean") {
+      return { valid: false, error: "Field 'privacy.isPasswordProtected' must be a boolean." };
+    }
+
+    if (priv.passcode !== undefined) {
+      if (typeof priv.passcode !== "string") {
+        return { valid: false, error: "Field 'privacy.passcode' must be a string." };
+      }
+      if (priv.passcode.length > 50) {
+        return { valid: false, error: "Field 'privacy.passcode' exceeds maximum length of 50 characters." };
+      }
+    }
+
+    if (priv.allowResponses !== undefined && typeof priv.allowResponses !== "boolean") {
+      return { valid: false, error: "Field 'privacy.allowResponses' must be a boolean." };
+    }
+
+    if (priv.allowRecipientContributions !== undefined && typeof priv.allowRecipientContributions !== "boolean") {
+      return { valid: false, error: "Field 'privacy.allowRecipientContributions' must be a boolean." };
+    }
+
+    if (priv.invitationStatus !== undefined) {
+      if (priv.invitationStatus !== "active" && priv.invitationStatus !== "revoked") {
+        return { valid: false, error: "Field 'privacy.invitationStatus' must be either 'active' or 'revoked'." };
+      }
+    }
+  }
+
+  return { valid: true };
+}
+
 export function updateGift(id: string, updates: Partial<GiftRecord>): GiftRecord | null {
-  const db = loadDatabase();
-  const idx = db.gifts.findIndex((g) => g.id === id);
+  const validation = validateGiftUpdates(updates);
+  if (!validation.valid) {
+    throw new Error(validation.error || "Invalid gift update data.");
+  }
+
+  const currentDb = loadDatabase();
+  const idx = currentDb.gifts.findIndex((g) => g.id === id);
   if (idx === -1) return null;
 
-  const existing = db.gifts[idx];
+  const existing = currentDb.gifts[idx];
   const now = new Date().toISOString();
 
   // If slug is being updated, ensure uniqueness
   let slug = existing.slug;
   if (updates.slug && typeof updates.slug === "string" && updates.slug.trim() !== existing.slug) {
     const candidate = updates.slug.trim().toLowerCase();
-    const isTaken = db.gifts.some((g) => g.id !== id && g.slug.toLowerCase() === candidate);
+    const isTaken = currentDb.gifts.some((g) => g.id !== id && g.slug.toLowerCase() === candidate);
     if (!isTaken) {
       slug = candidate;
     }
@@ -2658,18 +3307,22 @@ export function updateGift(id: string, updates: Partial<GiftRecord>): GiftRecord
     privacy: safePrivacy,
   };
 
-  db.gifts[idx] = updated;
-  saveDatabase(db);
+  // Work on a deep clone so memoryDb is not mutated if persistence fails
+  const newDb: RelationshipDatabase = JSON.parse(JSON.stringify(currentDb));
+  newDb.gifts[idx] = updated;
+
+  // Let persistence errors throw so callers know persistence failed
+  saveDatabase(newDb);
   return updated;
 }
 
 export function duplicateGift(id: string, newCreatorId?: string): GiftRecord | null {
-  const db = loadDatabase();
-  const existing = db.gifts.find((g) => g.id === id);
+  const currentDb = loadDatabase();
+  const existing = currentDb.gifts.find((g) => g.id === id);
   if (!existing) return null;
 
   const title = `${existing.title} (Copy)`;
-  const slug = generateSlug(title, db);
+  const slug = generateSlug(title, currentDb);
   const now = new Date().toISOString();
 
   const cloned: GiftRecord = {
@@ -2689,24 +3342,60 @@ export function duplicateGift(id: string, newCreatorId?: string): GiftRecord | n
     },
   };
 
-  db.gifts.push(cloned);
-  saveDatabase(db);
+  const newDb: RelationshipDatabase = JSON.parse(JSON.stringify(currentDb));
+  newDb.gifts.push(cloned);
+  saveDatabase(newDb);
   return cloned;
 }
 
 export function deleteGift(id: string): boolean {
-  const db = loadDatabase();
-  const idx = db.gifts.findIndex((g) => g.id === id);
+  const currentDb = loadDatabase();
+  const idx = currentDb.gifts.findIndex((g) => g.id === id);
   if (idx === -1) return false;
 
-  // Cannot delete the primary demo gift if it's the only one
-  if (db.gifts.length <= 1) {
+  // Cannot delete the primary demo gift
+  if (id === "gift_world_demo") {
     return false;
   }
 
-  db.gifts.splice(idx, 1);
-  saveDatabase(db);
-  return true;
+  // Cannot delete if it's the only remaining gift
+  if (currentDb.gifts.length <= 1) {
+    return false;
+  }
+
+  // Work on a deep clone so memoryDb is not mutated if persistence fails
+  const newDb: RelationshipDatabase = JSON.parse(JSON.stringify(currentDb));
+  const newIdx = newDb.gifts.findIndex((g) => g.id === id);
+  if (newIdx === -1) return false;
+
+  // Identify proposal IDs belonging to this gift for notification cascade
+  const giftProposalIds = new Set(
+    (newDb.dateProposals || [])
+      .filter((p) => p.giftId === id)
+      .map((p) => p.id)
+  );
+
+  // Cascade delete associated gift-scoped child records
+  newDb.comments = (newDb.comments || []).filter((c) => c.giftId !== id);
+  newDb.reactions = (newDb.reactions || []).filter((r) => r.giftId !== id);
+  newDb.journalEntries = (newDb.journalEntries || []).filter((j) => j.giftId !== id);
+  newDb.voiceMessages = (newDb.voiceMessages || []).filter((v) => v.giftId !== id);
+  newDb.dateProposals = (newDb.dateProposals || []).filter((p) => p.giftId !== id);
+  newDb.dateMemories = (newDb.dateMemories || []).filter((m) => m.giftId !== id);
+  newDb.dateNotifications = (newDb.dateNotifications || []).filter(
+    (n) => !n.proposalId || !giftProposalIds.has(n.proposalId)
+  );
+  newDb.mediaAssets = (newDb.mediaAssets || []).filter((a) => a.giftId !== id);
+
+  newDb.gifts.splice(newIdx, 1);
+
+  try {
+    saveDatabase(newDb);
+    return true;
+  } catch (err) {
+    console.error(`Failed to persist gift deletion for ${id}:`, err);
+    return false;
+  }
 }
 
 export function publishGift(
@@ -2812,14 +3501,21 @@ export function addMediaAsset(
     createdAt: new Date().toISOString(),
   };
 
-  db.mediaAssets.push(newAsset);
+  const currentDb = loadDatabase();
+  const newDb: RelationshipDatabase = JSON.parse(JSON.stringify(currentDb));
+  newDb.mediaAssets.push(newAsset);
   // Keep last 100 assets
-  if (db.mediaAssets.length > 100) {
-    db.mediaAssets = db.mediaAssets.slice(db.mediaAssets.length - 100);
+  if (newDb.mediaAssets.length > 100) {
+    newDb.mediaAssets = newDb.mediaAssets.slice(newDb.mediaAssets.length - 100);
   }
 
-  saveDatabase(db);
-  return { success: true, asset: newAsset };
+  try {
+    saveDatabase(newDb);
+    return { success: true, asset: newAsset };
+  } catch (err) {
+    console.error("Failed to persist media asset:", err);
+    return { success: false, error: "Database persistence failed for media upload." };
+  }
 }
 
 export function getMediaAssetById(id: string): MediaAsset | null {
@@ -2828,12 +3524,18 @@ export function getMediaAssetById(id: string): MediaAsset | null {
 }
 
 export function deleteMediaAsset(id: string): boolean {
-  const db = loadDatabase();
-  const idx = db.mediaAssets.findIndex((a) => a.id === id);
+  const currentDb = loadDatabase();
+  const idx = currentDb.mediaAssets.findIndex((a) => a.id === id);
   if (idx === -1) return false;
 
-  db.mediaAssets.splice(idx, 1);
-  saveDatabase(db);
-  return true;
+  const newDb: RelationshipDatabase = JSON.parse(JSON.stringify(currentDb));
+  newDb.mediaAssets.splice(idx, 1);
+  try {
+    saveDatabase(newDb);
+    return true;
+  } catch (err) {
+    console.error(`Failed to persist media asset deletion for ${id}:`, err);
+    return false;
+  }
 }
 
