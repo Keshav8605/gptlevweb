@@ -4,22 +4,25 @@ import {
   addDateIdea,
   updateDateIdea,
   deleteDateIdea,
-  verifyAccess,
   getDatePreferences,
 } from "@/lib/server-db";
+import { requireGiftAccess } from "@/lib/access-guard";
 
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
-    const token = url.searchParams.get("token") || "";
-    const roleParam = url.searchParams.get("role") || "";
+    const giftId = url.searchParams.get("giftId");
+    if (!giftId) {
+      return NextResponse.json({ error: "giftId parameter is required" }, { status: 400 });
+    }
 
-    const auth = token ? verifyAccess(token) : { authorized: false, role: (roleParam === "creator" ? "creator" : "recipient") as "creator" | "recipient", name: roleParam === "creator" ? "Babe" : "Baby" };
-    const effectiveRole = auth.authorized ? auth.role : ((roleParam === "creator" ? "creator" : "recipient") as "creator" | "recipient");
+    const access = await requireGiftAccess(request, giftId);
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error }, { status: access.status });
+    }
 
-    const ideas = getDateIdeas(effectiveRole === "creator");
-    const prefRole = (effectiveRole === "creator" ? "creator" : "recipient") as "creator" | "recipient";
-    const preferences = getDatePreferences(prefRole);
+    const ideas = getDateIdeas(access.role === "creator");
+    const preferences = getDatePreferences(access.role, giftId);
 
     return NextResponse.json({
       success: true,
@@ -34,20 +37,30 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const token = body.token || "";
-    const roleParam = body.role || "creator";
-    const authorName = body.authorName || (roleParam === "creator" ? "Babe" : "Baby");
+    let body: Record<string, unknown> = {};
+    try {
+      body = (await request.json()) as Record<string, unknown>;
+    } catch {
+      return NextResponse.json({ error: "Malformed request payload" }, { status: 400 });
+    }
 
-    const auth = token ? verifyAccess(token) : { authorized: true, role: roleParam, name: authorName };
-    const role = (auth.authorized ? auth.role : roleParam) as "creator" | "recipient";
-    const name = auth.authorized ? auth.name : authorName;
+    const url = new URL(request.url);
+    const giftId = (typeof body?.giftId === "string" ? body.giftId : null) || url.searchParams.get("giftId");
+    if (!giftId) {
+      return NextResponse.json({ error: "giftId is required" }, { status: 400 });
+    }
 
-    if (!body.title || !body.title.trim()) {
+    const access = await requireGiftAccess(request, giftId);
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error }, { status: access.status });
+    }
+
+    const title = typeof body?.title === "string" ? body.title : "";
+    if (!title.trim()) {
       return NextResponse.json({ error: "Title is required for a date idea" }, { status: 400 });
     }
 
-    const created = addDateIdea(body, role, name);
+    const created = addDateIdea(body as unknown as Parameters<typeof addDateIdea>[0], access.role, access.name);
     return NextResponse.json({ success: true, idea: created });
   } catch (err) {
     console.error("POST /api/dates/ideas error:", err);
@@ -57,19 +70,31 @@ export async function POST(request: Request) {
 
 export async function PUT(request: Request) {
   try {
-    const body = await request.json();
-    const token = body.token || "";
-    const roleParam = body.role || "creator";
-    const id = body.id;
+    let body: Record<string, unknown> = {};
+    try {
+      body = (await request.json()) as Record<string, unknown>;
+    } catch {
+      return NextResponse.json({ error: "Malformed request payload" }, { status: 400 });
+    }
 
+    const id = typeof body?.id === "string" ? body.id : "";
     if (!id) {
       return NextResponse.json({ error: "Idea ID is required" }, { status: 400 });
     }
 
-    const auth = token ? verifyAccess(token) : { authorized: true, role: roleParam, name: "Babe" };
-    const role = (auth.authorized ? auth.role : roleParam) as "creator" | "recipient";
+    const url = new URL(request.url);
+    const giftId = (typeof body?.giftId === "string" ? body.giftId : null) || url.searchParams.get("giftId");
+    if (!giftId) {
+      return NextResponse.json({ error: "giftId is required" }, { status: 400 });
+    }
 
-    const updated = updateDateIdea(id, body.updates || body, role);
+    const access = await requireGiftAccess(request, giftId);
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error }, { status: access.status });
+    }
+
+    const updates = (body.updates || body) as unknown as Record<string, string>;
+    const updated = updateDateIdea(id, updates, access.role);
     if (!updated) {
       return NextResponse.json({ error: "Unauthorized or idea not found" }, { status: 403 });
     }
@@ -85,17 +110,22 @@ export async function DELETE(request: Request) {
   try {
     const url = new URL(request.url);
     const id = url.searchParams.get("id");
-    const token = url.searchParams.get("token") || "";
-    const roleParam = url.searchParams.get("role") || "creator";
+    const giftId = url.searchParams.get("giftId");
 
     if (!id) {
       return NextResponse.json({ error: "Idea ID is required" }, { status: 400 });
     }
 
-    const auth = token ? verifyAccess(token) : { authorized: true, role: roleParam, name: "Babe" };
-    const role = (auth.authorized ? auth.role : roleParam) as "creator" | "recipient";
+    if (!giftId) {
+      return NextResponse.json({ error: "giftId parameter is required" }, { status: 400 });
+    }
 
-    const ok = deleteDateIdea(id, role);
+    const access = await requireGiftAccess(request, giftId);
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error }, { status: access.status });
+    }
+
+    const ok = deleteDateIdea(id, access.role);
     if (!ok) {
       return NextResponse.json({ error: "Unauthorized or idea not found" }, { status: 403 });
     }

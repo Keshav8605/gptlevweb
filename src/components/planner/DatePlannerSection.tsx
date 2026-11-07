@@ -16,26 +16,28 @@ import type {
   ChecklistItem,
 } from "@/lib/server-db";
 
+import { getUnlockHeaders } from "@/lib/client-auth";
+
 type PlannerTab = "discover" | "plans" | "memories";
 
 interface DatePlannerSectionProps {
   onOpenAccessModal?: () => void;
+  giftId?: string;
+  currentUserRole?: "creator" | "recipient";
+  currentUserName?: string;
 }
 
-export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProps) {
+export function DatePlannerSection({
+  onOpenAccessModal,
+  giftId,
+  currentUserRole = "recipient",
+  currentUserName = "Baby",
+}: DatePlannerSectionProps) {
   // Navigation: 3 destinations (Section 5 exact labels)
   const [activeTab, setActiveTab] = useState<PlannerTab>("discover");
 
-  // Dynamic user role & name from localStorage
-  const [currentRole, setCurrentRole] = useState<"creator" | "recipient">(() => {
-    if (typeof window === "undefined") return "recipient";
-    return (localStorage.getItem("gift_participant_role") as "creator" | "recipient") || "recipient";
-  });
-  const [currentName, setCurrentName] = useState<string>(() => {
-    if (typeof window === "undefined") return "Baby";
-    const role = localStorage.getItem("gift_participant_role") || "recipient";
-    return localStorage.getItem("gift_participant_name") || (role === "creator" ? "Babe" : "Baby");
-  });
+  const [currentRole] = useState<"creator" | "recipient">(currentUserRole);
+  const [currentName] = useState<string>(currentUserName);
 
   // Main state collections
   const [ideas, setIdeas] = useState<DateIdea[]>([]);
@@ -45,23 +47,15 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
   const [isLoading, setIsLoading] = useState(true);
   const [initialProposalForMemory, setInitialProposalForMemory] = useState<DateProposal | null>(null);
 
-  // Sync role and recipient name from localStorage
-  const syncRole = useCallback(() => {
-    if (typeof window === "undefined") return;
-    const role = (localStorage.getItem("gift_participant_role") as "creator" | "recipient") || "recipient";
-    const name = localStorage.getItem("gift_participant_name") || (role === "creator" ? "Babe" : "Baby");
-    setCurrentRole(role);
-    setCurrentName(name);
-  }, []);
+  const activeGiftId = giftId || "default";
 
   // Fetch all planner data
   const fetchAllData = useCallback(async () => {
     try {
-      const token = typeof window !== "undefined" ? localStorage.getItem("gift_auth_token") || "" : "";
-      const role = typeof window !== "undefined" ? localStorage.getItem("gift_participant_role") || "recipient" : "recipient";
+      const headers = getUnlockHeaders(activeGiftId);
 
       // 1. Fetch Ideas & Preferences
-      const ideasRes = await fetch(`/api/dates/ideas?role=${role}&token=${encodeURIComponent(token)}`);
+      const ideasRes = await fetch(`/api/dates/ideas?giftId=${encodeURIComponent(activeGiftId)}`, { headers });
       if (ideasRes.ok) {
         const data = await ideasRes.json();
         if (data.ideas) setIdeas(data.ideas);
@@ -69,14 +63,14 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
       }
 
       // 2. Fetch Proposals
-      const propRes = await fetch(`/api/dates/proposals?role=${role}&token=${encodeURIComponent(token)}`);
+      const propRes = await fetch(`/api/dates/proposals?giftId=${encodeURIComponent(activeGiftId)}`, { headers });
       if (propRes.ok) {
         const data = await propRes.json();
         if (data.proposals) setProposals(data.proposals);
       }
 
       // 3. Fetch Memories
-      const memRes = await fetch("/api/dates/memories");
+      const memRes = await fetch(`/api/dates/memories?giftId=${encodeURIComponent(activeGiftId)}`, { headers });
       if (memRes.ok) {
         const data = await memRes.json();
         if (data.memories) setMemories(data.memories);
@@ -86,19 +80,16 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
     } finally {
       setIsLoading(false);
     }
-  }, []);
+  }, [activeGiftId]);
 
   useEffect(() => {
     fetchAllData();
-    window.addEventListener("storage", syncRole);
-    return () => window.removeEventListener("storage", syncRole);
-  }, [syncRole, fetchAllData]);
+  }, [fetchAllData]);
 
   // ==================== MUTATION HANDLERS ====================
 
   // Toggle Favorite
   const handleToggleFavorite = async (ideaId: string, currentFav: boolean) => {
-    const token = localStorage.getItem("gift_auth_token") || "";
     setPreferences((prev) => {
       const idx = prev.findIndex((p) => p.ideaId === ideaId);
       if (idx !== -1) {
@@ -124,13 +115,11 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
     try {
       await fetch("/api/dates/preferences", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
+          giftId: activeGiftId,
           ideaId,
           updates: { isFavorite: !currentFav },
-          token,
-          role: currentRole,
-          name: currentName,
         }),
       });
     } catch (err) {
@@ -141,7 +130,6 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
 
   // Toggle Shortlist / Save (Section 8 & 9.B)
   const handleToggleShortlist = async (ideaId: string, currentShortlisted: boolean) => {
-    const token = localStorage.getItem("gift_auth_token") || "";
     setPreferences((prev) => {
       const idx = prev.findIndex((p) => p.ideaId === ideaId);
       if (idx !== -1) {
@@ -167,13 +155,11 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
     try {
       await fetch("/api/dates/preferences", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
+          giftId: activeGiftId,
           ideaId,
           updates: { isShortlisted: !currentShortlisted, isFavorite: !currentShortlisted },
-          token,
-          role: currentRole,
-          name: currentName,
         }),
       });
     } catch (err) {
@@ -184,7 +170,6 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
 
   // Update Preference State
   const handleUpdatePreferenceState = async (ideaId: string, state: DatePreferenceState) => {
-    const token = localStorage.getItem("gift_auth_token") || "";
     setPreferences((prev) => {
       const idx = prev.findIndex((p) => p.ideaId === ideaId);
       if (idx !== -1) {
@@ -210,13 +195,11 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
     try {
       await fetch("/api/dates/preferences", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
+          giftId: activeGiftId,
           ideaId,
           updates: { status: state },
-          token,
-          role: currentRole,
-          name: currentName,
         }),
       });
     } catch (err) {
@@ -227,7 +210,6 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
 
   // Save Personal Note on an Idea
   const handleSavePersonalNote = async (ideaId: string, note: string) => {
-    const token = localStorage.getItem("gift_auth_token") || "";
     setPreferences((prev) => {
       const idx = prev.findIndex((p) => p.ideaId === ideaId);
       if (idx !== -1) {
@@ -254,13 +236,11 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
     try {
       await fetch("/api/dates/preferences", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
+          giftId: activeGiftId,
           ideaId,
           updates: { personalNote: note },
-          token,
-          role: currentRole,
-          name: currentName,
         }),
       });
     } catch (err) {
@@ -271,16 +251,13 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
 
   // Create Custom Idea (Section 11)
   const handleCreateIdea = async (newIdea: Partial<DateIdea>): Promise<boolean> => {
-    const token = localStorage.getItem("gift_auth_token") || "";
     try {
       const res = await fetch("/api/dates/ideas", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
           ...newIdea,
-          token,
-          role: currentRole,
-          authorName: currentName,
+          giftId: activeGiftId,
         }),
       });
       if (res.ok) {
@@ -300,16 +277,13 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
 
   // Propose Date (Section 9.D)
   const handleProposeDate = async (proposalData: Partial<DateProposal>): Promise<boolean> => {
-    const token = localStorage.getItem("gift_auth_token") || "";
     try {
       const res = await fetch("/api/dates/proposals", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
           ...proposalData,
-          token,
-          proposerRole: currentRole,
-          proposerName: currentName,
+          giftId: activeGiftId,
         }),
       });
 
@@ -338,17 +312,14 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
       reason?: string;
     }
   ): Promise<boolean> => {
-    const token = localStorage.getItem("gift_auth_token") || "";
     try {
       const res = await fetch(`/api/dates/proposals/${encodeURIComponent(id)}/transition`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
+          giftId: activeGiftId,
           action,
           ...payload,
-          token,
-          role: currentRole,
-          name: currentName,
         }),
       });
 
@@ -373,16 +344,13 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
 
   // Update Checklist
   const handleUpdateChecklist = async (proposalId: string, checklist: ChecklistItem[]): Promise<boolean> => {
-    const token = localStorage.getItem("gift_auth_token") || "";
     try {
       const res = await fetch(`/api/dates/proposals/${encodeURIComponent(proposalId)}/checklist`, {
         method: "PATCH",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
+          giftId: activeGiftId,
           checklist,
-          token,
-          role: currentRole,
-          name: currentName,
         }),
       });
 
@@ -400,16 +368,13 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
 
   // Add Memory (Section 12)
   const handleAddMemory = async (memoryData: Partial<DateMemory>): Promise<boolean> => {
-    const token = localStorage.getItem("gift_auth_token") || "";
     try {
       const res = await fetch("/api/dates/memories", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
           ...memoryData,
-          token,
-          role: currentRole,
-          authorName: currentName,
+          giftId: activeGiftId,
         }),
       });
 
@@ -429,10 +394,10 @@ export function DatePlannerSection({ onOpenAccessModal }: DatePlannerSectionProp
 
   // Delete Memory
   const handleDeleteMemory = async (id: string): Promise<boolean> => {
-    const token = localStorage.getItem("gift_auth_token") || "";
     try {
-      const res = await fetch(`/api/dates/memories?id=${encodeURIComponent(id)}&token=${encodeURIComponent(token)}&role=${currentRole}`, {
+      const res = await fetch(`/api/dates/memories?id=${encodeURIComponent(id)}&giftId=${encodeURIComponent(activeGiftId)}`, {
         method: "DELETE",
+        headers: getUnlockHeaders(activeGiftId),
       });
 
       if (res.ok) {

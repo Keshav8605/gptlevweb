@@ -28,6 +28,7 @@ import { FinalHeartSection } from "@/components/sections/FinalHeartSection";
 import { ParticipantAccessModal } from "@/components/auth/ParticipantAccessModal";
 import { CreatorStudio } from "@/components/creator/CreatorStudio";
 import { scrollToChapter } from "@/lib/motion";
+import { storeUnlockToken } from "@/lib/client-auth";
 
 function GiftRecipientContent({
   params,
@@ -84,12 +85,19 @@ function GiftRecipientContent({
       if (data.isLocked) {
         setIsLocked(true);
         setIsLoading(false);
+        if (passcode) {
+          setPasscodeError("Incorrect secret passcode. Please try again.");
+        }
         return;
       }
 
       if (data.gift) {
         setGift(data.gift);
         setIsLocked(false);
+        setPasscodeError("");
+        if (data.unlockToken) {
+          storeUnlockToken(slug, data.unlockToken, data.gift.id);
+        }
       }
     } catch {
       setErrorStatus("Unable to open this gift right now.");
@@ -346,6 +354,7 @@ function GiftRecipientContent({
               return (
                 <NotebookSection
                   key="notebook"
+                  giftId={gift.id}
                   onOpenAccessModal={() => setIsAccessModalOpen(true)}
                 />
               );
@@ -354,6 +363,7 @@ function GiftRecipientContent({
               return (
                 <VoiceMessageSection
                   key="voice"
+                  giftId={gift.id}
                   onOpenAccessModal={() => setIsAccessModalOpen(true)}
                 />
               );
@@ -362,6 +372,7 @@ function GiftRecipientContent({
               return (
                 <DatePlannerSection
                   key="datePlanner"
+                  giftId={gift.id}
                   onOpenAccessModal={() => setIsAccessModalOpen(true)}
                 />
               );
@@ -491,6 +502,7 @@ function GiftRecipientContent({
       />
       <ParticipantAccessModal
         isOpen={isAccessModalOpen}
+        giftId={gift.id}
         onClose={() => setIsAccessModalOpen(false)}
       />
     </main>

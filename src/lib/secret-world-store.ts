@@ -1,6 +1,9 @@
 // Server-side store for Secret World verification, hints, and content.
 // Private content is verified on the server and never exposed in client bundles.
-// Isolated per creator to prevent cross-customer leakage.
+// Stored persistently inside gift records in relationship-database.json.
+
+import { loadDatabase, saveDatabase, type GiftRecord } from "./server-db";
+import { hashPasscode, verifyPasscode } from "./secrets";
 
 export interface SecretWorldConfig {
   password: string;
@@ -9,23 +12,6 @@ export interface SecretWorldConfig {
   letter: string;
   photos: string[];
 }
-
-const defaultSecretConfig: SecretWorldConfig = {
-  password: "iloveyou",
-  hint: "Three words, no spaces, all lowercase — the simplest truth I know 💕",
-  title: "You found your way in, my love. ♡",
-  letter:
-    "You found it. 🥺\n\nThis secret space is just for us. No one else in the world knows this exists.\n\nI wanted you to have a place where you know, without any doubt, how much you mean to me. Not in big gestures or fancy words — but in the quiet, honest truth:\n\nYou are my favorite person. My best friend. My safe place. My greatest adventure.\n\nI don't need the world to know. I just need YOU to know.\n\nI love you. Endlessly. Completely. Always.",
-  photos: [
-    "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=800&auto=format&fit=crop&q=80",
-    "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800&auto=format&fit=crop&q=80",
-  ],
-};
-
-// Tenant-isolated store mapping creatorId/giftId -> SecretWorldConfig
-const secretConfigMap = new Map<string, SecretWorldConfig>();
-secretConfigMap.set("default", defaultSecretConfig);
-secretConfigMap.set("gift_world_demo", defaultSecretConfig);
 
 // Rate limiting state: IP/Client -> { attempts: number, lockedUntil: number }
 interface RateLimitRecord {
@@ -38,10 +24,23 @@ const rateLimitMap = new Map<string, RateLimitRecord>();
 const MAX_ATTEMPTS = 5;
 const LOCKOUT_MS = 30 * 1000; // 30 second cooldown
 
+function resolveGift(key: string): GiftRecord | null {
+  const db = loadDatabase();
+  if (key && key !== "default") {
+    const byId = db.gifts.find((g) => g.id === key);
+    if (byId) return byId;
+    const bySlug = db.gifts.find((g) => g.slug === key);
+    if (bySlug) return bySlug;
+    const byCreator = db.gifts.find((g) => g.creatorId === key);
+    if (byCreator) return byCreator;
+  }
+  return db.gifts.find((g) => g.id === "gift_world_demo") || null;
+}
+
 export function getPublicSecretHint(key: string = "default"): { hint: string } {
-  const config = secretConfigMap.get(key) || defaultSecretConfig;
+  const gift = resolveGift(key);
   return {
-    hint: config.hint,
+    hint: gift?.secretHint || "",
   };
 }
 
@@ -79,21 +78,41 @@ export function verifySecretPassword(
     };
   }
 
-  const targetConfig = secretConfigMap.get(ownerKey) || defaultSecretConfig;
+  const gift = resolveGift(ownerKey);
 
-  // Normalize comparison
-  const normalizedAttempt = attempt.trim().toLowerCase();
-  const normalizedTarget = targetConfig.password.trim().toLowerCase();
+  // If no password is set on the gift, the secret chamber must stay locked
+  if (!gift || !gift.secretPassword || !gift.secretPassword.trim()) {
+    return {
+      success: false,
+      error: "The secret chamber is locked. No secret passcode has been configured by the creator.",
+    };
+  }
 
-  if (normalizedAttempt === normalizedTarget) {
+  const normalizedAttempt = attempt.trim();
+  const check = verifyPasscode(normalizedAttempt, gift.secretPassword);
+
+  if (check.valid) {
     // Reset rate limiting on success
     rateLimitMap.delete(clientKey);
+
+    // Rehash if legacy plaintext was verified
+    if (check.needsRehash) {
+      gift.secretPassword = hashPasscode(normalizedAttempt);
+      const db = loadDatabase();
+      saveDatabase(db);
+    }
+
     return {
       success: true,
       content: {
-        title: targetConfig.title,
-        letter: targetConfig.letter,
-        photos: targetConfig.photos,
+        title: "You found your way in, my love. ♡",
+        letter:
+          gift.secretContent ||
+          "You found it. 🥺\n\nThis secret space is just for us. No one else in the world knows this exists.\n\nI love you. Endlessly. Completely. Always.",
+        photos: [
+          "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=800&auto=format&fit=crop&q=80",
+          "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800&auto=format&fit=crop&q=80",
+        ],
       },
     };
   }
@@ -122,15 +141,48 @@ export function updateSecretConfig(
   newConfig: Partial<SecretWorldConfig>,
   ownerKey: string = "default"
 ): { success: boolean; config: SecretWorldConfig } {
-  const current = secretConfigMap.get(ownerKey) || { ...defaultSecretConfig };
-  const updated = {
-    ...current,
-    ...newConfig,
+  const db = loadDatabase();
+  const gift = resolveGift(ownerKey);
+
+  if (gift) {
+    if (newConfig.password !== undefined && newConfig.password !== "") {
+      gift.secretPassword = newConfig.password.startsWith("scrypt$")
+        ? newConfig.password
+        : hashPasscode(newConfig.password);
+    }
+    if (newConfig.hint !== undefined) {
+      gift.secretHint = newConfig.hint;
+    }
+    if (newConfig.letter !== undefined) {
+      gift.secretContent = newConfig.letter;
+    }
+    saveDatabase(db);
+  }
+
+  const sanitized: SecretWorldConfig = {
+    password: gift?.secretPassword ? "••••••••" : "",
+    hint: gift?.secretHint || "",
+    title: "You found your way in, my love. ♡",
+    letter: gift?.secretContent || "",
+    photos: [
+      "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800&auto=format&fit=crop&q=80",
+    ],
   };
-  secretConfigMap.set(ownerKey, updated);
-  return { success: true, config: updated };
+
+  return { success: true, config: sanitized };
 }
 
 export function getFullSecretConfigForCreator(ownerKey: string = "default"): SecretWorldConfig {
-  return secretConfigMap.get(ownerKey) || { ...defaultSecretConfig };
+  const gift = resolveGift(ownerKey);
+  return {
+    password: gift?.secretPassword ? "••••••••" : "",
+    hint: gift?.secretHint || "",
+    title: "You found your way in, my love. ♡",
+    letter: gift?.secretContent || "",
+    photos: [
+      "https://images.unsplash.com/photo-1518199266791-5375a83190b7?w=800&auto=format&fit=crop&q=80",
+      "https://images.unsplash.com/photo-1516589178581-6cd7833ae3b2?w=800&auto=format&fit=crop&q=80",
+    ],
+  };
 }

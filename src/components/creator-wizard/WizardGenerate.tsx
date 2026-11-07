@@ -13,14 +13,22 @@ interface WizardGenerateProps {
 export function WizardGenerate({ config, onBack }: WizardGenerateProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedSlug, setGeneratedSlug] = useState<string | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [rawInviteToken, setRawInviteToken] = useState<string | null>(null);
+  const [creatorPasscode, setCreatorPasscode] = useState<string>("love2024");
+  const [copiedLink, setCopiedLink] = useState(false);
+  const [copiedPasscode, setCopiedPasscode] = useState(false);
+  const [copiedAll, setCopiedAll] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isAuthError, setIsAuthError] = useState(false);
 
   const handleGenerate = async () => {
     setIsGenerating(true);
     setErrorMessage(null);
+    setIsAuthError(false);
 
     try {
+      const enteredPasscode = config.secretWorld.password?.trim() || "love2024";
+
       // Assemble full GiftRecord payload
       const payload = {
         title: config.websiteTitle.trim() || "Dear, Us",
@@ -32,7 +40,9 @@ export function WizardGenerate({ config, onBack }: WizardGenerateProps) {
         welcomeTitle: config.welcome.heading || config.websiteTitle,
         welcomeEyebrow: config.welcome.eyebrowLabel,
         welcomeHandwrittenNote: config.welcome.handwrittenNote,
-        welcomeSubtitle: config.welcome.subtitle || "A little world made from my favorite person, our little moments, and all the things I sometimes struggle to put into words.",
+        welcomeSubtitle:
+          config.welcome.subtitle ||
+          "A little world made from my favorite person, our little moments, and all the things I sometimes struggle to put into words.",
         welcomeMessage: config.welcome.quote || config.welcome.message || config.openingLine,
         welcomePolaroids: config.welcome.polaroids,
         welcomeButtonText: config.welcome.buttonText,
@@ -41,7 +51,7 @@ export function WizardGenerate({ config, onBack }: WizardGenerateProps) {
         sectionOrder: config.chapterOrder,
         finalLetter: config.finalHeart.finalMessage,
         finalMessage: config.finalHeart.finalMessage,
-        secretPassword: config.secretWorld.password || "iloveyou",
+        secretPassword: enteredPasscode,
         secretHint: config.secretWorld.hint || "Three words, no spaces...",
         secretContent: config.secretWorld.secretLetter,
         featuredSong: {
@@ -80,9 +90,8 @@ export function WizardGenerate({ config, onBack }: WizardGenerateProps) {
         finalCollagePhotos: config.finalHeart.collagePhotos,
         designPreferences: config.preferences,
         privacy: {
-          isPasswordProtected: false,
-          passcode: "love2024",
-          recipientInviteToken: `us-${Math.random().toString(36).slice(2, 7)}`,
+          isPasswordProtected: Boolean(config.secretWorld.password?.trim()),
+          passcode: enteredPasscode,
           invitationStatus: "active",
           allowResponses: true,
           allowRecipientContributions: true,
@@ -97,34 +106,53 @@ export function WizardGenerate({ config, onBack }: WizardGenerateProps) {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to create gift on server");
+        if (res.status === 401) {
+          setIsAuthError(true);
+          setErrorMessage("Please log in to create your gift");
+          return;
+        }
+        const errorData = await res.json().catch(() => ({}));
+        setErrorMessage(errorData.error || "Failed to create gift on server. Please try again.");
+        return;
       }
 
       const data = await res.json();
       const slug = data.gift?.slug || "our-story";
+      const rawToken = data.rawInviteToken || "";
       setGeneratedSlug(slug);
+      setRawInviteToken(rawToken);
+      setCreatorPasscode(enteredPasscode);
     } catch (err) {
       console.error("Generation error", err);
-      // Fallback local slug
-      const localSlug = (config.websiteTitle || "dear-us")
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, "-")
-        .replace(/(^-|-$)/g, "");
-      setGeneratedSlug(localSlug || "dear-us");
+      setErrorMessage("Network error: Unable to connect to server. Please try again.");
     } finally {
       setIsGenerating(false);
     }
   };
 
   const getFullShareUrl = () => {
-    if (typeof window === "undefined") return `/gift/${generatedSlug}`;
-    return `${window.location.origin}/gift/${generatedSlug}`;
+    const query = rawInviteToken ? `?token=${encodeURIComponent(rawInviteToken)}` : "";
+    if (typeof window === "undefined") return `/gift/${generatedSlug}${query}`;
+    return `${window.location.origin}/gift/${generatedSlug}${query}`;
   };
 
-  const copyToClipboard = () => {
+  const copyLink = () => {
     navigator.clipboard.writeText(getFullShareUrl());
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
+    setCopiedLink(true);
+    setTimeout(() => setCopiedLink(false), 2000);
+  };
+
+  const copyPasscode = () => {
+    navigator.clipboard.writeText(creatorPasscode);
+    setCopiedPasscode(true);
+    setTimeout(() => setCopiedPasscode(false), 2000);
+  };
+
+  const copyAll = () => {
+    const text = `💌 A special romantic world for you:\nInvite Link: ${getFullShareUrl()}\nPasscode: ${creatorPasscode}`;
+    navigator.clipboard.writeText(text);
+    setCopiedAll(true);
+    setTimeout(() => setCopiedAll(false), 2000);
   };
 
   return (
@@ -184,10 +212,32 @@ export function WizardGenerate({ config, onBack }: WizardGenerateProps) {
             </motion.button>
           </div>
 
+          {/* Error Message Box */}
           {errorMessage && (
-            <p className="text-xs font-rounded text-rose-500 font-semibold mt-2">
-              {errorMessage}
-            </p>
+            <div className="pt-2">
+              {isAuthError ? (
+                <div className="p-5 rounded-2xl bg-rose-50/90 border border-rose-200 text-rose-800 text-sm font-rounded space-y-3 text-center max-w-md mx-auto shadow-sm">
+                  <div className="text-2xl">🔒</div>
+                  <p className="font-bold text-rose-700">Please log in to create your gift</p>
+                  <p className="text-xs text-rose-600 leading-relaxed">
+                    You must be logged in with a creator account to save and manage your relationship website.
+                  </p>
+                  <div className="pt-1">
+                    <Link
+                      href="/login?next=/create"
+                      className="inline-flex items-center gap-2 px-6 py-2.5 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs font-bold hover:opacity-90 transition-opacity shadow-md shadow-pink-200"
+                    >
+                      <span>Log In to Continue</span>
+                      <span>→</span>
+                    </Link>
+                  </div>
+                </div>
+              ) : (
+                <div className="p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs font-rounded text-rose-600 font-semibold max-w-md mx-auto">
+                  {errorMessage}
+                </div>
+              )}
+            </div>
           )}
         </motion.div>
       ) : (
@@ -215,25 +265,76 @@ export function WizardGenerate({ config, onBack }: WizardGenerateProps) {
             <strong>{config.recipientNickname}</strong>.
           </p>
 
-          {/* Shareable Link Box */}
-          <div className="bg-[var(--pale-rose)]/50 p-4 sm:p-5 rounded-2xl border border-[var(--pink-primary)]/30 max-w-lg mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-            <span className="font-mono text-xs text-[var(--text-primary)] truncate max-w-xs sm:max-w-sm">
-              {getFullShareUrl()}
-            </span>
+          {/* Recipient Credentials Box */}
+          <div className="bg-[var(--pale-rose)]/40 p-5 sm:p-6 rounded-3xl border border-[var(--pink-primary)]/30 max-w-xl mx-auto space-y-4 text-left">
+            {/* Full Partner Invite Link */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--pink-strong)] font-rounded block">
+                💌 Partner Invite Link (With Secret Token)
+              </label>
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 bg-white p-2.5 rounded-2xl border border-[var(--border-subtle)] shadow-2xs">
+                <input
+                  type="text"
+                  readOnly
+                  value={getFullShareUrl()}
+                  className="font-mono text-xs text-[var(--text-primary)] bg-transparent border-none outline-none flex-1 px-2 select-all truncate"
+                />
+                <button
+                  type="button"
+                  onClick={copyLink}
+                  className="px-4 py-2 rounded-xl bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white text-xs font-rounded font-bold hover:opacity-90 cursor-pointer transition-opacity shrink-0 shadow-2xs"
+                >
+                  {copiedLink ? "✓ Copied!" : "Copy Link"}
+                </button>
+              </div>
+            </div>
 
-            <button
-              type="button"
-              onClick={copyToClipboard}
-              className="px-4 py-2 rounded-xl bg-white border border-[var(--pink-primary)] text-xs font-rounded font-bold text-[var(--pink-strong)] hover:bg-[var(--soft-pink)] cursor-pointer transition-colors shrink-0 shadow-2xs"
-            >
-              {copied ? "✓ Copied!" : "Copy Link 💌"}
-            </button>
+            {/* Secret Passcode */}
+            <div className="space-y-1.5">
+              <label className="text-xs font-bold uppercase tracking-wider text-[var(--pink-strong)] font-rounded block">
+                🔐 Unlock Passcode
+              </label>
+              <div className="flex items-center justify-between gap-2 bg-white p-2.5 rounded-2xl border border-[var(--border-subtle)] shadow-2xs">
+                <span className="font-mono text-sm font-bold text-[var(--romantic-plum)] px-2">
+                  {creatorPasscode}
+                </span>
+                <button
+                  type="button"
+                  onClick={copyPasscode}
+                  className="px-4 py-2 rounded-xl bg-white border border-[var(--pink-primary)] text-[var(--pink-strong)] text-xs font-rounded font-bold hover:bg-[var(--pale-rose)] cursor-pointer transition-colors shrink-0 shadow-2xs"
+                >
+                  {copiedPasscode ? "✓ Copied!" : "Copy Passcode"}
+                </button>
+              </div>
+            </div>
+
+            {/* One-time Warning Note */}
+            <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-200/80 text-amber-900 text-xs font-rounded flex items-start gap-2.5">
+              <span className="text-base shrink-0">⚠️</span>
+              <div className="space-y-0.5">
+                <p className="font-bold text-amber-950">Save this now. It can&apos;t be shown again.</p>
+                <p className="text-amber-800 leading-relaxed">
+                  For your relationship&apos;s privacy, tokens and passcodes are cryptographically hashed on the server and cannot be retrieved after leaving this page.
+                </p>
+              </div>
+            </div>
+
+            {/* Copy All Button */}
+            <div className="pt-1 text-center">
+              <button
+                type="button"
+                onClick={copyAll}
+                className="w-full py-2.5 rounded-xl border border-[var(--pink-primary)] bg-white text-xs font-rounded font-bold text-[var(--pink-strong)] hover:bg-[var(--pale-rose)] cursor-pointer transition-colors shadow-2xs"
+              >
+                {copiedAll ? "✓ Copied Link & Passcode!" : "Copy Both Link & Passcode 📋"}
+              </button>
+            </div>
           </div>
 
           {/* Action Navigation */}
           <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link
-              href={`/gift/${generatedSlug}`}
+              href={getFullShareUrl()}
               className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-gradient-to-r from-[var(--pink-primary)] to-[var(--pink-strong)] text-white font-rounded font-bold text-sm sm:text-base shadow-lg shadow-pink-300/40 hover:shadow-xl cursor-pointer transition-all inline-flex items-center justify-center gap-2"
             >
               <span>Visit Your Website Now 🚀</span>

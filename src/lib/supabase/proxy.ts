@@ -43,13 +43,25 @@ export async function updateSession(request: NextRequest) {
   });
 
   // Verify and refresh session token
-  const { data: claimsData } = await supabase.auth.getClaims();
-  const user = claimsData?.claims;
+  let user: any = null;
+  try {
+    const { data: userData, error } = await supabase.auth.getUser();
+    if (!error && userData?.user) {
+      user = userData.user;
+    }
+  } catch {
+    // Unauthenticated
+  }
 
   const pathname = request.nextUrl.pathname;
 
-  // 1. Protect /dashboard route - unauthenticated users get redirected to /login
-  if (pathname.startsWith("/dashboard") && !user) {
+  // 1. Protect /create, /studio, and /dashboard routes - unauthenticated visitors are redirected to /login with redirect-back
+  const isProtectedPath =
+    pathname.startsWith("/create") ||
+    pathname.startsWith("/studio") ||
+    pathname.startsWith("/dashboard");
+
+  if (isProtectedPath && !user) {
     const redirectUrl = request.nextUrl.clone();
     redirectUrl.pathname = "/login";
     redirectUrl.searchParams.set("next", pathname);
@@ -60,10 +72,16 @@ export async function updateSession(request: NextRequest) {
     return redirectResponse;
   }
 
-  // 2. Redirect logged-in users away from /login and /signup to /dashboard
+  // 2. Redirect logged-in users away from /login and /signup to their destination or /dashboard
   if ((pathname === "/login" || pathname === "/signup") && user) {
     const redirectUrl = request.nextUrl.clone();
-    redirectUrl.pathname = "/dashboard";
+    const nextParam = request.nextUrl.searchParams.get("next");
+    if (nextParam && nextParam.startsWith("/") && !nextParam.startsWith("//")) {
+      redirectUrl.pathname = nextParam;
+    } else {
+      redirectUrl.pathname = "/dashboard";
+    }
+    redirectUrl.search = "";
     const redirectResponse = NextResponse.redirect(redirectUrl);
     supabaseResponse.cookies.getAll().forEach((cookie) => {
       redirectResponse.cookies.set(cookie);

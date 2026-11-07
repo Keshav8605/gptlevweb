@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { RomanticCharacter } from "../RomanticCharacter";
 import type { JournalEntry, JournalReply } from "@/lib/server-db";
+import { getUnlockHeaders } from "@/lib/client-auth";
 
 const notebookPrompts = [
   "Something that made me think of you today",
@@ -21,21 +22,17 @@ interface NotebookSectionProps {
   currentUserRole?: "creator" | "recipient";
   currentUserName?: string;
   onOpenAccessModal?: () => void;
+  giftId?: string;
 }
 
 export function NotebookSection({
-  currentUserRole,
-  currentUserName,
+  currentUserRole = "recipient",
+  currentUserName = "Baby",
   onOpenAccessModal,
+  giftId,
 }: NotebookSectionProps) {
-  const [role, setRole] = useState<"creator" | "recipient">(() => {
-    if (typeof window === "undefined") return currentUserRole || "recipient";
-    return currentUserRole || (localStorage.getItem("gift_participant_role") as "creator" | "recipient") || "recipient";
-  });
-  const [name, setName] = useState<string>(() => {
-    if (typeof window === "undefined") return currentUserName || "Baby";
-    return currentUserName || localStorage.getItem("gift_participant_name") || (role === "creator" ? "Babe" : "Baby");
-  });
+  const [role] = useState<"creator" | "recipient">(currentUserRole);
+  const [name] = useState<string>(currentUserName);
 
   const [entries, setEntries] = useState<JournalEntry[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -65,19 +62,12 @@ export function NotebookSection({
   const [editReplyContent, setEditReplyContent] = useState("");
   const [isSavingReplyEdit, setIsSavingReplyEdit] = useState(false);
 
-  useEffect(() => {
-    const handleStorage = () => {
-      const savedRole = currentUserRole || (localStorage.getItem("gift_participant_role") as "creator" | "recipient") || "recipient";
-      setRole(savedRole);
-      setName(currentUserName || localStorage.getItem("gift_participant_name") || (savedRole === "creator" ? "Babe" : "Baby"));
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, [currentUserRole, currentUserName]);
+  const activeGiftId = giftId || "default";
 
   const fetchEntries = () => {
     setIsLoading(true);
-    fetch("/api/notebook")
+    const headers = getUnlockHeaders(activeGiftId);
+    fetch(`/api/notebook?giftId=${encodeURIComponent(activeGiftId)}`, { headers })
       .then((res) => res.json())
       .then((data) => {
         if (data.entries) setEntries(data.entries);
@@ -90,7 +80,7 @@ export function NotebookSection({
 
   useEffect(() => {
     fetchEntries();
-  }, []);
+  }, [activeGiftId]);
 
   const handleCreateEntry = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -100,14 +90,13 @@ export function NotebookSection({
     try {
       const res = await fetch("/api/notebook", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
+          giftId: activeGiftId,
           title: entryTitle.trim(),
           content: entryContent.trim(),
           prompt: selectedPrompt || undefined,
           moodEmoji: selectedMood,
-          role,
-          name,
         }),
       });
 
@@ -149,15 +138,14 @@ export function NotebookSection({
     try {
       const res = await fetch("/api/notebook", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
+          giftId: activeGiftId,
           id: entryId,
           title: editTitle.trim(),
           content: editContent.trim(),
           prompt: editPrompt || undefined,
           moodEmoji: editMood,
-          role,
-          name,
         }),
       });
 
@@ -178,8 +166,8 @@ export function NotebookSection({
     if (!confirm("Are you sure you want to remove this sweet note from our notebook?")) return;
     try {
       const res = await fetch(
-        `/api/notebook?id=${entryId}&role=${role}&name=${encodeURIComponent(name)}`,
-        { method: "DELETE" }
+        `/api/notebook?id=${encodeURIComponent(entryId)}&giftId=${encodeURIComponent(activeGiftId)}`,
+        { method: "DELETE", headers: getUnlockHeaders(activeGiftId) }
       );
       if (res.ok) {
         setEntries((prev) => prev.filter((item) => item.id !== entryId));
@@ -205,14 +193,13 @@ export function NotebookSection({
     try {
       const res = await fetch("/api/notebook", {
         method: "PUT",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
+          giftId: activeGiftId,
           action: "updateReply",
           entryId,
           replyId,
           content: editReplyContent.trim(),
-          role,
-          name,
         }),
       });
 
@@ -242,8 +229,8 @@ export function NotebookSection({
     if (!confirm("Are you sure you want to remove this little note reply?")) return;
     try {
       const res = await fetch(
-        `/api/notebook?id=${entryId}&replyId=${replyId}&role=${role}&name=${encodeURIComponent(name)}`,
-        { method: "DELETE" }
+        `/api/notebook?id=${encodeURIComponent(entryId)}&replyId=${encodeURIComponent(replyId)}&giftId=${encodeURIComponent(activeGiftId)}`,
+        { method: "DELETE", headers: getUnlockHeaders(activeGiftId) }
       );
       if (res.ok) {
         setEntries((prev) =>
@@ -265,13 +252,12 @@ export function NotebookSection({
     try {
       const res = await fetch("/api/notebook", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
+          giftId: activeGiftId,
           action: "reply",
           entryId,
           content: text,
-          role,
-          name,
         }),
       });
 
@@ -294,13 +280,12 @@ export function NotebookSection({
     try {
       const res = await fetch("/api/notebook", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
+          giftId: activeGiftId,
           action: "react",
           entryId,
           emoji,
-          role,
-          name,
         }),
       });
 

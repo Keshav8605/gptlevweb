@@ -1,18 +1,33 @@
 import { NextResponse } from "next/server";
 import { verifyAccess, updateCoupleConfig, getCoupleConfig } from "@/lib/server-db";
-import { getAuthenticatedCreator } from "@/lib/auth-guard";
+import { getAuthenticatedCreator, createGiftUnlockToken } from "@/lib/auth-guard";
 
 export async function POST(request: Request) {
   try {
     const body = await request.json();
     const token = body.token || body.passcode || "";
+    const giftId = (body.giftId || "gift_world_demo").trim();
 
-    const result = verifyAccess(token);
+    if (giftId !== "gift_world_demo") {
+      return NextResponse.json(
+        { authorized: false, role: "guest", name: "Guest", error: "Invalid access token or passcode." },
+        { status: 401 }
+      );
+    }
+
+    const result = verifyAccess(token, giftId);
     if (!result.authorized) {
       return NextResponse.json(result, { status: 401 });
     }
 
-    return NextResponse.json(result);
+    let unlockToken: string | undefined;
+    try {
+      unlockToken = createGiftUnlockToken(giftId);
+    } catch {
+      // Non-blocking
+    }
+
+    return NextResponse.json({ ...result, unlockToken });
   } catch {
     return NextResponse.json({ authorized: false, error: "Invalid request" }, { status: 400 });
   }
@@ -21,9 +36,16 @@ export async function POST(request: Request) {
 export async function GET(request: Request) {
   const url = new URL(request.url);
   const token = url.searchParams.get("token") || url.searchParams.get("passcode") || "";
+  const giftId = (url.searchParams.get("giftId") || "gift_world_demo").trim();
 
   if (token) {
-    const result = verifyAccess(token);
+    if (giftId !== "gift_world_demo") {
+      return NextResponse.json(
+        { authorized: false, role: "guest", name: "Guest", error: "Invalid access token or passcode." },
+        { status: 401 }
+      );
+    }
+    const result = verifyAccess(token, giftId);
     return NextResponse.json(result);
   }
 

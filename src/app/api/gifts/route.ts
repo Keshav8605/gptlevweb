@@ -14,31 +14,22 @@ export async function GET(request: Request) {
       );
     }
 
-    // If verified creator, list their gifts (and the public demo gift)
+    // If verified creator, return only gifts where creatorId === auth.userId
     if (auth.authenticated && auth.userId) {
-      const creatorGifts = getGifts(auth.userId);
+      const creatorGifts = getGifts(auth.userId).filter((g) => g.creatorId === auth.userId);
       return NextResponse.json({ success: true, gifts: creatorGifts });
     }
 
-    // Public / unauthenticated visitors only see published gifts, fully sanitized
-    const publicGifts = getGifts()
-      .filter((g) => g.status === "published")
-      .map((g) => ({
-        ...g,
-        secretPassword: undefined,
-        secretContent: undefined,
-        privacy: {
-          isPasswordProtected: g.privacy.isPasswordProtected,
-          invitationStatus: g.privacy.invitationStatus,
-          allowResponses: g.privacy.allowResponses,
-          allowRecipientContributions: g.privacy.allowRecipientContributions,
-        },
-      }));
+    // Public / unauthenticated visitors only see the public demo gift with safe fields only (id, title, slug)
+    const demoGift = getGiftById("gift_world_demo");
+    const safeDemoGifts = demoGift
+      ? [{ id: demoGift.id, title: demoGift.title, slug: demoGift.slug }]
+      : [];
 
-    return NextResponse.json({ success: true, gifts: publicGifts });
+    return NextResponse.json({ success: true, gifts: safeDemoGifts });
   } catch (err) {
     console.error("GET /api/gifts error:", err);
-    return NextResponse.json({ error: "Failed to list gifts" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch gifts" }, { status: 500 });
   }
 }
 
@@ -61,30 +52,47 @@ export async function POST(request: Request) {
     if (targetSourceId) {
       const sourceGift = getGiftById(targetSourceId);
       if (!sourceGift) {
-        return NextResponse.json({ error: "Gift to duplicate not found" }, { status: 404 });
+        return NextResponse.json({ error: "Source gift not found for duplication" }, { status: 404 });
       }
 
-      // For every unpublished gift, only the actual owner may duplicate it.
-      // Reject duplication when creatorId is missing or does not match the authenticated creator.
+      // If source gift is unpublished, require creator ownership to duplicate
       if (sourceGift.status !== "published") {
         if (!sourceGift.creatorId || sourceGift.creatorId !== auth.userId) {
           return NextResponse.json(
-            { error: "Forbidden. Only the owner may duplicate an unpublished gift." },
+            { error: "Forbidden. Cannot duplicate unpublished draft belonging to another creator." },
             { status: 403 }
           );
         }
       }
 
-      const cloned = duplicateGift(targetSourceId, auth.userId);
-      if (!cloned) {
+      const duplicated = duplicateGift(targetSourceId, auth.userId);
+      if (!duplicated) {
         return NextResponse.json({ error: "Failed to duplicate gift" }, { status: 500 });
       }
-      return NextResponse.json({ success: true, gift: cloned });
+
+      return NextResponse.json({ success: true, gift: duplicated });
     }
 
-    // 3. Create new gift bound to authenticated creator ID
+    // 3. Create fresh gift strictly bound to verified creator
     const created = createGift(giftData, auth.userId);
-    return NextResponse.json({ success: true, gift: created });
+    const rawInviteToken = created.rawInviteToken;
+
+    // Sanitize gift so hashes are stripped from the response
+    const safeGift = {
+      ...created,
+      rawInviteToken: undefined,
+      privacy: {
+        ...created.privacy,
+        recipientInviteToken: undefined,
+        passcode: undefined,
+      },
+    };
+
+    return NextResponse.json({
+      success: true,
+      gift: safeGift,
+      rawInviteToken,
+    });
   } catch (err) {
     console.error("POST /api/gifts error:", err);
     return NextResponse.json({ error: "Failed to create gift" }, { status: 500 });

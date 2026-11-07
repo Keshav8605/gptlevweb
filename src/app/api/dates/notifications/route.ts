@@ -2,19 +2,23 @@ import { NextResponse } from "next/server";
 import {
   getDateNotifications,
   markNotificationsAsRead,
-  verifyAccess,
 } from "@/lib/server-db";
+import { requireGiftAccess } from "@/lib/access-guard";
 
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
-    const token = url.searchParams.get("token") || "";
-    const roleParam = url.searchParams.get("role") || "recipient";
+    const giftId = url.searchParams.get("giftId");
+    if (!giftId) {
+      return NextResponse.json({ error: "giftId parameter is required" }, { status: 400 });
+    }
 
-    const auth = token ? verifyAccess(token) : { authorized: true, role: roleParam as "creator" | "recipient" };
-    const role = (auth.authorized ? auth.role : roleParam) as "creator" | "recipient";
+    const access = await requireGiftAccess(request, giftId);
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error }, { status: access.status });
+    }
 
-    const notifications = getDateNotifications(role);
+    const notifications = getDateNotifications(access.role, giftId);
     const unreadCount = notifications.filter((n) => !n.isRead).length;
 
     return NextResponse.json({ success: true, notifications, unreadCount });
@@ -26,13 +30,26 @@ export async function GET(request: Request) {
 
 export async function PATCH(request: Request) {
   try {
-    const body = await request.json();
-    const { ids, token, role: roleParam } = body;
+    let body: Record<string, unknown> = {};
+    try {
+      body = (await request.json()) as Record<string, unknown>;
+    } catch {
+      return NextResponse.json({ error: "Malformed request payload" }, { status: 400 });
+    }
 
-    const auth = token ? verifyAccess(token) : { authorized: true, role: roleParam || "recipient" };
-    const role = (auth.authorized ? auth.role : (roleParam || "recipient")) as "creator" | "recipient";
+    const url = new URL(request.url);
+    const giftId = (typeof body?.giftId === "string" ? body.giftId : null) || url.searchParams.get("giftId");
+    if (!giftId) {
+      return NextResponse.json({ error: "giftId is required" }, { status: 400 });
+    }
 
-    markNotificationsAsRead(ids || "all", role);
+    const access = await requireGiftAccess(request, giftId);
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error }, { status: access.status });
+    }
+
+    const ids = Array.isArray(body?.ids) ? (body.ids as string[]) : "all";
+    markNotificationsAsRead(ids, access.role);
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("PATCH /api/dates/notifications error:", err);

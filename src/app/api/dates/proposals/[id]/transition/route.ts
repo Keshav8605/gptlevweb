@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { transitionDateProposal, verifyAccess } from "@/lib/server-db";
+import { transitionDateProposal, getDateProposal, type ItineraryStop } from "@/lib/server-db";
+import { requireGiftAccess } from "@/lib/access-guard";
 
 export async function POST(
   request: Request,
@@ -7,23 +8,54 @@ export async function POST(
 ) {
   try {
     const { id } = await context.params;
-    const body = await request.json();
-    const { action, note, proposedDate, proposedStartTime, itinerary, reason, token, role: roleParam, name: nameParam } = body;
+    let body: Record<string, unknown> = {};
+    try {
+      body = (await request.json()) as Record<string, unknown>;
+    } catch {
+      return NextResponse.json({ error: "Malformed request payload" }, { status: 400 });
+    }
+
+    const action = typeof body?.action === "string" ? body.action : "";
+    const note = typeof body?.note === "string" ? body.note : undefined;
+    const proposedDate = typeof body?.proposedDate === "string" ? body.proposedDate : undefined;
+    const proposedStartTime = typeof body?.proposedStartTime === "string" ? body.proposedStartTime : undefined;
+    const itinerary = Array.isArray(body?.itinerary) ? (body.itinerary as unknown as ItineraryStop[]) : undefined;
+    const reason = typeof body?.reason === "string" ? body.reason : undefined;
 
     if (!action) {
       return NextResponse.json({ error: "Action is required" }, { status: 400 });
     }
 
-    const auth = token ? verifyAccess(token) : { authorized: true, role: roleParam || "recipient", name: nameParam || "Baby" };
-    const role = (auth.authorized ? auth.role : (roleParam || "recipient")) as "creator" | "recipient";
-    const name = auth.authorized ? auth.name : (nameParam || (role === "creator" ? "Babe" : "Baby"));
+    const url = new URL(request.url);
+    let giftId = (typeof body?.giftId === "string" ? body.giftId : null) || url.searchParams.get("giftId");
+
+    if (!giftId) {
+      const p = getDateProposal(id);
+      if (p?.giftId) {
+        giftId = p.giftId;
+      }
+    }
+
+    if (!giftId) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
+    const access = await requireGiftAccess(request, giftId);
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error }, { status: access.status });
+    }
+
+    const proposal = getDateProposal(id);
+    if (!proposal || proposal.giftId !== giftId) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
 
     const result = transitionDateProposal(
       id,
-      action,
+      action as Parameters<typeof transitionDateProposal>[1],
       { note, proposedDate, proposedStartTime, itinerary, reason },
-      role,
-      name
+      access.role,
+      access.name
     );
 
     if (!result.success) {

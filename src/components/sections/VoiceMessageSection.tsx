@@ -5,26 +5,31 @@ import { useState, useEffect, useRef } from "react";
 import { SectionWrapper } from "../SectionWrapper";
 import { RomanticCharacter } from "../RomanticCharacter";
 import type { VoiceMessage } from "@/lib/server-db";
+import { getUnlockHeaders } from "@/lib/client-auth";
 
 interface VoiceMessageSectionProps {
   onOpenAccessModal?: () => void;
+  giftId?: string;
+  currentUserRole?: "creator" | "recipient";
+  currentUserName?: string;
 }
 
-export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionProps) {
+export function VoiceMessageSection({
+  onOpenAccessModal,
+  giftId,
+  currentUserRole = "recipient",
+  currentUserName = "Baby",
+}: VoiceMessageSectionProps) {
   // Current user role
-  const [role, setRole] = useState<"creator" | "recipient">(() => {
-    if (typeof window === "undefined") return "recipient";
-    return (localStorage.getItem("gift_participant_role") as "creator" | "recipient") || "recipient";
-  });
-  const [participantName, setParticipantName] = useState<string>(() => {
-    if (typeof window === "undefined") return "Baby";
-    return localStorage.getItem("gift_participant_name") || (role === "creator" ? "Babe" : "Baby");
-  });
+  const [role] = useState<"creator" | "recipient">(currentUserRole);
+  const [participantName] = useState<string>(currentUserName);
 
   // Voice messages list
   const [messages, setMessages] = useState<VoiceMessage[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const activeGiftId = giftId || "default";
 
   // Recorder states
   const [isRecording, setIsRecording] = useState(false);
@@ -46,7 +51,9 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
 
   // Fetch voice notes
   const fetchMessages = () => {
-    fetch("/api/voice")
+    fetch(`/api/voice?giftId=${encodeURIComponent(activeGiftId)}`, {
+      headers: getUnlockHeaders(activeGiftId),
+    })
       .then((res) => res.json())
       .then((data) => {
         if (data.success && Array.isArray(data.messages)) {
@@ -62,7 +69,9 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
 
   useEffect(() => {
     let isMounted = true;
-    fetch("/api/voice")
+    fetch(`/api/voice?giftId=${encodeURIComponent(activeGiftId)}`, {
+      headers: getUnlockHeaders(activeGiftId),
+    })
       .then((res) => res.json())
       .then((data) => {
         if (isMounted) {
@@ -79,17 +88,10 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
         }
       });
 
-    const handleStorage = () => {
-      const savedRole = (localStorage.getItem("gift_participant_role") as "creator" | "recipient") || "recipient";
-      setRole(savedRole);
-      setParticipantName(localStorage.getItem("gift_participant_name") || (savedRole === "creator" ? "Babe" : "Baby"));
-    };
-    window.addEventListener("storage", handleStorage);
     return () => {
       isMounted = false;
-      window.removeEventListener("storage", handleStorage);
     };
-  }, []);
+  }, [activeGiftId]);
 
   // Timer logic for recording
   useEffect(() => {
@@ -196,12 +198,11 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
         const base64Audio = reader.result as string;
         const res = await fetch("/api/voice", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
           body: JSON.stringify({
             audioData: base64Audio,
             durationSeconds: recordingSeconds || 5,
-            role,
-            name: participantName,
+            giftId: activeGiftId,
           }),
         });
 
@@ -261,8 +262,9 @@ export function VoiceMessageSection({ onOpenAccessModal }: VoiceMessageSectionPr
   const handleDelete = async (id: string) => {
     if (!confirm("Are you sure you want to delete this voice note?")) return;
     try {
-      const res = await fetch(`/api/voice?id=${id}&role=${role}`, {
+      const res = await fetch(`/api/voice?id=${encodeURIComponent(id)}&giftId=${encodeURIComponent(activeGiftId)}`, {
         method: "DELETE",
+        headers: getUnlockHeaders(activeGiftId),
       });
       const data = await res.json();
       if (data.success) {

@@ -7,6 +7,7 @@ import { CursorHeartTrail } from "@/components/CursorHeartTrail";
 import { GiftNavigation } from "@/components/GiftNavigation";
 import { CreatorStudio } from "@/components/creator/CreatorStudio";
 import { ParticipantAccessModal } from "@/components/auth/ParticipantAccessModal";
+import { storeUnlockToken } from "@/lib/client-auth";
 
 function StoryLayoutInner({ children }: { children: React.ReactNode }) {
   const [isCreatorStudioOpen, setIsCreatorStudioOpen] = useState(false);
@@ -26,10 +27,11 @@ function StoryLayoutInner({ children }: { children: React.ReactNode }) {
         .then((r) => r.json())
         .then((data) => {
           if (data.authorized) {
-            localStorage.setItem("gift_participant_role", data.role || "recipient");
-            localStorage.setItem("gift_participant_name", data.name || "Baby");
-            localStorage.setItem("gift_auth_token", invite);
-            window.dispatchEvent(new Event("storage"));
+            storeUnlockToken("default", data.unlockToken || invite);
+            try {
+              localStorage.setItem("gift_auth_token", invite);
+              window.dispatchEvent(new Event("storage"));
+            } catch {}
           }
         })
         .catch(() => {});

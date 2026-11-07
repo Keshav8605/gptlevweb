@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import type { ContentReaction, ContentComment } from "@/lib/server-db";
+import { getUnlockHeaders } from "@/lib/client-auth";
 
 interface SharedInteractionsProps {
   targetType: "observation" | "memory" | "letter" | "openWhen";
@@ -10,6 +11,7 @@ interface SharedInteractionsProps {
   currentUserRole?: "creator" | "recipient";
   currentUserName?: string;
   accentColor?: string;
+  giftId?: string;
 }
 
 const reactionEmojis = ["❤️", "🥺", "🥰", "😂", "✨"];
@@ -17,18 +19,10 @@ const reactionEmojis = ["❤️", "🥺", "🥰", "😂", "✨"];
 export function SharedInteractions({
   targetType,
   targetId,
-  currentUserRole,
-  currentUserName,
+  currentUserRole = "recipient",
+  currentUserName = "Baby",
+  giftId,
 }: SharedInteractionsProps) {
-  const [role, setRole] = useState<"creator" | "recipient">(() => {
-    if (typeof window === "undefined") return currentUserRole || "recipient";
-    return currentUserRole || (localStorage.getItem("gift_participant_role") as "creator" | "recipient") || "recipient";
-  });
-  const [name, setName] = useState<string>(() => {
-    if (typeof window === "undefined") return currentUserName || "Baby";
-    return currentUserName || localStorage.getItem("gift_participant_name") || (role === "creator" ? "Babe" : "Baby");
-  });
-
   const [reactions, setReactions] = useState<ContentReaction[]>([]);
   const [comments, setComments] = useState<ContentComment[]>([]);
   const [commentText, setCommentText] = useState("");
@@ -36,44 +30,36 @@ export function SharedInteractions({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [savedSuccess, setSavedSuccess] = useState(false);
 
-  useEffect(() => {
-    const handleStorage = () => {
-      const savedRole = currentUserRole || (localStorage.getItem("gift_participant_role") as "creator" | "recipient") || "recipient";
-      setRole(savedRole);
-      setName(currentUserName || localStorage.getItem("gift_participant_name") || (savedRole === "creator" ? "Babe" : "Baby"));
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, [currentUserRole, currentUserName]);
+  const activeGiftId = giftId || "default";
 
   // Fetch reactions and comments from server
   useEffect(() => {
-    fetch(`/api/interactions/reactions?targetType=${targetType}&targetId=${targetId}`)
+    const headers = getUnlockHeaders(activeGiftId);
+    fetch(`/api/interactions/reactions?targetType=${targetType}&targetId=${targetId}&giftId=${activeGiftId}`, { headers })
       .then((res) => res.json())
       .then((data) => {
         if (data.reactions) setReactions(data.reactions);
       })
       .catch(() => {});
 
-    fetch(`/api/interactions/comments?targetType=${targetType}&targetId=${targetId}`)
+    fetch(`/api/interactions/comments?targetType=${targetType}&targetId=${targetId}&giftId=${activeGiftId}`, { headers })
       .then((res) => res.json())
       .then((data) => {
         if (data.comments) setComments(data.comments);
       })
       .catch(() => {});
-  }, [targetType, targetId]);
+  }, [targetType, targetId, activeGiftId]);
 
   const handleToggleReaction = async (emoji: string) => {
     try {
       const res = await fetch("/api/interactions/reactions", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
           targetType,
           targetId,
           emoji,
-          role,
-          name,
+          giftId: activeGiftId,
         }),
       });
       const data = await res.json();
@@ -91,13 +77,12 @@ export function SharedInteractions({
     try {
       const res = await fetch("/api/interactions/comments", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", ...getUnlockHeaders(activeGiftId) },
         body: JSON.stringify({
           targetType,
           targetId,
           content: commentText.trim(),
-          role,
-          name,
+          giftId: activeGiftId,
         }),
       });
       const data = await res.json();
@@ -116,8 +101,9 @@ export function SharedInteractions({
 
   const handleDeleteComment = async (commentId: string) => {
     try {
-      const res = await fetch(`/api/interactions/comments?id=${commentId}&role=${role}`, {
+      const res = await fetch(`/api/interactions/comments?id=${commentId}&giftId=${activeGiftId}`, {
         method: "DELETE",
+        headers: getUnlockHeaders(activeGiftId),
       });
       if (res.ok) {
         setComments((prev) => prev.filter((c) => c.id !== commentId));
@@ -129,7 +115,7 @@ export function SharedInteractions({
   const availableEmojis = targetType === "letter" ? ["❤️", "🥺", "🥰"] : reactionEmojis;
   const groupedReactions = availableEmojis.map((emoji) => {
     const list = reactions.filter((r) => r.emoji === emoji);
-    const hasReacted = list.some((r) => r.author === role);
+    const hasReacted = list.some((r) => r.author === currentUserRole);
     return {
       emoji,
       count: list.length,

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { updateProposalChecklist, verifyAccess } from "@/lib/server-db";
+import { updateProposalChecklist, getDateProposal } from "@/lib/server-db";
+import { requireGiftAccess } from "@/lib/access-guard";
 
 export async function PATCH(
   request: Request,
@@ -7,20 +8,46 @@ export async function PATCH(
 ) {
   try {
     const { id } = await context.params;
-    const body = await request.json();
-    const { checklist, token, role: roleParam, name: nameParam } = body;
+    let body: Record<string, unknown> = {};
+    try {
+      body = (await request.json()) as Record<string, unknown>;
+    } catch {
+      return NextResponse.json({ error: "Malformed request payload" }, { status: 400 });
+    }
+
+    const checklist = body?.checklist;
 
     if (!Array.isArray(checklist)) {
       return NextResponse.json({ error: "Checklist must be an array" }, { status: 400 });
     }
 
-    const auth = token ? verifyAccess(token) : { authorized: true, role: roleParam || "recipient", name: nameParam || "Baby" };
-    const role = (auth.authorized ? auth.role : (roleParam || "recipient")) as "creator" | "recipient";
-    const name = auth.authorized ? auth.name : (nameParam || (role === "creator" ? "Babe" : "Baby"));
+    const url = new URL(request.url);
+    let giftId = (typeof body?.giftId === "string" ? body.giftId : null) || url.searchParams.get("giftId");
 
-    const updatedChecklist = updateProposalChecklist(id, checklist, role, name);
+    if (!giftId) {
+      const p = getDateProposal(id);
+      if (p?.giftId) {
+        giftId = p.giftId;
+      }
+    }
+
+    if (!giftId) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
+    const access = await requireGiftAccess(request, giftId);
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error }, { status: access.status });
+    }
+
+    const proposal = getDateProposal(id);
+    if (!proposal || proposal.giftId !== giftId) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
+    const updatedChecklist = updateProposalChecklist(id, checklist, access.role, access.name);
     if (!updatedChecklist) {
-      return NextResponse.json({ error: "Proposal not found" }, { status: 404 });
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
     }
 
     return NextResponse.json({ success: true, checklist: updatedChecklist });

@@ -24,6 +24,7 @@ const TEST_JWT_SECRET = "test-crypto-secret-key-for-supabase-audit-32-chars-min!
 process.env.SUPABASE_JWT_SECRET = TEST_JWT_SECRET;
 process.env.GIFT_UNLOCK_SECRET = "test-crypto-gift-unlock-secret-min-32-chars-long!";
 process.env.NEXT_PUBLIC_SUPABASE_URL = "https://audit.supabase.co";
+process.env.DATABASE_FILE = process.env.DATABASE_FILE || "test-database.json";
 
 let passedCount = 0;
 let failedCount = 0;
@@ -163,11 +164,26 @@ async function runRegressionSuite() {
     const dataPub = await resPub.json();
     assert(dataPub.gift.status === "published", "Gift status transitions to 'published'");
 
-    // 6. Access Published Gift Publicly
-    const reqPubAccess = new Request(`http://localhost:3000/api/gifts/by-slug/${testGiftSlug}`);
+    // 6a. Access Published Non-Demo Gift Without Credentials (Must Return Locked with Zero Content)
+    const reqPubAccessNoAuth = new Request(`http://localhost:3000/api/gifts/by-slug/${testGiftSlug}`);
+    const resPubAccessNoAuth = await getGiftBySlug(reqPubAccessNoAuth, { params: Promise.resolve({ slug: testGiftSlug }) });
+    assert(resPubAccessNoAuth.status === 200, "Published non-demo gift returns HTTP 200");
+    const dataPubLocked = await resPubAccessNoAuth.json();
+    assert(dataPubLocked.isLocked === true, "Uncredentialed non-demo gift returns isLocked: true");
+    assert(dataPubLocked.gift === undefined, "Locked non-demo gift returns zero gift content");
+    assert(dataPubLocked.unlockToken === undefined, "Locked non-demo gift does not issue unlockToken");
+    assert(typeof dataPubLocked.title === "string", "Safe field 'title' returned");
+    assert(typeof dataPubLocked.recipientNickname === "string", "Safe field 'recipientNickname' returned");
+
+    // 6b. Access Published Gift With Valid Passcode
+    const reqPubAccess = new Request(`http://localhost:3000/api/gifts/by-slug/${testGiftSlug}`, {
+      headers: { "x-gift-passcode": "qa-pass-123" },
+    });
     const resPubAccess = await getGiftBySlug(reqPubAccess, { params: Promise.resolve({ slug: testGiftSlug }) });
-    assert(resPubAccess.status === 200, "Published gift is now accessible publicly (HTTP 200)");
+    assert(resPubAccess.status === 200, "Published gift unlocks with valid credentials (HTTP 200)");
     const dataPubAccess = await resPubAccess.json();
+    assert(Boolean(dataPubAccess.gift), "Unlocked gift returns full gift content");
+    assert(Boolean(dataPubAccess.unlockToken), "Unlocked gift returns HMAC unlockToken");
     assert(
       dataPubAccess.gift.privacy.passcode === undefined,
       "Plaintext passcode is stripped from public recipient payload"
@@ -205,9 +221,14 @@ async function runRegressionSuite() {
     // JOURNEY C: Two-Way Interactions Persistence
     // ----------------------------------------------------
     console.log("\n► [Journey C] Two-Way Interactions (Reactions, Comments, Notebook)");
+    const recipientHeaders = {
+      "Content-Type": "application/json",
+      "x-gift-unlock-token": dataPubAccess.unlockToken || "",
+    };
+
     const reqReaction = new Request("http://localhost:3000/api/interactions/reactions", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: recipientHeaders,
       body: JSON.stringify({
         giftId: testGiftId,
         targetType: "observation",
@@ -222,7 +243,7 @@ async function runRegressionSuite() {
 
     const reqComment = new Request("http://localhost:3000/api/interactions/comments", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: recipientHeaders,
       body: JSON.stringify({
         giftId: testGiftId,
         targetType: "memory",
@@ -237,7 +258,7 @@ async function runRegressionSuite() {
 
     const reqNotebook = new Request("http://localhost:3000/api/notebook", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: recipientHeaders,
       body: JSON.stringify({
         giftId: testGiftId,
         title: "Under the stars",
@@ -266,7 +287,7 @@ async function runRegressionSuite() {
     console.log("\n► [Journey D] Collaborative Date Planner Workflow");
     const reqProposal = new Request("http://localhost:3000/api/dates/proposals", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${creatorToken}` },
       body: JSON.stringify({
         giftId: testGiftId,
         title: "Moonlit Seaside Stroll & Gelato",
@@ -291,7 +312,7 @@ async function runRegressionSuite() {
     // Transition Accept
     const reqAccept = new Request(`http://localhost:3000/api/dates/proposals/${createdProposalId}/transition`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: recipientHeaders,
       body: JSON.stringify({
         action: "accept",
         role: "recipient",
@@ -307,7 +328,7 @@ async function runRegressionSuite() {
     // Transition Complete
     const reqComplete = new Request(`http://localhost:3000/api/dates/proposals/${createdProposalId}/transition`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: recipientHeaders,
       body: JSON.stringify({
         action: "complete",
         role: "recipient",
@@ -320,7 +341,7 @@ async function runRegressionSuite() {
     // Add Memory
     const reqMemory = new Request("http://localhost:3000/api/dates/memories", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: recipientHeaders,
       body: JSON.stringify({
         giftId: testGiftId,
         proposalId: createdProposalId,

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { getDateProposal, verifyAccess } from "@/lib/server-db";
+import { getDateProposal } from "@/lib/server-db";
+import { requireGiftAccess } from "@/lib/access-guard";
 
 export async function GET(
   request: Request,
@@ -8,15 +9,28 @@ export async function GET(
   try {
     const { id } = await context.params;
     const url = new URL(request.url);
-    const token = url.searchParams.get("token") || "";
-    const roleParam = url.searchParams.get("role") || "recipient";
+    let giftId = url.searchParams.get("giftId");
 
-    const auth = token ? verifyAccess(token) : { authorized: true, role: roleParam as "creator" | "recipient" };
-    const role = (auth.authorized ? auth.role : roleParam) as "creator" | "recipient";
+    if (!giftId) {
+      const p = getDateProposal(id);
+      if (p?.giftId) {
+        giftId = p.giftId;
+      }
+    }
 
-    const proposal = getDateProposal(id, role);
-    if (!proposal) {
-      return NextResponse.json({ error: "Proposal not found" }, { status: 404 });
+    if (!giftId) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
+    // Run access check BEFORE looking up the proposal data or gift
+    const access = await requireGiftAccess(request, giftId);
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error }, { status: access.status });
+    }
+
+    const proposal = getDateProposal(id, access.role);
+    if (!proposal || proposal.giftId !== giftId) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
     }
 
     return NextResponse.json({ success: true, proposal });

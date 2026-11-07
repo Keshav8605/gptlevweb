@@ -1,5 +1,13 @@
 import fs from "fs";
 import path from "path";
+import crypto from "crypto";
+import {
+  hashPasscode,
+  verifyPasscode,
+  hashInviteToken,
+  verifyInviteToken,
+  migrateDatabaseSecrets,
+} from "./secrets";
 import type {
   ObservationCard,
   Memory,
@@ -260,6 +268,7 @@ export interface NotificationSettings {
 export interface GiftRecord {
   id: string;
   creatorId?: string;
+  rawInviteToken?: string;
   slug: string;
   title: string;
   status: "draft" | "published" | "unpublished";
@@ -1146,17 +1155,35 @@ const defaultDb: RelationshipDatabase = {
 
 // Data persistence file path
 const DATA_DIR = path.join(process.cwd(), ".data");
-const DATA_FILE = path.join(DATA_DIR, "relationship-database.json");
+
+export function getDataFilePath(): string {
+  const custom = process.env.DATABASE_FILE || process.env.DATA_FILE_PATH;
+  if (custom) {
+    return path.isAbsolute(custom) ? custom : path.join(DATA_DIR, custom);
+  }
+  return path.join(DATA_DIR, "relationship-database.json");
+}
 
 let memoryDb: RelationshipDatabase | null = null;
+let memoryDbPath: string | null = null;
+
+export function resetDatabaseMemory(): void {
+  memoryDb = null;
+  memoryDbPath = null;
+}
 
 export function loadDatabase(): RelationshipDatabase {
-  if (memoryDb) return memoryDb;
+  const dataFile = getDataFilePath();
+  if (memoryDb && memoryDbPath === dataFile) return memoryDb;
 
   try {
-    if (fs.existsSync(DATA_FILE)) {
-      const raw = fs.readFileSync(DATA_FILE, "utf-8");
+    if (fs.existsSync(dataFile)) {
+      let raw = fs.readFileSync(dataFile, "utf-8");
+      if (raw.charCodeAt(0) === 0xfeff) {
+        raw = raw.slice(1);
+      }
       memoryDb = JSON.parse(raw);
+      memoryDbPath = dataFile;
 
       // Auto-migrate if older DB lacks Phase 4 & Phase 5 collections
       let needsSave = false;
@@ -1193,6 +1220,13 @@ export function loadDatabase(): RelationshipDatabase {
         needsSave = true;
       }
 
+      // Security Migration: Hash any remaining plaintext secrets
+      const migrated = migrateDatabaseSecrets(memoryDb!);
+      if (migrated > 0) {
+        console.log(`[Security Migration] Migrated ${migrated} plaintext secret(s) to cryptographic hashes.`);
+        needsSave = true;
+      }
+
       if (needsSave) {
         saveDatabase(memoryDb!);
       }
@@ -1204,11 +1238,14 @@ export function loadDatabase(): RelationshipDatabase {
   }
 
   memoryDb = JSON.parse(JSON.stringify(defaultDb));
+  memoryDbPath = dataFile;
+  migrateDatabaseSecrets(memoryDb!);
   saveDatabase(memoryDb!);
   return memoryDb!;
 }
 
 export function saveDatabase(db: RelationshipDatabase): void {
+  const dataFile = getDataFilePath();
   try {
     if (!fs.existsSync(DATA_DIR)) {
       fs.mkdirSync(DATA_DIR, { recursive: true });
@@ -1222,8 +1259,9 @@ export function saveDatabase(db: RelationshipDatabase): void {
 
     try {
       fs.writeFileSync(tempFile, payload, "utf-8");
-      fs.renameSync(tempFile, DATA_FILE);
+      fs.renameSync(tempFile, dataFile);
       memoryDb = db;
+      memoryDbPath = dataFile;
     } catch (writeErr) {
       if (fs.existsSync(tempFile)) {
         try {
@@ -1244,12 +1282,23 @@ export function saveDatabase(db: RelationshipDatabase): void {
 
 // ==================== AUTH & ACCESS ====================
 
-export function verifyAccess(tokenOrPasscode: string): {
+export function verifyAccess(tokenOrPasscode: string, giftId?: string): {
   authorized: boolean;
   role: "creator" | "recipient" | "guest";
   name: string;
   error?: string;
 } {
+  const normalizedGiftId = (giftId || "gift_world_demo").trim();
+  // db.config is strictly scoped to the primary demo gift ("gift_world_demo")
+  if (normalizedGiftId !== "gift_world_demo") {
+    return {
+      authorized: false,
+      role: "guest",
+      name: "Guest",
+      error: "Global configuration access is only valid for the primary demo gift (gift_world_demo).",
+    };
+  }
+
   const db = loadDatabase();
   const normalized = (tokenOrPasscode || "").trim();
 
@@ -1258,14 +1307,24 @@ export function verifyAccess(tokenOrPasscode: string): {
   }
 
   // Check creator passcode
-  if (normalized === db.config.creatorPasscode) {
+  const creatorCheck = verifyPasscode(normalized, db.config.creatorPasscode);
+  if (creatorCheck.valid) {
+    if (creatorCheck.needsRehash) {
+      db.config.creatorPasscode = hashPasscode(normalized);
+      saveDatabase(db);
+    }
     return { authorized: true, role: "creator", name: db.config.creatorName };
   }
 
   // Check recipient invite token
-  if (normalized === db.config.recipientInviteToken) {
+  const tokenCheck = verifyInviteToken(normalized, db.config.recipientInviteToken);
+  if (tokenCheck.valid) {
     if (db.config.invitationStatus === "revoked") {
       return { authorized: false, role: "guest", name: "Guest", error: "This invitation link has been revoked by the creator." };
+    }
+    if (tokenCheck.needsRehash) {
+      db.config.recipientInviteToken = hashInviteToken(normalized);
+      saveDatabase(db);
     }
     return { authorized: true, role: "recipient", name: db.config.recipientName };
   }
@@ -1296,7 +1355,14 @@ export function getFullCoupleConfigForCreator() {
 
 export function updateCoupleConfig(updates: Partial<RelationshipDatabase["config"]>) {
   const db = loadDatabase();
-  db.config = { ...db.config, ...updates };
+  const safeUpdates = { ...updates };
+  if (safeUpdates.recipientInviteToken && !safeUpdates.recipientInviteToken.startsWith("sha256$")) {
+    safeUpdates.recipientInviteToken = hashInviteToken(safeUpdates.recipientInviteToken);
+  }
+  if (safeUpdates.creatorPasscode && !safeUpdates.creatorPasscode.startsWith("scrypt$")) {
+    safeUpdates.creatorPasscode = hashPasscode(safeUpdates.creatorPasscode);
+  }
+  db.config = { ...db.config, ...safeUpdates };
   saveDatabase(db);
   return db.config;
 }
@@ -1380,13 +1446,15 @@ export function addComment(
   return newComment;
 }
 
-export function deleteComment(id: string, role: "creator" | "recipient") {
+export function deleteComment(id: string, role: "creator" | "recipient", authorName?: string) {
   const db = loadDatabase();
   const idx = db.comments.findIndex((c) => c.id === id);
   if (idx === -1) return false;
 
-  if (role !== "creator" && db.comments[idx].author !== role) {
-    return false;
+  const comment = db.comments[idx];
+  if (role !== "creator") {
+    if (comment.author !== role) return false;
+    if (authorName && comment.authorName?.trim().toLowerCase() !== authorName.trim().toLowerCase()) return false;
   }
 
   db.comments.splice(idx, 1);
@@ -1633,13 +1701,15 @@ export function addVoiceMessage(
   return newMsg;
 }
 
-export function deleteVoiceMessage(id: string, role: "creator" | "recipient") {
+export function deleteVoiceMessage(id: string, role: "creator" | "recipient", authorName?: string) {
   const db = loadDatabase();
   const idx = db.voiceMessages.findIndex((v) => v.id === id);
   if (idx === -1) return false;
 
-  if (role !== "creator" && db.voiceMessages[idx].sender !== role) {
-    return false;
+  const msg = db.voiceMessages[idx];
+  if (role !== "creator") {
+    if (msg.sender !== role) return false;
+    if (authorName && msg.senderName?.trim().toLowerCase() !== authorName.trim().toLowerCase()) return false;
   }
 
   db.voiceMessages.splice(idx, 1);
@@ -1740,9 +1810,16 @@ export function deleteDateIdea(id: string, role: "creator" | "recipient"): boole
 
 // ==================== DATE PLANNER: PREFERENCES & SHORTLIST ====================
 
-export function getDatePreferences(participantRole: "creator" | "recipient"): DatePreference[] {
+export function getDatePreferences(
+  participantRole: "creator" | "recipient",
+  giftId?: string
+): DatePreference[] {
   const db = loadDatabase();
-  return db.datePreferences.filter((p) => p.participantRole === participantRole);
+  let list = db.datePreferences.filter((p) => p.participantRole === participantRole);
+  if (giftId) {
+    list = list.filter((p) => !(p as { giftId?: string }).giftId || (p as { giftId?: string }).giftId === giftId);
+  }
+  return list;
 }
 
 export function updateDatePreference(
@@ -1816,9 +1893,14 @@ function maskSurpriseForRecipient(
   return proposal;
 }
 
-export function getDateProposals(viewerRole?: "creator" | "recipient" | "guest"): DateProposal[] {
+export function getDateProposals(
+  viewerRole?: "creator" | "recipient" | "guest",
+  giftId?: string
+): DateProposal[] {
   const db = loadDatabase();
-  return db.dateProposals
+  let list = db.dateProposals;
+  if (giftId) list = list.filter((p) => p.giftId === giftId);
+  return list
     .map((p) => maskSurpriseForRecipient(p, viewerRole))
     .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
 }
@@ -2166,9 +2248,11 @@ export function updateProposalChecklist(
 
 // ==================== DATE PLANNER: MEMORIES ====================
 
-export function getDateMemories(): DateMemory[] {
+export function getDateMemories(giftId?: string): DateMemory[] {
   const db = loadDatabase();
-  return [...db.dateMemories].sort(
+  let list = db.dateMemories;
+  if (giftId) list = list.filter((m) => m.giftId === giftId);
+  return [...list].sort(
     (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 }
@@ -2176,13 +2260,14 @@ export function getDateMemories(): DateMemory[] {
 export function addDateMemory(
   data: Partial<DateMemory>,
   authorRole: "creator" | "recipient",
-  authorName: string
+  authorName: string,
+  giftId?: string
 ): DateMemory {
   const db = loadDatabase();
 
   const newMemory: DateMemory = {
     id: `dmem_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
-    giftId: data.giftId,
+    giftId: giftId || data.giftId,
     proposalId: data.proposalId,
     dateTitle: (data.dateTitle || "Our Little Adventure").trim(),
     completedDate: data.completedDate || new Date().toISOString().split("T")[0],
@@ -2203,14 +2288,15 @@ export function addDateMemory(
   return newMemory;
 }
 
-export function deleteDateMemory(id: string, role: "creator" | "recipient"): boolean {
+export function deleteDateMemory(id: string, role: "creator" | "recipient", authorName?: string): boolean {
   const db = loadDatabase();
   const idx = db.dateMemories.findIndex((m) => m.id === id);
   if (idx === -1) return false;
 
   const mem = db.dateMemories[idx];
-  if (role !== "creator" && mem.authorRole !== role) {
-    return false;
+  if (role !== "creator") {
+    if (mem.authorRole !== role) return false;
+    if (authorName && mem.authorName?.trim().toLowerCase() !== authorName.trim().toLowerCase()) return false;
   }
 
   db.dateMemories.splice(idx, 1);
@@ -2259,12 +2345,22 @@ export function createNotification(
   return notif;
 }
 
-export function getDateNotifications(targetRole?: "creator" | "recipient" | "guest"): DateNotification[] {
+export function getDateNotifications(
+  targetRole?: "creator" | "recipient" | "guest",
+  giftId?: string
+): DateNotification[] {
   const db = loadDatabase();
   if (!targetRole || targetRole === "guest") return [];
-  return db.dateNotifications.filter(
+  let list = db.dateNotifications.filter(
     (n) => n.targetRole === targetRole || n.targetRole === "both"
   );
+  if (giftId) {
+    const giftProposalIds = new Set(
+      db.dateProposals.filter((p) => p.giftId === giftId).map((p) => p.id)
+    );
+    list = list.filter((n) => !n.proposalId || giftProposalIds.has(n.proposalId));
+  }
+  return list;
 }
 
 export function markNotificationsAsRead(
@@ -2491,6 +2587,11 @@ export function createGift(data: Partial<GiftRecord>, creatorId?: string): GiftR
     "finalHeart",
   ];
 
+  const rawInviteToken =
+    data.privacy?.recipientInviteToken && !data.privacy.recipientInviteToken.startsWith("sha256$")
+      ? data.privacy.recipientInviteToken
+      : crypto.randomBytes(32).toString("hex");
+
   const newGift: GiftRecord = {
     id: `gift_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
     creatorId: creatorId || data.creatorId,
@@ -2520,7 +2621,9 @@ export function createGift(data: Partial<GiftRecord>, creatorId?: string): GiftR
     enabledSections: data.enabledSections && data.enabledSections.length > 0 ? data.enabledSections : allDefaultSections,
     sectionOrder: data.sectionOrder && data.sectionOrder.length > 0 ? data.sectionOrder : allDefaultSections,
     customMilestones: data.customMilestones,
-    secretPassword: data.secretPassword || "iloveyou",
+    secretPassword: data.secretPassword
+      ? (data.secretPassword.startsWith("scrypt$") ? data.secretPassword : hashPasscode(data.secretPassword))
+      : undefined,
     secretHint: data.secretHint || "What I always whisper to you...",
     secretContent: data.secretContent || "You are the greatest dream my heart has ever dared to imagine.",
     featuredSong: data.featuredSong || {
@@ -2554,8 +2657,10 @@ export function createGift(data: Partial<GiftRecord>, creatorId?: string): GiftR
     designPreferences: data.designPreferences,
     privacy: {
       isPasswordProtected: data.privacy?.isPasswordProtected ?? false,
-      passcode: data.privacy?.passcode || "love2024",
-      recipientInviteToken: data.privacy?.recipientInviteToken || `sweetheart-${Math.random().toString(36).slice(2, 6)}`,
+      passcode: data.privacy?.passcode
+        ? (data.privacy.passcode.startsWith("scrypt$") ? data.privacy.passcode : hashPasscode(data.privacy.passcode))
+        : hashPasscode("love2024"),
+      recipientInviteToken: hashInviteToken(rawInviteToken),
       invitationStatus: data.privacy?.invitationStatus || "active",
       allowResponses: data.privacy?.allowResponses ?? true,
       allowRecipientContributions: data.privacy?.allowRecipientContributions ?? true,
@@ -2564,6 +2669,7 @@ export function createGift(data: Partial<GiftRecord>, creatorId?: string): GiftR
 
   db.gifts.push(newGift);
   saveDatabase(db);
+  newGift.rawInviteToken = rawInviteToken;
   return newGift;
 }
 
@@ -3270,7 +3376,11 @@ export function updateGift(id: string, updates: Partial<GiftRecord>): GiftRecord
       ? { isPasswordProtected: Boolean(updates.privacy.isPasswordProtected) }
       : {}),
     ...(typeof updates.privacy?.passcode === "string"
-      ? { passcode: updates.privacy.passcode.slice(0, 50) }
+      ? {
+          passcode: updates.privacy.passcode.startsWith("scrypt$")
+            ? updates.privacy.passcode
+            : hashPasscode(updates.privacy.passcode.slice(0, 50)),
+        }
       : {}),
     ...(updates.privacy?.allowResponses !== undefined
       ? { allowResponses: Boolean(updates.privacy.allowResponses) }
@@ -3291,6 +3401,13 @@ export function updateGift(id: string, updates: Partial<GiftRecord>): GiftRecord
     if (field in updates && (updates as Record<string, unknown>)[field] !== undefined) {
       (sanitizedUpdates as Record<string, unknown>)[field] = (updates as Record<string, unknown>)[field];
     }
+  }
+
+  // If secretPassword is being updated, hash it
+  if (typeof updates.secretPassword === "string") {
+    sanitizedUpdates.secretPassword = updates.secretPassword.startsWith("scrypt$")
+      ? updates.secretPassword
+      : hashPasscode(updates.secretPassword.slice(0, 50));
   }
 
   const updated: GiftRecord = {
@@ -3337,7 +3454,7 @@ export function duplicateGift(id: string, newCreatorId?: string): GiftRecord | n
     publishedAt: undefined,
     privacy: {
       ...existing.privacy,
-      recipientInviteToken: `sweetheart-${Math.random().toString(36).slice(2, 6)}`,
+      recipientInviteToken: hashInviteToken(crypto.randomBytes(32).toString("hex")),
       invitationStatus: "active",
     },
   };
@@ -3465,8 +3582,6 @@ export function getMediaAssets(giftId?: string): MediaAsset[] {
 export function addMediaAsset(
   asset: Omit<MediaAsset, "id" | "createdAt">
 ): { success: boolean; asset?: MediaAsset; error?: string } {
-  const db = loadDatabase();
-
   const isImage = ALLOWED_IMAGE_MIMES.includes(asset.mimeType);
   const isAudio = ALLOWED_AUDIO_MIMES.includes(asset.mimeType);
 

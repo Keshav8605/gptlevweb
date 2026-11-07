@@ -1,7 +1,8 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState } from "react";
+import { storeUnlockToken } from "@/lib/client-auth";
 
 interface ParticipantAccessModalProps {
   isOpen: boolean;
@@ -9,14 +10,16 @@ interface ParticipantAccessModalProps {
   onRoleChange?: (role: "creator" | "recipient", name: string) => void;
   currentRole?: "creator" | "recipient" | "guest";
   currentName?: string;
+  giftId?: string;
 }
 
 export function ParticipantAccessModal({
   isOpen,
   onClose,
   onRoleChange,
-  currentRole: propRole,
-  currentName: propName,
+  currentRole = "recipient",
+  currentName = "Baby",
+  giftId,
 }: ParticipantAccessModalProps) {
   const [tokenInput, setTokenInput] = useState("");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
@@ -26,27 +29,6 @@ export function ParticipantAccessModal({
     return `${window.location.origin}/?invite=sweetheart`;
   });
   const [copiedLink, setCopiedLink] = useState(false);
-
-  // Read role and name dynamically
-  const [currentRole, setCurrentRole] = useState<"creator" | "recipient" | "guest">(() => {
-    if (typeof window === "undefined") return propRole || "recipient";
-    return propRole || (localStorage.getItem("gift_participant_role") as "creator" | "recipient") || "recipient";
-  });
-  const [currentName, setCurrentName] = useState<string>(() => {
-    if (typeof window === "undefined") return propName || "Baby";
-    return propName || localStorage.getItem("gift_participant_name") || "Baby";
-  });
-
-  useEffect(() => {
-    const handleStorage = () => {
-      const role = propRole || (localStorage.getItem("gift_participant_role") as "creator" | "recipient") || "recipient";
-      const name = propName || localStorage.getItem("gift_participant_name") || (role === "creator" ? "Babe" : "Baby");
-      setCurrentRole(role);
-      setCurrentName(name);
-    };
-    window.addEventListener("storage", handleStorage);
-    return () => window.removeEventListener("storage", handleStorage);
-  }, [propRole, propName]);
 
   const handleVerify = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -59,20 +41,15 @@ export function ParticipantAccessModal({
       const res = await fetch("/api/auth/access", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ token: tokenInput.trim() }),
+        body: JSON.stringify({ token: tokenInput.trim(), giftId }),
       });
 
       const data = await res.json();
       if (res.ok && data.authorized) {
+        if (data.unlockToken) {
+          storeUnlockToken("default", data.unlockToken, giftId);
+        }
         if (onRoleChange) onRoleChange(data.role, data.name);
-        try {
-          localStorage.setItem("gift_auth_token", tokenInput.trim());
-          localStorage.setItem("gift_participant_role", data.role);
-          localStorage.setItem("gift_participant_name", data.name);
-          setCurrentRole(data.role);
-          setCurrentName(data.name);
-          window.dispatchEvent(new Event("storage"));
-        } catch {}
         onClose();
         setTokenInput("");
       } else {
@@ -92,52 +69,6 @@ export function ParticipantAccessModal({
         setTimeout(() => setCopiedLink(false), 2000);
       });
     }
-  };
-
-  const handleQuickSwitch = (role: "creator" | "recipient") => {
-    const token = role === "creator" ? "love2024" : "sweetheart";
-    const name = role === "creator" ? "Babe" : "Baby";
-    setTokenInput(token);
-    setIsLoading(true);
-    fetch("/api/auth/access", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ token }),
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        if (data.authorized) {
-          if (onRoleChange) onRoleChange(data.role, data.name);
-          try {
-            localStorage.setItem("gift_auth_token", token);
-            localStorage.setItem("gift_participant_role", data.role);
-            localStorage.setItem("gift_participant_name", data.name);
-            setCurrentRole(data.role);
-            setCurrentName(data.name);
-            window.dispatchEvent(new Event("storage"));
-          } catch {}
-          onClose();
-        } else {
-          // Direct fallback
-          if (onRoleChange) onRoleChange(role, name);
-          localStorage.setItem("gift_participant_role", role);
-          localStorage.setItem("gift_participant_name", name);
-          setCurrentRole(role);
-          setCurrentName(name);
-          window.dispatchEvent(new Event("storage"));
-          onClose();
-        }
-      })
-      .catch(() => {
-        if (onRoleChange) onRoleChange(role, name);
-        localStorage.setItem("gift_participant_role", role);
-        localStorage.setItem("gift_participant_name", name);
-        setCurrentRole(role);
-        setCurrentName(name);
-        window.dispatchEvent(new Event("storage"));
-        onClose();
-      })
-      .finally(() => setIsLoading(false));
   };
 
   return (
@@ -188,49 +119,16 @@ export function ParticipantAccessModal({
               </span>
             </div>
 
-            {/* Quick Switch for Testing */}
-            <div className="space-y-2">
-              <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-                Quick-Switch Participant (for 2-way testing):
-              </label>
-              <div className="grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={() => handleQuickSwitch("recipient")}
-                  className={`p-3 rounded-2xl text-xs font-semibold border transition-all cursor-pointer flex flex-col items-center gap-1 ${
-                    currentRole === "recipient"
-                      ? "bg-[var(--pale-rose)] border-[var(--pink-strong)] text-[var(--pink-deep)]"
-                      : "bg-white border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--pink-primary)]"
-                  }`}
-                >
-                  <span className="text-lg">💌</span>
-                  <span>Switch to Recipient</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => handleQuickSwitch("creator")}
-                  className={`p-3 rounded-2xl text-xs font-semibold border transition-all cursor-pointer flex flex-col items-center gap-1 ${
-                    currentRole === "creator"
-                      ? "bg-[var(--pale-rose)] border-[var(--pink-strong)] text-[var(--pink-deep)]"
-                      : "bg-white border-[var(--border-subtle)] text-[var(--text-secondary)] hover:border-[var(--pink-primary)]"
-                  }`}
-                >
-                  <span className="text-lg">✏️</span>
-                  <span>Switch to Creator</span>
-                </button>
-              </div>
-            </div>
-
             {/* Passcode verification form */}
             <form onSubmit={handleVerify} className="space-y-3 pt-2">
               <label className="block text-xs font-semibold text-[var(--text-secondary)]">
-                Or enter Invitation Token / Creator Passcode:
+                Enter Invitation Token or Passcode:
               </label>
               <input
-                type="text"
+                type="password"
                 value={tokenInput}
                 onChange={(e) => setTokenInput(e.target.value)}
-                placeholder="e.g. sweetheart or love2024"
+                placeholder="Enter passcode or invite token..."
                 className="w-full text-xs p-3 rounded-xl border border-[var(--border-medium)] focus:border-[var(--pink-primary)] focus:outline-none"
               />
 

@@ -5,6 +5,8 @@ export async function proxy(request: NextRequest) {
   return await updateSession(request);
 }
 
+export { proxy as middleware };
+
 export const config = {
   matcher: [
     /*

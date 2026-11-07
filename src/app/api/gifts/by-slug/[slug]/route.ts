@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getGiftBySlug } from "@/lib/server-db";
 import { getAuthenticatedCreator, createGiftUnlockToken } from "@/lib/auth-guard";
+import { verifyPasscode, verifyInviteToken } from "@/lib/secrets";
 
 /**
  * Extracts gift access credentials with secure header priority:
@@ -82,10 +83,18 @@ async function handleGiftAccessBySlug(
       Boolean(gift.creatorId) &&
       gift.creatorId === auth.userId;
 
+    const inviteCheck = Boolean(token) && verifyInviteToken(token, gift.privacy?.recipientInviteToken);
     const isRecipient =
-      Boolean(token) &&
-      token === gift.privacy?.recipientInviteToken &&
+      Boolean(inviteCheck && inviteCheck.valid) &&
       gift.privacy?.invitationStatus === "active";
+
+    const isDemoGift = gift.id === "gift_world_demo";
+
+    const passcodeCheck =
+      Boolean(passcode) &&
+      Boolean(gift.privacy?.passcode) &&
+      verifyPasscode(passcode, gift.privacy?.passcode);
+    const isPasscodeUnlocked = Boolean(passcodeCheck && passcodeCheck.valid);
 
     // 1. Enforce strict draft authorization:
     // A passcode alone must NEVER authorize access to an unpublished draft.
@@ -102,18 +111,32 @@ async function handleGiftAccessBySlug(
       }
     }
 
-    // 2. Check password protection for published gifts (or non-owners)
-    if (gift.privacy?.isPasswordProtected && !isOwner) {
-      const isPasscodeUnlocked = Boolean(passcode) && passcode === gift.privacy.passcode;
-      if (!isPasscodeUnlocked && !isRecipient) {
-        return NextResponse.json({
-          success: true,
-          isLocked: true,
-          giftId: gift.id,
-          title: gift.title,
-          recipientNickname: gift.recipientNickname,
-        });
-      }
+    // 2. Lock check:
+    // Policy change: for every gift except gift_world_demo, GET /api/gifts/by-slug/[slug]
+    // must return isLocked: true (title and recipientNickname only) unless the caller presents:
+    // - a valid passcode for this specific gift,
+    // - a valid invite token for this specific gift, or
+    // - is the owning creator.
+    // This applies even when privacy.isPasswordProtected is false.
+    if (!isDemoGift && !isOwner && !isRecipient && !isPasscodeUnlocked) {
+      return NextResponse.json({
+        success: true,
+        isLocked: true,
+        giftId: gift.id,
+        title: gift.title,
+        recipientNickname: gift.recipientNickname,
+      });
+    }
+
+    // Demo gift password-protection check (if demo was configured with a passcode)
+    if (isDemoGift && gift.privacy?.isPasswordProtected && !isOwner && !isRecipient && !isPasscodeUnlocked) {
+      return NextResponse.json({
+        success: true,
+        isLocked: true,
+        giftId: gift.id,
+        title: gift.title,
+        recipientNickname: gift.recipientNickname,
+      });
     }
 
     // 3. If caller is not verified owner, sanitize sensitive creator secrets and tokens
@@ -129,20 +152,50 @@ async function handleGiftAccessBySlug(
           allowRecipientContributions: gift.privacy?.allowRecipientContributions ?? true,
         },
       };
+
+      const hasRecipientCredentials = isRecipient || isPasscodeUnlocked;
+
+      // For anonymous callers on the demo gift (unprotected demo preview):
+      // Keep demo open (gift content returned), but do NOT issue an unlockToken or recipient role.
+      // Collaborative writes remain rejected for anonymous visitors.
+      if (!hasRecipientCredentials && isDemoGift) {
+        return NextResponse.json({
+          success: true,
+          gift: sanitizedGift,
+          role: "guest",
+          name: "Guest",
+        });
+      }
+
       let unlockToken: string | undefined;
       try {
         unlockToken = createGiftUnlockToken(gift.id);
-      } catch (tokenErr) {
-        if (gift.privacy?.isPasswordProtected) {
-          console.error("Failed to generate unlock token for password-protected gift.");
-          return NextResponse.json(
-            { error: "Server configuration error: unable to generate unlock authorization." },
-            { status: 500 }
-          );
-        }
+      } catch {
+        console.error("Failed to generate unlock token.");
+        return NextResponse.json(
+          { error: "Server configuration error: unable to generate unlock authorization." },
+          { status: 500 }
+        );
       }
-      return NextResponse.json({ success: true, gift: sanitizedGift, unlockToken });
+      return NextResponse.json({
+        success: true,
+        gift: sanitizedGift,
+        unlockToken,
+        role: "recipient",
+        name: gift.recipientNickname || gift.recipientName || "Baby",
+      });
     }
+
+    // Safe owner view: never expose raw passcodes or hashes
+    const sanitizedOwnerGift = {
+      ...gift,
+      secretPassword: undefined,
+      privacy: {
+        ...gift.privacy,
+        passcode: undefined,
+        recipientInviteToken: undefined,
+      },
+    };
 
     let unlockToken: string | undefined;
     try {
@@ -150,7 +203,13 @@ async function handleGiftAccessBySlug(
     } catch {
       // Non-blocking for owner view
     }
-    return NextResponse.json({ success: true, gift, unlockToken });
+    return NextResponse.json({
+      success: true,
+      gift: sanitizedOwnerGift,
+      unlockToken,
+      role: "creator",
+      name: gift.senderName || gift.senderNickname || "Babe",
+    });
   } catch {
     console.error("Failed to process gift request by slug.");
     return NextResponse.json({ error: "Failed to fetch gift" }, { status: 500 });

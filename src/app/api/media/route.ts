@@ -2,6 +2,7 @@ import path from "path";
 import { NextResponse } from "next/server";
 import { getMediaAssets, deleteMediaAsset, getMediaAssetById, getGiftById, getGifts } from "@/lib/server-db";
 import { getAuthenticatedCreator, verifyGiftUnlockToken } from "@/lib/auth-guard";
+import { verifyInviteToken } from "@/lib/secrets";
 
 export async function GET(request: Request) {
   try {
@@ -13,11 +14,7 @@ export async function GET(request: Request) {
     if (auth.authenticated && auth.userId) {
       if (giftId) {
         const gift = getGiftById(giftId);
-        if (!gift) {
-          return NextResponse.json({ error: "Gift not found." }, { status: 404 });
-        }
-        // Strict ownership: creator can only access media belonging to their own gift
-        if (!gift.creatorId || gift.creatorId !== auth.userId) {
+        if (!gift || !gift.creatorId || gift.creatorId !== auth.userId) {
           return NextResponse.json(
             { error: "Forbidden. You cannot access media for another creator's gift." },
             { status: 403 }
@@ -40,55 +37,40 @@ export async function GET(request: Request) {
     }
 
     // Case 2: Unauthenticated or recipient request
-    // Reject requests with missing giftId upfront (unauthenticated GET /api/media)
+    // Reject requests with missing giftId upfront
     if (!giftId) {
       return NextResponse.json(
-        { error: "Authentication or valid published gift ID required to access media." },
+        { error: "Authentication required." },
         { status: 401 }
       );
     }
 
-    const gift = getGiftById(giftId);
-    if (!gift) {
-      return NextResponse.json({ error: "Gift not found." }, { status: 404 });
-    }
+    // Check credentials BEFORE looking up the gift
+    const unlockToken =
+      request.headers.get("x-unlock-token") ||
+      request.headers.get("x-gift-unlock-token") ||
+      url.searchParams.get("unlockToken") ||
+      "";
 
-    // Check if recipient is authorized via active invitation token
     const token =
       url.searchParams.get("token") ||
       url.searchParams.get("invite") ||
       url.searchParams.get("inviteToken") ||
       request.headers.get("x-invite-token") ||
+      request.headers.get("x-invitation-token") ||
       "";
 
-    const hasActiveInvite =
-      Boolean(token) &&
-      token === gift.privacy?.recipientInviteToken &&
-      gift.privacy?.invitationStatus === "active";
-
-    // 1. Unpublished drafts: require valid active recipient invitation token
-    if (gift.status !== "published") {
-      if (!hasActiveInvite) {
-        return NextResponse.json(
-          { error: "Forbidden. Media cannot be accessed for an unpublished or unauthorized gift." },
-          { status: 403 }
-        );
-      }
-      const assets = getMediaAssets(giftId).filter((a) => a.giftId === giftId);
-      return NextResponse.json({ success: true, assets });
+    // If caller lacks valid creator auth or a valid unlock token (or invite token)
+    if (!unlockToken && !token) {
+      return NextResponse.json(
+        { error: "Authentication required." },
+        { status: 401 }
+      );
     }
 
-    // 2. Published gifts: if password-protected, require valid unexpired unlock authorization
-    if (gift.privacy?.isPasswordProtected) {
-      // Prefer secure header-based authorization to avoid recording sensitive tokens in URLs and server access logs
-      const unlockToken =
-        request.headers.get("x-unlock-token") ||
-        request.headers.get("x-gift-unlock-token") ||
-        url.searchParams.get("unlockToken") ||
-        (token.split(".").length === 3 && !token.startsWith("eyJ") ? token : "") ||
-        "";
-
-      const unlockVerification = verifyGiftUnlockToken(unlockToken, gift.id);
+    // If unlock token provided, verify it cryptographically before looking up gift
+    if (unlockToken) {
+      const unlockVerification = verifyGiftUnlockToken(unlockToken, giftId);
       if (!unlockVerification.valid) {
         return NextResponse.json(
           {
@@ -99,9 +81,34 @@ export async function GET(request: Request) {
           { status: 403 }
         );
       }
+
+      const gift = getGiftById(giftId);
+      if (!gift) {
+        return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+      }
+
+      const assets = getMediaAssets(giftId).filter((a) => a.giftId === giftId);
+      return NextResponse.json({ success: true, assets });
     }
 
-    // 3. Ordinary published gifts (or verified unlocked password-protected gifts)
+    // Invitation token flow
+    const gift = getGiftById(giftId);
+    if (!gift) {
+      return NextResponse.json({ error: "Authentication required." }, { status: 401 });
+    }
+
+    const inviteCheck = Boolean(token) && verifyInviteToken(token, gift.privacy?.recipientInviteToken);
+    const hasActiveInvite =
+      Boolean(inviteCheck && inviteCheck.valid) &&
+      gift.privacy?.invitationStatus === "active";
+
+    if (!hasActiveInvite) {
+      return NextResponse.json(
+        { error: "Forbidden. Media cannot be accessed for an unpublished or unauthorized gift." },
+        { status: 403 }
+      );
+    }
+
     const assets = getMediaAssets(giftId).filter((a) => a.giftId === giftId);
     return NextResponse.json({ success: true, assets });
   } catch (err) {
@@ -116,8 +123,8 @@ export async function DELETE(request: Request) {
     const auth = await getAuthenticatedCreator(request);
     if (!auth.authenticated || !auth.userId) {
       return NextResponse.json(
-        { error: auth.error || "Creator authentication required to delete media assets." },
-        { status: auth.statusCode || 401 }
+        { error: "Authentication required." },
+        { status: 401 }
       );
     }
 
@@ -128,14 +135,9 @@ export async function DELETE(request: Request) {
       return NextResponse.json({ error: "Media asset ID required." }, { status: 400 });
     }
 
-    // 2. Locate asset and verify existence
+    // 2. Locate asset and verify existence and creator ownership
     const asset = getMediaAssetById(id);
-    if (!asset) {
-      return NextResponse.json({ error: "Media asset not found." }, { status: 404 });
-    }
-
-    // 3. Reject assets with missing ownership information
-    if (!asset.creatorId || asset.creatorId !== auth.userId) {
+    if (!asset || !asset.creatorId || asset.creatorId !== auth.userId) {
       return NextResponse.json(
         { error: "Forbidden. Media asset lacks creator ownership or does not belong to you." },
         { status: 403 }

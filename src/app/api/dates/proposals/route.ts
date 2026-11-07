@@ -2,19 +2,23 @@ import { NextResponse } from "next/server";
 import {
   getDateProposals,
   createDateProposal,
-  verifyAccess,
 } from "@/lib/server-db";
+import { requireGiftAccess } from "@/lib/access-guard";
 
 export async function GET(request: Request) {
   try {
     const url = new URL(request.url);
-    const token = url.searchParams.get("token") || "";
-    const roleParam = url.searchParams.get("role") || "";
+    const giftId = url.searchParams.get("giftId");
+    if (!giftId) {
+      return NextResponse.json({ error: "giftId parameter is required" }, { status: 400 });
+    }
 
-    const auth = token ? verifyAccess(token) : { authorized: false, role: (roleParam === "creator" ? "creator" : "recipient") as "creator" | "recipient", name: roleParam === "creator" ? "Babe" : "Baby" };
-    const effectiveRole = auth.authorized ? auth.role : ((roleParam === "creator" ? "creator" : "recipient") as "creator" | "recipient");
+    const access = await requireGiftAccess(request, giftId);
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error }, { status: access.status });
+    }
 
-    const proposals = getDateProposals(effectiveRole);
+    const proposals = getDateProposals(access.role, giftId);
     return NextResponse.json({ success: true, proposals });
   } catch (err) {
     console.error("GET /api/dates/proposals error:", err);
@@ -24,17 +28,30 @@ export async function GET(request: Request) {
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json();
-    const token = body.token || "";
-    const roleParam = body.proposerRole || body.role || "creator";
-    const nameParam = body.proposerName || (roleParam === "creator" ? "Babe" : "Baby");
-    const dedupeKey = body.dedupeKey;
+    let body: Record<string, unknown> = {};
+    try {
+      body = (await request.json()) as Record<string, unknown>;
+    } catch {
+      return NextResponse.json({ error: "Malformed request payload" }, { status: 400 });
+    }
 
-    const auth = token ? verifyAccess(token) : { authorized: true, role: roleParam, name: nameParam };
-    const role = (auth.authorized ? auth.role : roleParam) as "creator" | "recipient";
-    const name = auth.authorized ? auth.name : nameParam;
+    const url = new URL(request.url);
+    const giftId = (typeof body?.giftId === "string" ? body.giftId : null) || url.searchParams.get("giftId");
+    if (!giftId) {
+      return NextResponse.json({ error: "giftId is required" }, { status: 400 });
+    }
 
-    if (!body.title || !body.title.trim()) {
+    const access = await requireGiftAccess(request, giftId);
+    if (!access.authorized) {
+      return NextResponse.json({ error: access.error }, { status: access.status });
+    }
+
+    const dedupeKey = typeof body.dedupeKey === "string" ? body.dedupeKey : undefined;
+    const role = access.role;
+    const name = access.name;
+
+    const title = typeof body.title === "string" ? body.title : "";
+    if (!title.trim()) {
       return NextResponse.json({ error: "Title is required for a date proposal" }, { status: 400 });
     }
 
@@ -42,7 +59,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "A proposed date is required" }, { status: 400 });
     }
 
-    const created = createDateProposal(body, role, name, dedupeKey);
+    const created = createDateProposal({ ...(body as unknown as Parameters<typeof createDateProposal>[0]), giftId }, role, name, dedupeKey);
     return NextResponse.json({ success: true, proposal: created });
   } catch (err) {
     console.error("POST /api/dates/proposals error:", err);
